@@ -46,7 +46,7 @@ Objective: maximize validation balanced accuracy for imagined both-fists (T1) vs
 Rules:
 - Propose only a config from the allowed surface (packet.surface). Every config needs method, band, window, channels, plus C for bandpower_lr or n_components for csp_lda.
 - Only propose configs that are ELIGIBLE: the channel set's count must be <= goal.constraints.max_channels.
-- Only propose configs that have NOT been tried. Tried configs appear in incumbent, pending and recent.
+- Only propose configs that have NOT been tried. Every tried config is listed in tried; never propose one of those.
 - Cite evidence by id in evidence_ids. Use only ids that appear in the packet: experiment_id values, memory_id values, or source_ids of retrieved memories.
 - Never state a metric number that is not in the packet. You do not compute results; code does.
 - Rationale: at most 2 sentences.
@@ -110,7 +110,8 @@ def packet_evidence_ids(packet: dict) -> set[str]:
     inc = packet.get("incumbent")
     if inc and inc.get("experiment_id"):
         ids.add(inc["experiment_id"])
-    for row in packet.get("pending", []) + packet.get("recent", []):
+    for row in (packet.get("pending", []) + packet.get("recent", [])
+                + packet.get("leaders", []) + packet.get("laggards", [])):
         if row.get("experiment_id"):
             ids.add(row["experiment_id"])
     for m in packet.get("retrieved", []):
@@ -165,8 +166,9 @@ def fallback_config(packet: dict) -> dict | None:
 # --------------------------------------------------------------------------
 
 def _user_message(packet: dict) -> str:
-    view = {k: packet.get(k) for k in ("goal", "incumbent", "pending", "recent", "retrieved", "surface")}
-    view["tried_count"] = len(packet.get("tried_keys", []))
+    """Every packet field except tried_keys (opaque hashes) and packet_id. `tried` carries the same
+    experiments as readable labels, so the model can see what was already run."""
+    view = {k: v for k, v in packet.items() if k not in ("tried_keys", "packet_id")}
     return "Evidence packet (JSON):\n" + json.dumps(view, default=str)
 
 

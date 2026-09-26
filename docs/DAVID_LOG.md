@@ -56,6 +56,8 @@ Branch `david`. Dev DB `second_shift_david`.
   - Filtering held: the incumbent query's top 4 stayed all verified_result even at 10,000 distractors. The packet's generic query did not: its 4 retrieved slots flip to synthetic notes once distractors exist (same finding as D6).
   - Packet size stays well under budget as memory grows (940 then 781 tokens estimated, of 4,000), because retrieval is capped at k=4 and the recent window is fixed.
   - Latency: p50 grows from ~240 ms to ~727 ms and p95 reaches ~4.6 s at 10,000; much of that is the Voyage embedding round trip, measured from a laptop on venue wifi, not isolated Atlas time.
+- **Planner fix from Andrew** (13:25 ET): `_user_message` now sends every packet field except `tried_keys` and `packet_id` (so `tried`, `leaders`, `laggards` and any future field reach the model). System prompt line now reads "Every tried config is listed in tried; never propose one of those." `packet_evidence_ids` also accepts `leaders[].experiment_id` and `laggards[].experiment_id`; without that, citing a leader would fail validation and burn the repair. Test: sent fields == packet minus the two, leaders/laggards cited without fallback. Live call re-checked: valid proposal, no fallback. Suite 66 passed, 3 live skipped.
+- Andrew: Vector Search now retrieves notes only; numbers come from exact reads. Synthetic distractors stay in on purpose. P3 kept as is.
 
 ## Tests
 
@@ -97,3 +99,4 @@ Branch `david`. Dev DB `second_shift_david`.
 - 13:10 ET: prompt 2 done (D5-D9). Moving to prompt 3 after merging origin/main.
 - 13:14 ET: P1, P2 done. Suite 64 passed, 3 live skipped.
 - 13:18 ET: P3 done. Prompt 3 complete (P4 = D9 already done in prompt 2). Stopped.
+- 13:25 ET: planner fix pushed. Stopped.
