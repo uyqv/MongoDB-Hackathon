@@ -8,7 +8,7 @@ One owner per file. Never edit a file you don't own. That rule is what makes the
 
 | Owner | Files |
 |---|---|
-| **Andrew** | `harness/contracts.py`, `harness/db.py`, `harness/eeg.py`, `harness/store.py`, `harness/worker.py`, `harness/context.py`, `eval/run_ablation.py`, `tests/test_contracts.py`, `tests/test_eeg.py`, `tests/test_store.py`, `tests/test_worker.py`, `requirements.txt`, `.env.example`, `.gitignore`, `README.md`, `docs/WORKPLAN.md`, `docs/CONTRACTS.md`, `docs/DAVID_PROMPTS.md` |
+| **Andrew** | `harness/contracts.py`, `harness/db.py`, `harness/eeg.py`, `harness/store.py`, `harness/worker.py`, `harness/context.py`, `eval/run_ablation.py`, `eval/demo_checks.py`, `tests/test_contracts.py`, `tests/test_eeg.py`, `tests/test_store.py`, `tests/test_worker.py`, `requirements.txt`, `.env.example`, `.gitignore`, `README.md`, `docs/WORKPLAN.md`, `docs/CONTRACTS.md`, `docs/DAVID_PROMPTS.md` |
 | **David** | `harness/planner.py`, `harness/memory.py`, `harness/control.py`, `harness/jev.py`, `api/**`, `web/**`, `eval/fixtures.py`, `eval/seed_fake.py`, `tests/test_planner.py`, `tests/test_memory.py`, `tests/test_api.py`, `tests/test_fixtures.py`, `tests/test_jev.py`, `docs/ATTRIBUTION.md`, `docs/DAVID_LOG.md` |
 
 David needs a new Python dependency: add it to `docs/DAVID_LOG.md` under "deps needed" and install it locally. Andrew adds it to `requirements.txt` at merge.
