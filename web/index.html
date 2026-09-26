@@ -23,16 +23,17 @@
   </header>
 
   <div id="controls" class="controls">
-    <button id="btn-start" disabled>Start worker</button>
-    <button id="btn-kill" class="danger" disabled>Kill worker (SIGKILL)</button>
-    <button id="btn-reset" disabled>Reset context</button>
+    <span id="worker-status" class="pill">worker: ?</span>
+    <button id="btn-start">Start worker</button>
+    <button id="btn-kill" class="danger">Kill worker (SIGKILL)</button>
+    <button id="btn-reset">Reset context</button>
     <span class="sep"></span>
     <label>Channel budget
-      <select id="sel-channels" disabled><option>9</option><option>21</option><option>64</option></select>
+      <select id="sel-channels"><option>9</option><option>21</option><option>64</option></select>
     </label>
-    <input id="constraint-reason" placeholder="reason" disabled>
-    <button id="btn-constraint" disabled>Apply</button>
-    <span id="worker-status" class="muted">controls arrive in D5</span>
+    <input id="constraint-reason" placeholder="reason (shown in goal history)">
+    <button id="btn-constraint">Apply</button>
+    <span id="control-msg" class="muted"></span>
   </div>
 
   <main class="grid">

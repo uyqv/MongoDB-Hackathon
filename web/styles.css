@@ -97,7 +97,7 @@ tr.incumbent td { background: rgba(0, 237, 100, 0.07); }
 #timeline li { display: grid; grid-template-columns: 70px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
 #timeline .t { color: var(--muted); font-family: var(--mono); }
 #timeline .type { font-weight: 600; }
-.ev-worker_killed .type, .ev-stale_commit_rejected .type { color: var(--bad); }
+.ev-worker_killed .type, .ev-fault_injection .type, .ev-stale_commit_rejected .type { color: var(--bad); }
 .ev-worker_start .type, .ev-finalized .type { color: var(--accent); }
 .ev-context_reset .type, .ev-goal_changed .type { color: var(--warn); }
 .ev-job_reused .type, .ev-lease_expired .type { color: #7cc4ff; }

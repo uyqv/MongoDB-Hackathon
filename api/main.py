@@ -17,8 +17,10 @@ from bson import ObjectId
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
 from harness import contracts as C
+from harness import control
 from harness.db import get_db
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
@@ -150,35 +152,49 @@ def memories(cid: str, kind: str | None = None, include_synthetic: bool = False)
     return clean(list(db().memories.find(flt, {"embedding": 0}).sort("created_at", -1)))
 
 
-def _not_yet(what: str):
-    return JSONResponse({"error": f"{what} not implemented yet (prompt 2)"}, status_code=501)
+class StartBody(BaseModel):
+    campaign_id: str
+
+
+class ConstraintBody(BaseModel):
+    max_channels: int
+    reason: str = ""
 
 
 @app.get("/api/eeg/preview")
 def eeg_preview():
-    return _not_yet("EEG preview")
+    return JSONResponse({"error": "EEG preview not implemented yet"}, status_code=501)
 
 
 @app.get("/api/worker/status")
 def worker_status():
-    return _not_yet("worker status")
+    return control.worker_status()
 
 
 @app.post("/api/worker/start")
-def worker_start():
-    return _not_yet("worker start")
+def worker_start(body: StartBody):
+    _campaign_or_404(body.campaign_id)
+    try:
+        return {"pid": control.start_worker(body.campaign_id)}
+    except RuntimeError as e:
+        raise HTTPException(409, str(e))
 
 
 @app.post("/api/worker/kill")
 def worker_kill():
-    return _not_yet("worker kill")
+    return control.kill_worker()
 
 
 @app.post("/api/campaigns/{cid}/constraint")
-def constraint(cid: str):
-    return _not_yet("constraint change")
+def constraint(cid: str, body: ConstraintBody):
+    _campaign_or_404(cid)
+    try:
+        return clean(control.change_constraint(db(), cid, body.max_channels, body.reason))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
 
 
 @app.post("/api/campaigns/{cid}/context-reset")
 def context_reset(cid: str):
-    return _not_yet("context reset")
+    _campaign_or_404(cid)
+    return {"context_epoch": control.reset_context(db(), cid)}
