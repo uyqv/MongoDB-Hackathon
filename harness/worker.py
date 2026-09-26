@@ -2,7 +2,7 @@
 
 CLI (the API spawns this exact command, so keep it stable):
     python -m harness.worker --campaign <campaign_id>
-    python -m harness.worker --new --mode {smoke,demo} --max-channels 64 --budget 10
+    python -m harness.worker --new --mode {smoke,demo} --max-channels 64 --budget 10 [--create-only]
 
 State loop: REHYDRATE -> PLAN -> VALIDATE -> QUEUE -> EXECUTE -> COMMIT -> REHYDRATE,
 plus WAITING / FAILED / DONE. Holds no conversation history between steps: every
@@ -269,6 +269,7 @@ def main() -> None:
     ap.add_argument("--max-steps", type=int)
     ap.add_argument("--crash-after-claim", type=int)
     ap.add_argument("--strategy", default="evidence", choices=["evidence", "recent_window"])
+    ap.add_argument("--create-only", action="store_true", help="with --new: create the campaign, print its id, exit")
     args = ap.parse_args()
     db = get_db()
     store.ensure_indexes(db)
@@ -282,6 +283,8 @@ def main() -> None:
         cid = store.create_campaign(db, protocol=protocol, objective=OBJECTIVE, max_channels=args.max_channels,
                                     max_experiments=args.budget)
         print(cid, flush=True)
+        if args.create_only:
+            return
     elif args.campaign:
         cid = args.campaign
     else:
