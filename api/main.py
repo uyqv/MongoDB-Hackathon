@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from bson import ObjectId
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -29,6 +29,27 @@ WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
 app = FastAPI(title="Second Shift")
 app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
+
+
+def read_only() -> bool:
+    """Public serverless deployments observe campaigns; workers run separately."""
+    return (os.environ.get("VERCEL") == "1" or os.environ.get("DASHBOARD_READ_ONLY") == "1"
+            or os.environ.get("DASHBOARD_DATA_MODE") == "snapshot")
+
+
+@app.middleware("http")
+async def protect_hosted_dashboard(request: Request, call_next):
+    if read_only() and request.method not in {"GET", "HEAD", "OPTIONS"}:
+        return JSONResponse({"detail": "This dashboard is read-only. Run operator controls locally."}, status_code=403)
+    if os.environ.get("DASHBOARD_DATA_MODE") == "snapshot" and request.url.path.startswith("/api/campaigns"):
+        from api.snapshot import response_for
+        body, status = response_for(request.url.path, request.query_params)
+        response = JSONResponse(body, status_code=status)
+    else:
+        response = await call_next(request)
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 def clean(obj: Any) -> Any:
@@ -87,6 +108,9 @@ def index():
 
 @app.get("/api/health")
 def health():
+    if os.environ.get("DASHBOARD_DATA_MODE") == "snapshot":
+        from api.snapshot import load_snapshot
+        return {"ok": True, "mode": "snapshot", "captured_at": load_snapshot()["captured_at"]}
     d = db()
     d.command("ping")
     return {"ok": True, "db": d.name}
@@ -166,6 +190,16 @@ def latest_packet(cid: str, strategy: str = "evidence"):
     return clean(doc)
 
 
+@app.get("/api/campaigns/{cid}/packets/{packet_id}")
+def packet_by_id(cid: str, packet_id: str):
+    """The stored evidence for one decision, scoped to its owning campaign."""
+    _campaign_or_404(cid)
+    doc = db().packets.find_one({"_id": packet_id, "campaign_id": cid})
+    if not doc:
+        raise HTTPException(404, "packet not found in this campaign")
+    return clean(doc)
+
+
 @app.get("/api/campaigns/{cid}/memories")
 def memories(cid: str, kind: str | None = None, include_synthetic: bool = False):
     flt: dict = {"campaign_id": cid}
@@ -240,7 +274,8 @@ def build_eeg_preview() -> dict:
 
 @app.get("/api/eeg/preview")
 def eeg_preview():
-    cache = Path(os.environ.get("EEG_PREVIEW_CACHE", "data/eeg_preview.json"))
+    bundled = WEB_DIR.parent / "artifacts" / "eeg_preview.json"
+    cache = Path(os.environ.get("EEG_PREVIEW_CACHE", str(bundled) if bundled.exists() else "data/eeg_preview.json"))
     if cache.exists():
         return json.loads(cache.read_text())
     try:
@@ -254,6 +289,12 @@ def eeg_preview():
 
 @app.get("/api/worker/status")
 def worker_status():
+    if read_only():
+        status = {"running": False, "pid": None, "campaign_id": None, "read_only": True, "remote": True}
+        if os.environ.get("DASHBOARD_DATA_MODE") == "snapshot":
+            from api.snapshot import load_snapshot
+            status.update(data_mode="snapshot", captured_at=load_snapshot()["captured_at"])
+        return status
     return control.worker_status()
 
 

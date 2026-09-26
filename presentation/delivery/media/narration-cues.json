@@ -1,0 +1,48 @@
+{
+  "duration_seconds": 60,
+  "spoken_audio_seconds": 56.293083,
+  "lead_seconds": 0.6,
+  "voice": "Eric",
+  "provider": "ElevenLabs",
+  "model": "eleven_v3",
+  "tempo_factor": 0.8937833037300178,
+  "new_recording_required": true,
+  "scenes": [
+    {
+      "id": "intro",
+      "text": "This is Second Shift, an autonomous research assistant for brain signals.",
+      "start": 0.6,
+      "end": 5.851
+    },
+    {
+      "id": "run",
+      "text": "It searches EEG recordings for patterns of imagined hand and foot movement. The planner chooses an experiment. Numerical code measures the result, and MongoDB Atlas preserves the evidence.",
+      "start": 5.851,
+      "end": 19.508
+    },
+    {
+      "id": "crash",
+      "text": "Now we kill the worker. A replacement rebuilds its context from Atlas. Completed experiments are reused. An interrupted attempt can run again.",
+      "start": 19.508,
+      "end": 30.316
+    },
+    {
+      "id": "goal",
+      "text": "Next, we reset its context and cut the electrode limit from sixty four to nine. It checks existing results against the new limit and continues the search.",
+      "start": 30.316,
+      "end": 41.464
+    },
+    {
+      "id": "results",
+      "text": "Separate checks passed all eight recovery tests and all five goal change tests. Here is the code that rebuilds each decision from evidence.",
+      "start": 41.464,
+      "end": 52.003
+    },
+    {
+      "id": "close",
+      "text": "Second Shift keeps the research moving, even when the agent starts over.",
+      "start": 52.003,
+      "end": 56.9
+    }
+  ]
+}

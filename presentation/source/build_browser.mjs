@@ -1,0 +1,14 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {deck} from './content.mjs';
+const here=path.dirname(fileURLToPath(import.meta.url)),out=path.resolve(here,'../delivery');
+deck.demoReady=await fs.access(path.join(out,'media/second-shift-demo.mp4')).then(()=>true).catch(()=>false);
+const css=await fs.readFile(path.join(here,'browser.css'),'utf8'),js=await fs.readFile(path.join(here,'browser.js'),'utf8');
+const html=`<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Second Shift · Neuro AI</title><link rel="icon" href="assets/second-shift.svg"><style>${css}</style></head><body><main id="viewport"><div id="stage"></div></main><nav id="controls" aria-label="Presentation controls"><button id="prev" aria-label="Previous slide">←</button><span id="counter"></span><button id="next" aria-label="Next slide">→</button><span class="sep"></span><button id="fullscreen">Fullscreen F</button><button id="notes-toggle">Notes N</button><button id="overview-toggle">Overview O</button><span class="sep"></span><label for="demo-file" tabindex="0">Load new demo</label><input id="demo-file" type="file" accept="video/*" hidden></nav><aside id="notes" hidden><button id="notes-close" aria-label="Close notes">×</button><h2 id="notes-title"></h2><p class="cue" id="notes-cue"></p><p id="notes-copy"></p><div class="note-timing"><span id="elapsed"></span><span id="slide-elapsed"></span></div><p class="cue">R resets the rehearsal timer. Close notes before projecting.</p></aside><div id="overview" hidden></div><div id="toast" role="status" hidden></div><script>window.DECK=${JSON.stringify(deck).replace(/</g,'\\u003c')};</script><script>${js}</script></body></html>`;
+await fs.writeFile(path.join(out,'index.html'),html);
+const words=deck.slides.filter(s=>s.id!=='demo').reduce((n,s)=>n+s.notes.split(/\s+/).length,0);
+const notes=`# Second Shift: presenter notes\n\nTarget: 2:55, including a 60-second narrated demo. Five seconds remain for transitions. ${words} live words; allow 115 seconds for live delivery.\n\n`+deck.slides.map((s,i)=>`## ${i+1}. ${s.title} (${Math.floor(s.start/60)}:${String(s.start%60).padStart(2,'0')}–${Math.floor((s.start+s.duration)/60)}:${String((s.start+s.duration)%60).padStart(2,'0')})\n\n${s.notes}\n\nSources: ${s.sources.join('; ')}\n`).join('\n');
+await fs.writeFile(path.join(out,'presenter-notes.md'),notes);
+await fs.writeFile(path.join(here,'content.json'),JSON.stringify(deck,null,2));
+console.log({slides:deck.slides.length,liveWords:words,demoReady:deck.demoReady});

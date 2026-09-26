@@ -1,0 +1,6 @@
+{
+  "tool": "Built-in image_gen",
+  "purpose": "Transparent cutouts of the approved sculptures",
+  "hero": "Edit this image. Preserve the existing brain sculpture exactly, including its ivory folds, green EEG contacts, thin silver supports and pale sage translucent underside. Remove the entire opaque cream background and replace it with genuine alpha transparency. Preserve the whole object without cropping and include only a soft translucent grounding shadow. No new objects or text. Output the isolated sculpture as a transparent PNG.",
+  "closing": "Edit this image. Preserve exactly the existing ivory brain sculpture and all three thin pale sage glass plates. Remove the entire opaque cream background and replace it with genuine alpha transparency, including the background visible through the glass plates. Preserve the whole sculpture without cropping and a subtle translucent grounding shadow. No added objects or text. Output as transparent PNG."
+}

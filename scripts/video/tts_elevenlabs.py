@@ -9,6 +9,7 @@ Key: ELEVENLABS_API_KEY in .env.
 """
 import base64
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -17,14 +18,15 @@ import httpx
 from dotenv import dotenv_values
 
 KEY = dotenv_values(".env")["ELEVENLABS_API_KEY"]
-VOICE = sys.argv[1] if len(sys.argv) > 1 else "cjVigY5qzO86Huf0OWal"   # Eric: smooth, trustworthy
+VOICE = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("VIDEO_VOICE_ID", "ypfAZhVeE0hhj0A5eGdR")
 MODEL = "eleven_v3"
-OUT = Path("run/video/voice")
-SCENES = json.loads(Path("scripts/video/narration.json").read_text())
+OUT = Path(os.environ.get("VIDEO_VOICE_DIR", "run/video/voice"))
+SCENES = json.loads(Path(os.environ.get("VIDEO_SCRIPT", "scripts/video/narration.json")).read_text())
 
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "narration.json").write_text(json.dumps(SCENES, indent=2) + "\n")
     sep = " "
     text = sep.join(s["text"] for s in SCENES)
     starts, pos = [], 0
@@ -40,11 +42,12 @@ def main() -> None:
               "voice_settings": {"stability": 0.5, "similarity_boost": 0.8, "use_speaker_boost": True}},
         timeout=180)
     if r.status_code != 200:
-        raise SystemExit(f"{r.status_code} {r.text[:400]}")
+        raise SystemExit(f"ElevenLabs narration failed: HTTP {r.status_code}")
     d = r.json()
     mp3 = OUT / "narration.mp3"
     mp3.write_bytes(base64.b64decode(d["audio_base64"]))
     al = d.get("normalized_alignment") or d["alignment"]
+    (OUT / "alignment.json").write_text(json.dumps(al))
     chars, t0s, t1s = al["characters"], al["character_start_times_seconds"], al["character_end_times_seconds"]
     if "".join(chars) != text:
         al = d["alignment"]   # prefer the alignment that matches our text exactly

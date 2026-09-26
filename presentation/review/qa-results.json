@@ -1,0 +1,28 @@
+{
+  "slides": 6,
+  "live_words": 229,
+  "planned_total_seconds": 175,
+  "final_demo_attached": false,
+  "previous_dashboard_media_included": false,
+  "new_movie_uses_own_soundtrack": true,
+  "checks": {
+    "navigation": true,
+    "overview_and_notes": true,
+    "fullscreen": true,
+    "reduced_motion": true,
+    "offline_navigation_after_initial_load": true,
+    "worker_dims_during_reset": true,
+    "evidence_stays_visible_during_reset": true,
+    "video_explicit_start": true,
+    "video_exit_stops_and_resets": true,
+    "video_reentry_requires_play": true,
+    "pptx_package": true,
+    "pptx_layout": true,
+    "pptx_native_chart": true
+  },
+  "not_yet_verified": [
+    "final_demo_events_and_audio",
+    "complete_pitch_rehearsal",
+    "native_desktop_powerpoint_open"
+  ]
+}

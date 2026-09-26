@@ -1,0 +1,179 @@
+{
+  "duration": 59.6,
+  "source": "run/video-v3/take-2/raw-continuous.webm",
+  "shots": [
+    {
+      "shot": 1,
+      "source_start": 8.0,
+      "source_end": 41.8,
+      "output_start": 0,
+      "output_end": 33.8,
+      "playback_speed": 1,
+      "content": "Neuroscience introduction, two real EEG measurements, evidence reuse, and the real stop"
+    },
+    {
+      "shot": 2,
+      "source_start": 43.0,
+      "source_end": 44.0,
+      "output_start": 33.8,
+      "output_end": 34.8,
+      "playback_speed": 1,
+      "content": "Restart through the working interface"
+    },
+    {
+      "shot": 3,
+      "source_start": 53.0,
+      "source_end": 58.12,
+      "output_start": 34.8,
+      "output_end": 39.92,
+      "playback_speed": 1,
+      "content": "Same interrupted experiment on attempt two, with prior results intact"
+    },
+    {
+      "shot": 4,
+      "source_start": 64.6,
+      "source_end": 70.8,
+      "output_start": 39.92,
+      "output_end": 46.12,
+      "playback_speed": 1,
+      "content": "Clear context, electrode limit 64 to 9, and honest empty eligibility"
+    },
+    {
+      "shot": 5,
+      "source_start": 71.8,
+      "source_end": 78.88,
+      "output_start": 46.12,
+      "output_end": 53.2,
+      "playback_speed": 1,
+      "content": "Brain-signal research continues under the new constraint; nine-electrode result"
+    },
+    {
+      "shot": 6,
+      "source_start": 80.24,
+      "source_end": 82.44,
+      "output_start": 53.2,
+      "output_end": 55.4,
+      "playback_speed": 1,
+      "content": "Actual context-reconstruction code from this repository"
+    },
+    {
+      "shot": 7,
+      "source_start": 85.2,
+      "source_end": 89.4,
+      "output_start": 55.4,
+      "output_end": 59.6,
+      "playback_speed": 1,
+      "content": "Return to the running EEG campaign and its next measured result"
+    }
+  ],
+  "narration": [
+    {
+      "scene": "intro",
+      "source": [
+        0,
+        5.38
+      ],
+      "timeline": [
+        0.3,
+        5.68
+      ],
+      "spoken_alignment_start": 0.3
+    },
+    {
+      "scene": "task",
+      "source": [
+        5.38,
+        11.651000000000002
+      ],
+      "timeline": [
+        5.83,
+        12.100999999999999
+      ],
+      "spoken_alignment_start": 5.95
+    },
+    {
+      "scene": "run",
+      "source": [
+        11.651000000000002,
+        21.4
+      ],
+      "timeline": [
+        12.297,
+        22.046
+      ],
+      "spoken_alignment_start": 12.417
+    },
+    {
+      "scene": "memory",
+      "source": [
+        21.4,
+        27.74
+      ],
+      "timeline": [
+        22.198,
+        28.538
+      ],
+      "spoken_alignment_start": 22.318
+    },
+    {
+      "scene": "kill",
+      "source": [
+        27.74,
+        31.176
+      ],
+      "timeline": [
+        28.89,
+        32.326
+      ],
+      "spoken_alignment_start": 29.01
+    },
+    {
+      "scene": "recover",
+      "source": [
+        31.176,
+        37.400000000000006
+      ],
+      "timeline": [
+        32.92999999999999,
+        39.153999999999996
+      ],
+      "spoken_alignment_start": 33.05
+    },
+    {
+      "scene": "goal",
+      "source": [
+        37.400000000000006,
+        43.187000000000005
+      ],
+      "timeline": [
+        39.802,
+        45.589
+      ],
+      "spoken_alignment_start": 39.922
+    },
+    {
+      "scene": "adapt",
+      "source": [
+        43.187000000000005,
+        49.870000000000005
+      ],
+      "timeline": [
+        45.939,
+        52.622
+      ],
+      "spoken_alignment_start": 46.059
+    },
+    {
+      "scene": "close",
+      "source": [
+        49.870000000000005,
+        54.48
+      ],
+      "timeline": [
+        53.023,
+        57.633
+      ],
+      "spoken_alignment_start": 53.143
+    }
+  ]
+}
