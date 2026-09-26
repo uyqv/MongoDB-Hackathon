@@ -1,0 +1,30 @@
+[
+ {
+  "id": "intro",
+  "text": "Long running agents forget why they ran old experiments. Second Shift keeps the whole research campaign in MongoDB Atlas, and rebuilds every decision from that evidence."
+ },
+ {
+  "id": "run",
+  "text": "The workload is real brain signal data. Claude picks the next experiment from a fixed menu and cites its evidence. Code computes every number."
+ },
+ {
+  "id": "crash",
+  "text": "Now we kill the worker in the middle of a job. A new process rebuilds the campaign from Atlas, reuses the finished work, and reruns the orphaned job as attempt two."
+ },
+ {
+  "id": "goal",
+  "text": "We wipe the context and cut the electrode budget from sixty four to nine. It reranks what it already measured, and keeps searching under the new goal."
+ },
+ {
+  "id": "packet",
+  "text": "Each decision sees a small evidence packet. Jev routes the model's notes into memory, and Vector Search brings them back."
+ },
+ {
+  "id": "numbers",
+  "text": "Measured today: eight of eight recovery checks, five of five constraint checks, and ten thousand memory notes with context held near twelve hundred tokens."
+ },
+ {
+  "id": "outro",
+  "text": "One persistent mission. Bounded context. Measured results."
+ }
+]
