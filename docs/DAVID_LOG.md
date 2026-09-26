@@ -59,6 +59,15 @@ Branch `david`. Dev DB `second_shift_david`.
 - **Planner fix from Andrew** (13:25 ET): `_user_message` now sends every packet field except `tried_keys` and `packet_id` (so `tried`, `leaders`, `laggards` and any future field reach the model). System prompt line now reads "Every tried config is listed in tried; never propose one of those." `packet_evidence_ids` also accepts `leaders[].experiment_id` and `laggards[].experiment_id`; without that, citing a leader would fail validation and burn the repair. Test: sent fields == packet minus the two, leaders/laggards cited without fallback. Live call re-checked: valid proposal, no fallback. Suite 66 passed, 3 live skipped.
 - Andrew: Vector Search now retrieves notes only; numbers come from exact reads. Synthetic distractors stay in on purpose. P3 kept as is.
 
+### D10: 3D video scenes (David's request, outside the prompts)
+
+- New directory `deck/`, owned by David (not in the CONTRACTS table; touches no harness/api/web/eval/tests file). Vite + React Three Fiber + drei, RobotExpressive.glb (CC0) served locally, no CDN at runtime (checked: zero external requests over a full playlist on the production build).
+- 5 scenes, each playable alone for screen capture: `forget` (context window overflows while history keeps growing), `packet` (125-event history in Atlas vs a 940/4,000-token briefing, with cards matching the real packet sections: goal, incumbent, recent ×3, retrieved ×4, pending ×0), `kill` (SIGKILL, Death animation, new worker rehydrates from Atlas), `constraint` (9 real experiments; 64→9 greys out the 21- and 64-channel results, and the incumbent moves 0.773 (21 ch) → 0.759 (9 ch), computed with the same `n_channels <= max_channels` rule as `contracts.is_eligible`), `numbers` (val 0.773, sealed test 0.732 n=75, 9/10 experiments, 10 calls, 0 fallbacks, $0.085 provider, 940 tokens estimate).
+- Every metric is read from `deck/src/snapshot/campaign.json`, snapshotted by `deck/scripts/snapshot.mjs` from a read-only API instance on port 8001 with `DB_NAME=second_shift`, campaign `camp_0f8981ee`. The script refuses fake campaigns and the dev DB.
+- `deck/scripts/cut.sh` stitches the clips per `clips/cut.txt` to 1080p30 with narration and fails if the total is over 60 s. Tested on 8 synthetic placeholder clips (60.0 s output, video and audio streams present); the placeholders were deleted.
+- `deck/NARRATION.md` holds the 60-second voiceover script aligned to the cut.
+- Verified with headless Chromium screenshots of every scene mid-play and at the end.
+
 ## Tests
 
 - `tests/test_planner.py`: 9 passed, 1 live skipped by default; live passed with `LIVE=1`.
