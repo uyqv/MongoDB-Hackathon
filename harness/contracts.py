@@ -36,7 +36,7 @@ EVENT_TYPES = (
     "state_change", "packet_built", "llm_call", "proposal", "proposal_rejected",
     "job_queued", "job_reused", "job_claimed", "job_committed", "job_failed",
     "lease_expired", "stale_commit_rejected", "context_reset", "goal_changed",
-    "memory_added", "finalized", "fault_injection",
+    "memory_added", "finalized", "fault_injection", "jev_routed",
 )
 PACKET_STRATEGIES = ("evidence", "recent_window")
 
