@@ -1466,3 +1466,7 @@ body[data-phase="paused"] * {
     transform: none !important;
   }
 }
+
+.research-candidate { padding: 16px 0; border-top: 1px solid #dfe6e7; }
+.research-candidate h4 { margin: 0 0 8px; font-size: 13px; line-height: 1.6; }
+.research-candidate code { display: block; margin-top: 8px; overflow-wrap: anywhere; }

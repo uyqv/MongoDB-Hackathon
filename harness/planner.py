@@ -100,6 +100,24 @@ TOOLS = [
     }},
 ]
 
+RESEARCH_PROMPT = """You plan an EEG research campaign. Select ONE candidate_id from research.candidates,
+or stop only when the budget is spent or the shortlist is empty. Code computes the ranking and every metric.
+Consider expected improvement, uncertainty and single-parameter comparisons. State a two-sentence rationale
+and cite evidence_ids from the packet. Predicted scores are estimates, not observations. Hypothesis assessments
+are exploratory validation evidence, not population findings. Code registers a fixed comparison claim of at
+least 0.02 improvement over the reference; initialization is exploration. You cannot change that claim or
+invent configurations, numeric results or references. Answer with exactly one tool call."""
+
+RESEARCH_TOOLS = [
+    {"type": "function", "function": {
+        "name": "propose_experiment", "description": "Choose one code-ranked candidate and explain the hypothesis.",
+        "parameters": {"type": "object", "properties": {
+            "candidate_id": {"type": "string"}, "rationale": {"type": "string", "maxLength": 1000},
+            "evidence_ids": {"type": "array", "items": {"type": "string"}}},
+            "required": ["candidate_id", "rationale", "evidence_ids"], "additionalProperties": False}}},
+    TOOLS[1],
+]
+
 
 # --------------------------------------------------------------------------
 # Validation
@@ -118,6 +136,8 @@ def packet_evidence_ids(packet: dict) -> set[str]:
         if m.get("memory_id"):
             ids.add(m["memory_id"])
         ids.update(m.get("source_ids") or [])
+    for h in packet.get("hypotheses", []):
+        ids.update(x for x in (h.get("_id"), h.get("experiment_id"), h.get("reference_experiment_id")) if x)
     return ids
 
 
@@ -125,7 +145,9 @@ def validate(packet: dict, name: str, args: dict) -> tuple[dict | None, str | No
     """Return (normalized config or None for stop, error message or None)."""
     if name not in ("propose_experiment", "stop"):
         return None, f"unknown tool {name!r}; call propose_experiment or stop"
-    ev = args.get("evidence_ids") or []
+    if not isinstance(args, dict):
+        return None, "tool arguments must be a JSON object"
+    ev = args.get("evidence_ids", [])
     if not isinstance(ev, list) or not all(isinstance(x, str) for x in ev):
         return None, "evidence_ids must be a list of id strings"
     unknown = sorted(set(ev) - packet_evidence_ids(packet))
@@ -138,6 +160,14 @@ def validate(packet: dict, name: str, args: dict) -> tuple[dict | None, str | No
         return None, (f"stop is not allowed: {remaining} experiments remain in the budget and eligible untried "
                       "configs exist. Propose one. If nearby variants look exhausted, explore a different "
                       "method, band, or window.")
+    if packet.get("policy") == "research_v1":
+        candidate = next((c for c in packet["research"]["candidates"]
+                          if c["candidate_id"] == args.get("candidate_id")), None)
+        if candidate is None:
+            return None, "candidate_id must appear in the current research shortlist"
+        if not isinstance(args.get("rationale"), str) or not 0 < len(args["rationale"]) <= 1000:
+            return None, "provide a nonempty rationale of at most 1000 characters"
+        args = {**args, "config": candidate["config"]}
     try:
         cfg = C.normalize_config(args.get("config"))
     except ValueError as e:
@@ -153,6 +183,9 @@ def validate(packet: dict, name: str, args: dict) -> tuple[dict | None, str | No
 
 def fallback_config(packet: dict) -> dict | None:
     """First config in all_configs() order that is eligible and untried."""
+    if packet.get("policy") == "research_v1":
+        candidates = packet["research"]["candidates"]
+        return candidates[0]["config"] if candidates else None
     tried = set(packet.get("tried_keys", []))
     constraints = packet["goal"]["constraints"]
     for cfg in C.all_configs():
@@ -168,7 +201,8 @@ def fallback_config(packet: dict) -> dict | None:
 def _user_message(packet: dict) -> str:
     """Every packet field except tried_keys (opaque hashes) and packet_id. `tried` carries the same
     experiments as readable labels, so the model can see what was already run."""
-    view = {k: v for k, v in packet.items() if k not in ("tried_keys", "packet_id")}
+    from harness.context import planner_view
+    view = planner_view(packet)
     return "Evidence packet (JSON):\n" + json.dumps(view, default=str)
 
 
@@ -190,6 +224,8 @@ def _parse(resp) -> tuple[str | None, dict, Any, str | None]:
     calls = msg.tool_calls or []
     if not calls:
         return None, {}, msg, "no tool call returned; call propose_experiment or stop"
+    if len(calls) != 1:
+        return None, {}, msg, "return exactly one tool call"
     call = calls[0]
     try:
         args = json.loads(call.function.arguments or "{}")
@@ -230,13 +266,18 @@ def plan(packet: dict, *, model: str | None = None) -> dict:
         else:
             u = {"input_tokens": _estimate_tokens(messages), "output_tokens": None, "cost_usd": None,
                  "source": "estimate"}
-        return {
+        out = {
             "action": action, "config": cfg, "rationale": rationale, "evidence_ids": ev,
             "model": FALLBACK_MODEL if fallback_reason else resp_model, "request_id": request_id,
             "usage": u, "fallback_used": fallback_reason is not None, "fallback_reason": fallback_reason,
         }
+        if action == "propose" and packet.get("policy") == "research_v1":
+            from harness.research import proposal_metadata
+            out.update(proposal_metadata(packet, cfg))
+        return out
 
-    messages: list[dict] = [{"role": "system", "content": SYSTEM_PROMPT},
+    research = packet.get("policy") == "research_v1"
+    messages: list[dict] = [{"role": "system", "content": RESEARCH_PROMPT if research else SYSTEM_PROMPT},
                             {"role": "user", "content": _user_message(packet)}]
 
     if fallback_config(packet) is None:
@@ -249,7 +290,7 @@ def plan(packet: dict, *, model: str | None = None) -> dict:
         client = client_factory()
         for attempt in range(2):
             resp = client.chat.completions.create(
-                model=model, messages=messages, tools=TOOLS, tool_choice="required",
+                model=model, messages=messages, tools=RESEARCH_TOOLS if research else TOOLS, tool_choice="required",
                 max_tokens=MAX_TOKENS, extra_body={"usage": {"include": True}},
             )
             request_id = getattr(resp, "id", None) or request_id
@@ -277,5 +318,6 @@ def plan(packet: dict, *, model: str | None = None) -> dict:
 
     cfg = fallback_config(packet)
     reason = f"planner failed validation or call after repair: {last_error}"
-    return result("propose", cfg, f"Deterministic fallback: first eligible untried config ({C.config_label(cfg)}).",
+    selection = "highest-ranked candidate" if research else "first eligible untried config"
+    return result("propose", cfg, f"Deterministic fallback: {selection} ({C.config_label(cfg)}).",
                   [], fallback_reason=reason)

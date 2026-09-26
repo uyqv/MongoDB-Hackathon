@@ -1,0 +1,158 @@
+{
+  "duration": 59.6,
+  "source": "run/video-v5/take-1/raw-continuous.webm",
+  "shots": [
+    {
+      "shot": 1,
+      "source_start": 9.6,
+      "source_end": 44.48,
+      "output_start": 0,
+      "output_end": 34.88,
+      "playback_speed": 1,
+      "content": "Neuroscience harness, real EEG measurements, crash, saved results, and restart"
+    },
+    {
+      "shot": 2,
+      "source_start": 47.96,
+      "source_end": 54.08,
+      "output_start": 34.88,
+      "output_end": 41.0,
+      "playback_speed": 1,
+      "content": "Same interrupted experiment runs as attempt two"
+    },
+    {
+      "shot": 3,
+      "source_start": 61.8,
+      "source_end": 67.8,
+      "output_start": 41.0,
+      "output_end": 47.0,
+      "playback_speed": 1,
+      "content": "Clear context, reduce the electrode limit, and recompute eligibility"
+    },
+    {
+      "shot": 4,
+      "source_start": 68.2,
+      "source_end": 73.92,
+      "output_start": 47.0,
+      "output_end": 52.72,
+      "playback_speed": 1,
+      "content": "Rebuilt evidence guides the next nine-electrode experiment"
+    },
+    {
+      "shot": 5,
+      "source_start": 75.44,
+      "source_end": 78.32,
+      "output_start": 52.72,
+      "output_end": 55.6,
+      "playback_speed": 1,
+      "content": "Actual context-reconstruction code"
+    },
+    {
+      "shot": 6,
+      "source_start": 81.28,
+      "source_end": 85.28,
+      "output_start": 55.6,
+      "output_end": 59.6,
+      "playback_speed": 1,
+      "content": "Return to the running EEG campaign"
+    }
+  ],
+  "narration": [
+    {
+      "scene": "intro",
+      "source": [
+        0,
+        5.987
+      ],
+      "timeline": [
+        0.3,
+        6.287
+      ],
+      "spoken_alignment_start": 0.3
+    },
+    {
+      "scene": "position",
+      "source": [
+        5.987,
+        9.971
+      ],
+      "timeline": [
+        6.287,
+        10.271
+      ],
+      "spoken_alignment_start": 6.407
+    },
+    {
+      "scene": "run",
+      "source": [
+        9.971,
+        23.36
+      ],
+      "timeline": [
+        10.271,
+        23.66
+      ],
+      "spoken_alignment_start": 10.391
+    },
+    {
+      "scene": "kill",
+      "source": [
+        23.36,
+        30.52
+      ],
+      "timeline": [
+        23.66,
+        30.82
+      ],
+      "spoken_alignment_start": 23.78
+    },
+    {
+      "scene": "recover",
+      "source": [
+        30.52,
+        39.88
+      ],
+      "timeline": [
+        30.82,
+        40.18
+      ],
+      "spoken_alignment_start": 30.94
+    },
+    {
+      "scene": "goal",
+      "source": [
+        39.88,
+        46.02
+      ],
+      "timeline": [
+        40.18,
+        46.32
+      ],
+      "spoken_alignment_start": 40.3
+    },
+    {
+      "scene": "adapt",
+      "source": [
+        46.02,
+        51.544000000000004
+      ],
+      "timeline": [
+        46.32,
+        51.844
+      ],
+      "spoken_alignment_start": 46.44
+    },
+    {
+      "scene": "close",
+      "source": [
+        51.544000000000004,
+        58.24
+      ],
+      "timeline": [
+        51.844,
+        58.54
+      ],
+      "spoken_alignment_start": 51.964
+    }
+  ]
+}

@@ -92,7 +92,7 @@ def incumbent(camp: dict, experiments: list[dict]) -> dict | None:
         acc = (e.get("result") or {}).get("val_balanced_accuracy")
         if acc is None or not _eligible(e["config"], camp["constraints"]):
             continue
-        if best is None or acc > best["result"]["val_balanced_accuracy"]:
+        if best is None or (acc, e["result"].get("val_f1", 0), e["_id"]) > (best["result"]["val_balanced_accuracy"], best["result"].get("val_f1", 0), best["_id"]):
             best = e
     if best is None:
         return None
@@ -119,6 +119,7 @@ def health():
 @app.get("/api/campaigns")
 def campaigns():
     proj = {"objective": 1, "state": 1, "goal_version": 1, "constraints": 1, "created_at": 1, "fake": 1}
+    proj["policy"] = 1
     return clean(list(db().campaigns.find({}, proj).sort("created_at", -1)))
 
 
@@ -164,9 +165,12 @@ def experiments(cid: str):
     reused = {e["payload"].get("experiment_id")
               for e in d.events.find({"campaign_id": cid, "type": "job_reused"}, {"payload": 1})}
     out = []
+    claims = {h["experiment_id"]: h for h in d.hypotheses.find({"campaign_id": cid})} if camp.get("policy") == "research_v1" else {}
     for e in d.experiments.find({"campaign_id": cid}).sort("created_at", 1):
         e["eligible"] = _eligible(e.get("config", {}), camp["constraints"])
         e["reused"] = e["_id"] in reused
+        if e["_id"] in claims:
+            e["hypothesis"] = claims[e["_id"]]
         out.append(e)
     return clean(out)
 
@@ -208,6 +212,13 @@ def memories(cid: str, kind: str | None = None, include_synthetic: bool = False)
     if not include_synthetic:
         flt["synthetic"] = {"$ne": True}
     return clean(list(db().memories.find(flt, {"embedding": 0}).sort("created_at", -1)))
+
+
+@app.get("/api/campaigns/{cid}/hypotheses")
+def hypotheses(cid: str):
+    camp = _campaign_or_404(cid)
+    return clean(list(db().hypotheses.find({"campaign_id": cid, "protocol_id": camp["protocol_id"]})
+                      .sort("created_at", -1)))
 
 
 class StartBody(BaseModel):

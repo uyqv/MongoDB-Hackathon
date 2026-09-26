@@ -1,0 +1,2224 @@
+[
+  {
+    "_id": "6ab82a1b6f1f76582e331638",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:24:59.034+00:00",
+    "type": "campaign_created",
+    "worker_id": null,
+    "payload": {
+      "protocol_id": "p_8b1175a416b1",
+      "constraints": {
+        "max_channels": 64
+      },
+      "max_experiments": 10,
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit."
+    }
+  },
+  {
+    "_id": "6ab82a25966cba67925ff36e",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:09.606+00:00",
+    "type": "worker_start",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "resumed": false,
+      "pid": 7456,
+      "counts": {
+        "done": 0,
+        "failed": 0,
+        "running": 0,
+        "queued": 0
+      },
+      "note": "fresh start"
+    }
+  },
+  {
+    "_id": "6ab82a28966cba67925ff36f",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:12.077+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "_id": "6ab82a29966cba67925ff370",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:13.162+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "packet_id": "pk_298c74b2f5b5",
+      "strategy": "evidence",
+      "goal_version": 1,
+      "token_estimate": 260,
+      "budget_tokens": 4000,
+      "retrieved_ids": [],
+      "incumbent_id": null
+    }
+  },
+  {
+    "_id": "6ab82a2c966cba67925ff371",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:16.247+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "packet_id": "pk_298c74b2f5b5",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454313-4eYgCUOVX1R3VYamo6k6",
+      "usage": {
+        "input_tokens": 2089,
+        "output_tokens": 186,
+        "cost_usd": 0.006038,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a2c966cba67925ff372",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:16.418+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "_id": "6ab82a2c966cba67925ff373",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:16.680+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "_id": "6ab82a2c966cba67925ff374",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:16.764+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "packet_id": "pk_298c74b2f5b5",
+      "config": {
+        "method": "csp_lda",
+        "band": "mu_8_12",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 4
+      },
+      "rationale": "CSP+LDA on mu band with motor-relevant channels is a strong standard baseline for motor imagery discrimination between fists and feet.",
+      "evidence_ids": [],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "_id": "6ab82a2c966cba67925ff375",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:16.933+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+      "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4"
+    }
+  },
+  {
+    "_id": "6ab82a2d966cba67925ff376",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:17.104+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "_id": "6ab82a2d966cba67925ff377",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:17.275+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+      "attempt": 1,
+      "lease_token": "caaa1b2659a76bb3"
+    }
+  },
+  {
+    "_id": "6ab82a2d966cba67925ff378",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:17.797+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "_id": "6ab82a2e966cba67925ff379",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:18.240+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+      "val_balanced_accuracy": 0.6259,
+      "fit_seconds": 0.352
+    }
+  },
+  {
+    "_id": "6ab82a2e966cba67925ff37a",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:18.641+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "memory_id": "m_df8444301dd9",
+      "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "_id": "6ab82a2f966cba67925ff37b",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:19.427+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+      "label": "research_note",
+      "memory_id": "m_958578146974",
+      "note": "Planner hypothesis before running csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: CSP+LDA on mu band with motor-relevant channels is a strong standard baseline for motor imagery discrimination between fists and feet. Outcome, computed by code: it is now the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790454318-vHlAgz71ePHWmtEsoCnc",
+      "usage": {
+        "input_tokens": 527,
+        "output_tokens": 48,
+        "cost_usd": 2.2134e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a2f966cba67925ff37c",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:19.597+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a30966cba67925ff37d",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:20.348+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "_id": "6ab82a31966cba67925ff37e",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:21.065+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "packet_id": "pk_b56fdf95a18a",
+      "strategy": "evidence",
+      "goal_version": 1,
+      "token_estimate": 633,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_958578146974"
+      ],
+      "incumbent_id": "camp_b502457a:x_c895457f2bf3a3ea"
+    }
+  },
+  {
+    "_id": "6ab82a34966cba67925ff37f",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:24.766+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "packet_id": "pk_b56fdf95a18a",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454321-mjFI9oFOS5PgJGzcaA7f",
+      "usage": {
+        "input_tokens": 2904,
+        "output_tokens": 216,
+        "cost_usd": 0.007968,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a34966cba67925ff380",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:24.939+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "_id": "6ab82a35966cba67925ff381",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:25.205+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "_id": "6ab82a35966cba67925ff382",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:25.297+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "packet_id": "pk_b56fdf95a18a",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 4
+      },
+      "rationale": "Test broader beta band with same CSP+LDA settings that produced the current best result, since beta rhythms are also implicated in motor imagery.",
+      "evidence_ids": [
+        "camp_b502457a:x_c895457f2bf3a3ea",
+        "m_958578146974"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "_id": "6ab82a35966cba67925ff383",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:25.470+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4"
+    }
+  },
+  {
+    "_id": "6ab82a35966cba67925ff384",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:25.640+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "_id": "6ab82a35966cba67925ff385",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:25.816+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+      "attempt": 1,
+      "lease_token": "b71553f5f4d4db65"
+    }
+  },
+  {
+    "_id": "6ab82a36966cba67925ff386",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:26.258+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "_id": "6ab82a36966cba67925ff387",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:26.432+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+      "val_balanced_accuracy": 0.6924,
+      "fit_seconds": 0.271
+    }
+  },
+  {
+    "_id": "6ab82a36966cba67925ff388",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:26.837+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "memory_id": "m_8589c3978a4f",
+      "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "_id": "6ab82a37966cba67925ff389",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:27.614+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+      "label": "research_note",
+      "memory_id": "m_d2ff69e33635",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: Test broader beta band with same CSP+LDA settings that produced the current best result, since beta rhythms are also implicated in motor imagery. Outcome, computed by code: it is now the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790454327-3Af4woyUtjYxlL4xhGth",
+      "usage": {
+        "input_tokens": 529,
+        "output_tokens": 48,
+        "cost_usd": 2.2218e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a37966cba67925ff38a",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:27.785+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a38966cba67925ff38b",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:28.623+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "_id": "6ab82a39966cba67925ff38c",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:29.543+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "packet_id": "pk_a1fc9efbd17c",
+      "strategy": "evidence",
+      "goal_version": 1,
+      "token_estimate": 948,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_958578146974",
+        "m_d2ff69e33635"
+      ],
+      "incumbent_id": "camp_b502457a:x_179f0e198f2ab069"
+    }
+  },
+  {
+    "_id": "6ab82a3d966cba67925ff38d",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:33.515+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "packet_id": "pk_a1fc9efbd17c",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454329-5XCcVspJfkpDOSlrJTWh",
+      "usage": {
+        "input_tokens": 3553,
+        "output_tokens": 243,
+        "cost_usd": 0.009536,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a3d966cba67925ff38e",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:33.694+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "_id": "6ab82a3d966cba67925ff38f",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:33.971+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "_id": "6ab82a3e966cba67925ff390",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:34.071+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "packet_id": "pk_a1fc9efbd17c",
+      "config": {
+        "method": "csp_lda",
+        "band": "broad_8_30",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 4
+      },
+      "rationale": "Broad band combines mu and beta rhythms both implicated in motor imagery; testing if wider band improves on beta_13_30 incumbent with same CSP+LDA settings.",
+      "evidence_ids": [
+        "camp_b502457a:x_179f0e198f2ab069",
+        "camp_b502457a:x_c895457f2bf3a3ea"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "_id": "6ab82a3e966cba67925ff391",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:34.263+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+      "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4"
+    }
+  },
+  {
+    "_id": "6ab82a3e966cba67925ff392",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:34.440+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "_id": "6ab82a3e966cba67925ff393",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:34.638+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_7456",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+      "attempt": 1,
+      "lease_token": "c127b39dc4373d1e"
+    }
+  },
+  {
+    "_id": "6ab82a3ec77c668c900e9d14",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:34.715+00:00",
+    "type": "worker_killed",
+    "worker_id": null,
+    "payload": {
+      "pid": 7456,
+      "signal": "SIGKILL"
+    }
+  },
+  {
+    "_id": "6ab82a47ac9246ab8649fc00",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:43.766+00:00",
+    "type": "worker_start",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "resumed": true,
+      "pid": 7953,
+      "counts": {
+        "done": 2,
+        "failed": 0,
+        "running": 1,
+        "queued": 0
+      },
+      "note": "resuming: 2 done experiments will be reused, not recomputed"
+    }
+  },
+  {
+    "_id": "6ab82a49ac9246ab8649fc01",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:45.727+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a4aac9246ab8649fc02",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:46.503+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "WAITING",
+      "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+      "lease_expires_at": "2026-09-26T20:25:49.546+00:00"
+    }
+  },
+  {
+    "_id": "6ab82a4eac9246ab8649fc03",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:50.251+00:00",
+    "type": "lease_expired",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+      "attempt": 1,
+      "dead_owner": "w_Andrews-Ma_7456"
+    }
+  },
+  {
+    "_id": "6ab82a4eac9246ab8649fc04",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:50.524+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "WAITING",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a4fac9246ab8649fc05",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:51.385+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "_id": "6ab82a4fac9246ab8649fc06",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:51.557+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+      "attempt": 2,
+      "lease_token": "380590048771ac34"
+    }
+  },
+  {
+    "_id": "6ab82a50ac9246ab8649fc07",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:52.025+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "_id": "6ab82a50ac9246ab8649fc08",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:52.200+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+      "val_balanced_accuracy": 0.5843,
+      "fit_seconds": 0.291
+    }
+  },
+  {
+    "_id": "6ab82a50ac9246ab8649fc09",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:52.902+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "memory_id": "m_a9a222382542",
+      "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "_id": "6ab82a51ac9246ab8649fc0a",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:53.647+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+      "label": "research_note",
+      "memory_id": "m_50152d9e7bdd",
+      "note": "Planner hypothesis before running csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: Broad band combines mu and beta rhythms both implicated in motor imagery; testing if wider band improves on beta_13_30 incumbent with same CSP+LDA settings. Outcome, computed by code: it did not beat the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790454353-hrB4T154GkDuP1y5m8pq",
+      "usage": {
+        "input_tokens": 536,
+        "output_tokens": 48,
+        "cost_usd": 2.2512e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a51ac9246ab8649fc0b",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:53.826+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a53ac9246ab8649fc0c",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:55.038+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "_id": "6ab82a53ac9246ab8649fc0d",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:55.685+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_69d4381690c1",
+      "strategy": "evidence",
+      "goal_version": 1,
+      "token_estimate": 1216,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_958578146974",
+        "m_d2ff69e33635",
+        "m_50152d9e7bdd"
+      ],
+      "incumbent_id": "camp_b502457a:x_179f0e198f2ab069"
+    }
+  },
+  {
+    "_id": "6ab82a57ac9246ab8649fc0e",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:59.769+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_69d4381690c1",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454356-cTWtbo3ZYsX96SwVjemS",
+      "usage": {
+        "input_tokens": 4103,
+        "output_tokens": 226,
+        "cost_usd": 0.010466,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a57ac9246ab8649fc0f",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:25:59.944+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "_id": "6ab82a58ac9246ab8649fc10",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:00.235+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "_id": "6ab82a58ac9246ab8649fc11",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:00.325+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_69d4381690c1",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 6
+      },
+      "rationale": "Beta band is the best performing so far; increasing CSP components from 4 to 6 may capture more discriminative spatial patterns within the same winning band/window/channels.",
+      "evidence_ids": [
+        "camp_b502457a:x_179f0e198f2ab069",
+        "m_d2ff69e33635"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "_id": "6ab82a58ac9246ab8649fc12",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:00.520+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_ef4ac199c19d5c65",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6"
+    }
+  },
+  {
+    "_id": "6ab82a58ac9246ab8649fc13",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:00.720+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "_id": "6ab82a58ac9246ab8649fc14",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:00.894+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_ef4ac199c19d5c65",
+      "attempt": 1,
+      "lease_token": "44a2bdc3e4cf7159"
+    }
+  },
+  {
+    "_id": "6ab82a59ac9246ab8649fc15",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:01.346+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "_id": "6ab82a59ac9246ab8649fc16",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:01.520+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_ef4ac199c19d5c65",
+      "val_balanced_accuracy": 0.7454,
+      "fit_seconds": 0.269
+    }
+  },
+  {
+    "_id": "6ab82a59ac9246ab8649fc17",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:01.922+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "memory_id": "m_8a9d0a52daea",
+      "experiment_id": "camp_b502457a:x_ef4ac199c19d5c65",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "_id": "6ab82a5ac77c668c900e9d15",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:02.137+00:00",
+    "type": "context_reset",
+    "worker_id": null,
+    "payload": {
+      "context_epoch": 1
+    }
+  },
+  {
+    "_id": "6ab82a5aac9246ab8649fc18",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:02.656+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_ef4ac199c19d5c65",
+      "label": "research_note",
+      "memory_id": "m_22948c114541",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6: Beta band is the best performing so far; increasing CSP components from 4 to 6 may capture more discriminative spatial patterns within the same winning band/window/channels. Outcome, computed by code: it is now the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790454362-iUk4zUnf9CSbSuCRpfIK",
+      "usage": {
+        "input_tokens": 537,
+        "output_tokens": 48,
+        "cost_usd": 2.2554e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a5aac9246ab8649fc19",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:02.839+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a5bac9246ab8649fc1a",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:03.013+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "note": "context reset observed; next decision rebuilt from Atlas only",
+      "context_epoch": 1
+    }
+  },
+  {
+    "_id": "6ab82a5bac9246ab8649fc1b",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:03.954+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "_id": "6ab82a5cc77c668c900e9d16",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:04.112+00:00",
+    "type": "goal_changed",
+    "worker_id": null,
+    "payload": {
+      "from_version": 1,
+      "to_version": 2,
+      "old_constraints": {
+        "max_channels": 64
+      },
+      "new_constraints": {
+        "max_channels": 9
+      },
+      "reason": "Electrode budget changed from the research dashboard"
+    }
+  },
+  {
+    "_id": "6ab82a5cac9246ab8649fc1c",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:04.612+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_fe9a25954c41",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1164,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_958578146974",
+        "m_50152d9e7bdd",
+        "m_d2ff69e33635",
+        "m_22948c114541"
+      ],
+      "incumbent_id": null
+    }
+  },
+  {
+    "_id": "6ab82a61ac9246ab8649fc1d",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:09.152+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_fe9a25954c41",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454364-I40mPfXHLTm1hWROVcvN",
+      "usage": {
+        "input_tokens": 3888,
+        "output_tokens": 248,
+        "cost_usd": 0.010256,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a61ac9246ab8649fc1e",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:09.323+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "_id": "6ab82a61ac9246ab8649fc1f",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:09.584+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "_id": "6ab82a61ac9246ab8649fc20",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:09.672+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_fe9a25954c41",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 6
+      },
+      "rationale": "All prior top results used motor21 (21 channels), which exceeds the current max_channels=9 constraint, making them ineligible; test the best-known band/window/n_components combo on the eligible central9 channel set to establish a valid incumbent.",
+      "evidence_ids": [
+        "camp_b502457a:x_ef4ac199c19d5c65",
+        "m_22948c114541"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "_id": "6ab82a61ac9246ab8649fc21",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:09.851+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6"
+    }
+  },
+  {
+    "_id": "6ab82a62ac9246ab8649fc22",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:10.054+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "_id": "6ab82a62ac9246ab8649fc23",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:10.249+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+      "attempt": 1,
+      "lease_token": "11e5c984efb878b8"
+    }
+  },
+  {
+    "_id": "6ab82a62ac9246ab8649fc24",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:10.449+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "_id": "6ab82a62ac9246ab8649fc25",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:10.625+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+      "val_balanced_accuracy": 0.6529,
+      "fit_seconds": 0.024
+    }
+  },
+  {
+    "_id": "6ab82a63ac9246ab8649fc26",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:11.016+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "memory_id": "m_7f209a30ed1d",
+      "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "_id": "6ab82a63ac9246ab8649fc27",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:11.786+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+      "label": "research_note",
+      "memory_id": "m_a8823bb19235",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6: All prior top results used motor21 (21 channels), which exceeds the current max_channels=9 constraint, making them ineligible; test the best-known band/window/n_components combo on the eligible central9 channel set to establish a valid incumbent. Outcome, computed by code: it is now the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790454371-7Aq3G1GuztXvZGbhj05I",
+      "usage": {
+        "input_tokens": 551,
+        "output_tokens": 48,
+        "cost_usd": 2.3142e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a63ac9246ab8649fc28",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:11.963+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a65ac9246ab8649fc29",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:13.088+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "_id": "6ab82a65ac9246ab8649fc2a",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:13.735+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_110e8233e08b",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1330,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_a8823bb19235",
+        "m_22948c114541",
+        "m_958578146974",
+        "m_d2ff69e33635"
+      ],
+      "incumbent_id": "camp_b502457a:x_57c6273a72d0b921"
+    }
+  },
+  {
+    "_id": "6ab82a6aac9246ab8649fc2b",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:18.118+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_110e8233e08b",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454373-08D22b9BXsboFipEstGD",
+      "usage": {
+        "input_tokens": 4229,
+        "output_tokens": 254,
+        "cost_usd": 0.010998,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a6aac9246ab8649fc2c",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:18.293+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "_id": "6ab82a6aac9246ab8649fc2d",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:18.560+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "_id": "6ab82a6aac9246ab8649fc2e",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:18.649+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_110e8233e08b",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 4
+      },
+      "rationale": "With central9 the only eligible channel set, test n_components=4 to see if fewer components reduce overfitting versus n=6, since motor21 comparisons showed n=6 helped but central9 has fewer channels to span.",
+      "evidence_ids": [
+        "camp_b502457a:x_57c6273a72d0b921",
+        "camp_b502457a:x_ef4ac199c19d5c65"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "_id": "6ab82a6aac9246ab8649fc2f",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:18.821+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4"
+    }
+  },
+  {
+    "_id": "6ab82a6aac9246ab8649fc30",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:18.991+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "_id": "6ab82a6bac9246ab8649fc31",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:19.174+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+      "attempt": 1,
+      "lease_token": "f3f16fccb61e00a6"
+    }
+  },
+  {
+    "_id": "6ab82a6bac9246ab8649fc32",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:19.379+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "_id": "6ab82a6bac9246ab8649fc33",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:19.555+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+      "val_balanced_accuracy": 0.7055,
+      "fit_seconds": 0.019
+    }
+  },
+  {
+    "_id": "6ab82a6bac9246ab8649fc34",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:19.954+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "memory_id": "m_f94610697350",
+      "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "_id": "6ab82a6cac9246ab8649fc35",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:20.665+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+      "label": "research_note",
+      "memory_id": "m_7f2cf612c679",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4: With central9 the only eligible channel set, test n_components=4 to see if fewer components reduce overfitting versus n=6, since motor21 comparisons showed n=6 helped but central9 has fewer channels to span. Outcome, computed by code: it is now the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790454380-wAtxHNdU54reTnHs2RW9",
+      "usage": {
+        "input_tokens": 548,
+        "output_tokens": 48,
+        "cost_usd": 2.3016e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a6cac9246ab8649fc36",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:20.838+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a6eac9246ab8649fc37",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:22.013+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "_id": "6ab82a6eac9246ab8649fc38",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:22.678+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_21c41a9d6876",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1421,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_a8823bb19235",
+        "m_7f2cf612c679",
+        "m_22948c114541",
+        "m_958578146974"
+      ],
+      "incumbent_id": "camp_b502457a:x_d042267980f0d2af"
+    }
+  },
+  {
+    "_id": "6ab82a72ac9246ab8649fc39",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:26.415+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_21c41a9d6876",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454382-bKjefL2U5ftYC69HxkVU",
+      "usage": {
+        "input_tokens": 4419,
+        "output_tokens": 233,
+        "cost_usd": 0.011168,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a72ac9246ab8649fc3a",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:26.590+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "_id": "6ab82a72ac9246ab8649fc3b",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:26.847+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "_id": "6ab82a72ac9246ab8649fc3c",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:26.933+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_21c41a9d6876",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 2
+      },
+      "rationale": "Since n=6 underperformed n=4 on central9, testing n=2 explores whether even fewer components further reduce overfitting on the limited 9-channel set.",
+      "evidence_ids": [
+        "camp_b502457a:x_d042267980f0d2af",
+        "camp_b502457a:x_57c6273a72d0b921"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "_id": "6ab82a73ac9246ab8649fc3d",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:27.107+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2"
+    }
+  },
+  {
+    "_id": "6ab82a73ac9246ab8649fc3e",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:27.283+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "_id": "6ab82a73ac9246ab8649fc3f",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:27.459+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+      "attempt": 1,
+      "lease_token": "0905f1ef7758a630"
+    }
+  },
+  {
+    "_id": "6ab82a73ac9246ab8649fc40",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:27.659+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "_id": "6ab82a73ac9246ab8649fc41",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:27.835+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+      "val_balanced_accuracy": 0.7315,
+      "fit_seconds": 0.021
+    }
+  },
+  {
+    "_id": "6ab82a74ac9246ab8649fc42",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:28.220+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "memory_id": "m_2080ebe9c843",
+      "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "_id": "6ab82a74ac9246ab8649fc43",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:28.965+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+      "label": "research_note",
+      "memory_id": "m_4cdbad3bc470",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2: Since n=6 underperformed n=4 on central9, testing n=2 explores whether even fewer components further reduce overfitting on the limited 9-channel set. Outcome, computed by code: it is now the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790454388-9Fn39KEV0x1nMWhe4bCD",
+      "usage": {
+        "input_tokens": 538,
+        "output_tokens": 48,
+        "cost_usd": 2.2596e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a75ac9246ab8649fc44",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:29.135+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a76ac9246ab8649fc45",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:30.721+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "_id": "6ab82a77ac9246ab8649fc46",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:31.377+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_7119037615fe",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1500,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_a8823bb19235",
+        "m_7f2cf612c679",
+        "m_4cdbad3bc470",
+        "m_22948c114541"
+      ],
+      "incumbent_id": "camp_b502457a:x_82815d2c340ea4b2"
+    }
+  },
+  {
+    "_id": "6ab82a7bac9246ab8649fc47",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:35.241+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_7119037615fe",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454391-8dXJeuXXUKxJNXm8F2Fh",
+      "usage": {
+        "input_tokens": 4599,
+        "output_tokens": 228,
+        "cost_usd": 0.011478,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a7bac9246ab8649fc48",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:35.414+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "_id": "6ab82a7bac9246ab8649fc49",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:35.673+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "_id": "6ab82a7bac9246ab8649fc4a",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:35.759+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_7119037615fe",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.5_3.5",
+        "channels": "central9",
+        "n_components": 2
+      },
+      "rationale": "n_components=2 is the best so far on central9 (0.7315); testing a shifted window may capture more discriminative beta activity within the same eligible channel/method configuration.",
+      "evidence_ids": [
+        "camp_b502457a:x_82815d2c340ea4b2",
+        "m_4cdbad3bc470"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "_id": "6ab82a7bac9246ab8649fc4b",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:35.936+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_9ff45d527cd86889",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.5_3.5 \u00b7 central9 \u00b7 n=2"
+    }
+  },
+  {
+    "_id": "6ab82a7cac9246ab8649fc4c",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:36.110+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "_id": "6ab82a7cac9246ab8649fc4d",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:36.283+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_9ff45d527cd86889",
+      "attempt": 1,
+      "lease_token": "8935479b4789f9f1"
+    }
+  },
+  {
+    "_id": "6ab82a7cac9246ab8649fc4e",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:36.482+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "_id": "6ab82a7cac9246ab8649fc4f",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:36.656+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_9ff45d527cd86889",
+      "val_balanced_accuracy": 0.6515,
+      "fit_seconds": 0.024
+    }
+  },
+  {
+    "_id": "6ab82a7dac9246ab8649fc50",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:37.045+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "memory_id": "m_df2eb037d096",
+      "experiment_id": "camp_b502457a:x_9ff45d527cd86889",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "_id": "6ab82a7dac9246ab8649fc51",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:37.788+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_9ff45d527cd86889",
+      "label": "research_note",
+      "memory_id": "m_abd15df2dbc9",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.5_3.5 \u00b7 central9 \u00b7 n=2: n_components=2 is the best so far on central9 (0.7315); testing a shifted window may capture more discriminative beta activity within the same eligible channel/method configuration. Outcome, computed by code: it did not beat the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790454397-lSYkI6w5KieJPh7SfYDt",
+      "usage": {
+        "input_tokens": 543,
+        "output_tokens": 48,
+        "cost_usd": 2.2806e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a7dac9246ab8649fc52",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:37.962+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a7fac9246ab8649fc53",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:39.323+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "_id": "6ab82a7fac9246ab8649fc54",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:39.845+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_227f97eefbba",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1523,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_a8823bb19235",
+        "m_7f2cf612c679",
+        "m_4cdbad3bc470",
+        "m_22948c114541"
+      ],
+      "incumbent_id": "camp_b502457a:x_82815d2c340ea4b2"
+    }
+  },
+  {
+    "_id": "6ab82a83ac9246ab8649fc55",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:43.792+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_227f97eefbba",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454399-l9QuElMSAcgbxpO7owuU",
+      "usage": {
+        "input_tokens": 4652,
+        "output_tokens": 232,
+        "cost_usd": 0.011624,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a83ac9246ab8649fc56",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:43.964+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "_id": "6ab82a84ac9246ab8649fc57",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:44.226+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "_id": "6ab82a84ac9246ab8649fc58",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:44.315+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_227f97eefbba",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w0.5_2.5",
+        "channels": "central9",
+        "n_components": 2
+      },
+      "rationale": "n=2 is the best-performing component count on central9 so far; testing an earlier window may better capture beta-band ERD onset before movement-related artifacts.",
+      "evidence_ids": [
+        "camp_b502457a:x_82815d2c340ea4b2",
+        "camp_b502457a:x_9ff45d527cd86889"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "_id": "6ab82a84ac9246ab8649fc59",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:44.485+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_310fc5724c1a7578",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=2"
+    }
+  },
+  {
+    "_id": "6ab82a84ac9246ab8649fc5a",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:44.661+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "_id": "6ab82a84ac9246ab8649fc5b",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:44.849+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_310fc5724c1a7578",
+      "attempt": 1,
+      "lease_token": "187ca917a7f71248"
+    }
+  },
+  {
+    "_id": "6ab82a85ac9246ab8649fc5c",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:45.049+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "_id": "6ab82a85ac9246ab8649fc5d",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:45.229+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_310fc5724c1a7578",
+      "val_balanced_accuracy": 0.6924,
+      "fit_seconds": 0.021
+    }
+  },
+  {
+    "_id": "6ab82a85ac9246ab8649fc5e",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:45.615+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "memory_id": "m_6ec2aea4d742",
+      "experiment_id": "camp_b502457a:x_310fc5724c1a7578",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "_id": "6ab82a86ac9246ab8649fc5f",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:46.329+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_310fc5724c1a7578",
+      "label": "research_note",
+      "memory_id": "m_01b215da5d73",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=2: n=2 is the best-performing component count on central9 so far; testing an earlier window may better capture beta-band ERD onset before movement-related artifacts. Outcome, computed by code: it did not beat the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790454405-wmK8kwL6wMOsQQGGfGmU",
+      "usage": {
+        "input_tokens": 535,
+        "output_tokens": 48,
+        "cost_usd": 2.247e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a86ac9246ab8649fc60",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:46.507+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a87ac9246ab8649fc61",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:47.929+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "_id": "6ab82a88ac9246ab8649fc62",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:48.448+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_703ece67a917",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1546,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_a8823bb19235",
+        "m_01b215da5d73",
+        "m_7f2cf612c679",
+        "m_4cdbad3bc470"
+      ],
+      "incumbent_id": "camp_b502457a:x_82815d2c340ea4b2"
+    }
+  },
+  {
+    "_id": "6ab82a8cac9246ab8649fc63",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:52.897+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_703ece67a917",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454408-tjndGc2h4Bj37gufbBE3",
+      "usage": {
+        "input_tokens": 4703,
+        "output_tokens": 278,
+        "cost_usd": 0.012186,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a8dac9246ab8649fc64",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:53.070+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "_id": "6ab82a8dac9246ab8649fc65",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:53.335+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "_id": "6ab82a8dac9246ab8649fc66",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:53.423+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "packet_id": "pk_703ece67a917",
+      "config": {
+        "method": "bandpower_lr",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "C": 1.0
+      },
+      "rationale": "With only one experiment left and CSP variants on central9 plateauing near 0.73, testing an untried method (bandpower_lr) on the same best band/window/channel setup explores a different hypothesis space before budget exhausts.",
+      "evidence_ids": [
+        "camp_b502457a:x_82815d2c340ea4b2",
+        "camp_b502457a:x_d042267980f0d2af",
+        "camp_b502457a:x_310fc5724c1a7578"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "_id": "6ab82a8dac9246ab8649fc67",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:53.593+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_4e913c152ed2d717",
+      "label": "bandpower_lr \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 C=1.0"
+    }
+  },
+  {
+    "_id": "6ab82a8dac9246ab8649fc68",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:53.771+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "_id": "6ab82a8dac9246ab8649fc69",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:53.951+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_4e913c152ed2d717",
+      "attempt": 1,
+      "lease_token": "fa79cb45bdc5a735"
+    }
+  },
+  {
+    "_id": "6ab82a8eac9246ab8649fc6a",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:54.140+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "_id": "6ab82a8eac9246ab8649fc6b",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:54.313+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_4e913c152ed2d717",
+      "val_balanced_accuracy": 0.6266,
+      "fit_seconds": 0.013
+    }
+  },
+  {
+    "_id": "6ab82a8eac9246ab8649fc6c",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:54.700+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "memory_id": "m_b225278d24cb",
+      "experiment_id": "camp_b502457a:x_4e913c152ed2d717",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "_id": "6ab82a8fac9246ab8649fc6d",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:55.463+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_4e913c152ed2d717",
+      "label": "research_note",
+      "memory_id": "m_a99c6895a261",
+      "note": "Planner hypothesis before running bandpower_lr \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 C=1.0: With only one experiment left and CSP variants on central9 plateauing near 0.73, testing an untried method (bandpower_lr) on the same best band/window/channel setup explores a different hypothesis space before budget exhausts. Outcome, computed by code: it did not beat the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790454415-fyn8luqpRYOVt7Ca0Frn",
+      "usage": {
+        "input_tokens": 556,
+        "output_tokens": 48,
+        "cost_usd": 2.3352e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "_id": "6ab82a8fac9246ab8649fc6e",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:55.658+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "_id": "6ab82a92ac9246ab8649fc6f",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:58.834+00:00",
+    "type": "finalized",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 2
+      },
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+      "val_balanced_accuracy": 0.7315,
+      "goal_version": 2,
+      "constraints": {
+        "max_channels": 9
+      },
+      "test_balanced_accuracy": 0.6924,
+      "test_f1": 0.6914,
+      "n_test": 75,
+      "per_subject_test_balanced_accuracy": {
+        "1": 1.0,
+        "2": 0.5,
+        "3": 0.7321,
+        "4": 0.6875,
+        "5": 0.6071
+      },
+      "scored_at": "2026-09-26T20:26:58.748+00:00"
+    }
+  },
+  {
+    "_id": "6ab82a92ac9246ab8649fc70",
+    "campaign_id": "camp_b502457a",
+    "ts": "2026-09-26T20:26:58.923+00:00",
+    "type": "worker_stop",
+    "worker_id": "w_Andrews-Ma_7953",
+    "payload": {
+      "steps": 8
+    }
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "intro",
+    "text": "Your agent can crash. Your neuroscience research shouldn't have to start over."
+  },
+  {
+    "id": "position",
+    "text": "We built Second Shift, a neuroscience harness."
+  },
+  {
+    "id": "run",
+    "text": "Claude proposes experiments to classify imagined hand and foot movements from EEG. Our pipeline measures the results. MongoDB Atlas preserves the evidence."
+  },
+  {
+    "id": "kill",
+    "text": "Now let's pull the plug. The worker disappears, but its completed results stay."
+  },
+  {
+    "id": "recover",
+    "text": "Restart it, and the harness rebuilds context. Completed results are reused; the interrupted experiment runs again."
+  },
+  {
+    "id": "goal",
+    "text": "Now we erase the context and cut the electrode limit from sixty four to nine."
+  },
+  {
+    "id": "adapt",
+    "text": "The harness rechecks the evidence, then continues the search with fewer sensors."
+  },
+  {
+    "id": "close",
+    "text": "With Second Shift, your agent starts fresh, and your neuroscience research moves forward."
+  }
+]

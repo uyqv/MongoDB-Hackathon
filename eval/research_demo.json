@@ -1,0 +1,630 @@
+{
+  "ran_at": "2026-09-26T21:15:50.064+00:00",
+  "campaign_id": "camp_f03bf7b8",
+  "db": "second_shift",
+  "invariants": {
+    "sigkill_in_commit_gap": true,
+    "ranking_reconstructed": true,
+    "assessments_idempotent": true,
+    "ten_distinct_experiments": true,
+    "no_committed_experiment_reexecuted": true,
+    "each_result_committed_once": true,
+    "one_assessment_per_experiment": true,
+    "later_proposals_respect_nine_channels": true,
+    "final_respects_goal": true,
+    "one_finalization": true
+  },
+  "final": {
+    "experiment_id": "camp_f03bf7b8:x_32481b9d069c5a3f",
+    "config": {
+      "method": "bandpower_lr",
+      "band": "lowbeta_13_20",
+      "window": "w0.5_2.5",
+      "channels": "central9",
+      "C": 1.0
+    },
+    "label": "bandpower_lr \u00b7 lowbeta_13_20 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 C=1.0",
+    "val_balanced_accuracy": 0.7333,
+    "goal_version": 2,
+    "constraints": {
+      "max_channels": 9
+    },
+    "test_balanced_accuracy": 0.5601,
+    "test_f1": 0.56,
+    "n_test": 75,
+    "per_subject_test_balanced_accuracy": {
+      "1": 0.8125,
+      "2": 0.5536,
+      "3": 0.3304,
+      "4": 0.5268,
+      "5": 0.5804
+    },
+    "scored_at": "2026-09-26T21:15:44.486+00:00"
+  },
+  "hypotheses": [
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "candidate_id": "x_32481b9d069c5a3f",
+      "changed_parameters": [
+        "band"
+      ],
+      "claim": "Candidate improves reference validation balanced accuracy by at least 0.02",
+      "created_at": "2026-09-26T21:15:32.767+00:00",
+      "evidence_ids": [
+        "camp_f03bf7b8:x_3b508231bc297a6e",
+        "camp_f03bf7b8:x_9e1a7b53f1e8fb67",
+        "camp_f03bf7b8:x_de68d906c24c63d9",
+        "camp_f03bf7b8:x_8e552ccfe20b98f0"
+      ],
+      "experiment_id": "camp_f03bf7b8:x_32481b9d069c5a3f",
+      "goal_version": 2,
+      "kind": "comparison",
+      "packet_id": "pk_9f12fb06327d",
+      "policy_version": "research_v1",
+      "predicted_improvement": -0.09391176966178283,
+      "protocol_id": "p_6a7342086321",
+      "rationale": "With only 1 experiment left, x_32481b9d069c5a3f has the highest expected improvement (0.0359) among remaining candidates and isolates a single parameter (band=lowbeta_13_20) versus the incumbent, extending the systematic band-axis probing without conflating multiple changes as csp_lda candidates would. Prior single-parameter probes on window, C, and mu band all failed to beat the incumbent, but lowbeta remains untested and offers comparable predictive_std (~0.184) to other top options, making it the most informative final move.",
+      "reference_experiment_id": "camp_f03bf7b8:x_3b508231bc297a6e",
+      "scope": "specific_configuration_pair_exploratory_validation",
+      "status": "inconclusive",
+      "threshold": 0.02,
+      "assessed_at": "2026-09-26T21:15:37.481+00:00",
+      "comparison": {
+        "method": "subject_cluster_percentile",
+        "seed": 42,
+        "n_resamples": 2000,
+        "confidence_level": 0.95,
+        "n_subjects": 5,
+        "estimate": 0.08179231863442393,
+        "interval": [
+          -0.03525641025641035,
+          0.18162393162393164
+        ],
+        "variance": 0.0029956348331123673,
+        "scope": "exploratory_adaptive_validation",
+        "paired": true,
+        "available": true
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "candidate_id": "x_de68d906c24c63d9",
+      "changed_parameters": [
+        "C"
+      ],
+      "claim": "Candidate improves reference validation balanced accuracy by at least 0.02",
+      "created_at": "2026-09-26T21:15:07.596+00:00",
+      "evidence_ids": [
+        "m_8e8d2c4da608",
+        "m_ec186dcfd724",
+        "m_7b20133b60be",
+        "h_camp_f03bf7b8:x_9e1a7b53f1e8fb67",
+        "h_camp_f03bf7b8:x_8e552ccfe20b98f0"
+      ],
+      "experiment_id": "camp_f03bf7b8:x_de68d906c24c63d9",
+      "goal_version": 2,
+      "kind": "comparison",
+      "packet_id": "pk_e7fefcb8f525",
+      "policy_version": "research_v1",
+      "predicted_improvement": -0.0977756831927471,
+      "protocol_id": "p_6a7342086321",
+      "rationale": "With only 2 experiments remaining, x_de68d906c24c63d9 offers the highest expected improvement (0.0365) among remaining candidates while isolating a single parameter (C=0.1 vs incumbent's C=1.0), providing a clean regularization-axis probe not yet tested against the 0.6515 incumbent. Its predictive_std (~0.189) is comparable to other top options, and prior single-parameter probes (band, window) have already been exhausted without beating the incumbent, so testing the C-dimension is the most informative remaining move.",
+      "reference_experiment_id": "camp_f03bf7b8:x_3b508231bc297a6e",
+      "scope": "specific_configuration_pair_exploratory_validation",
+      "status": "contradicted_on_validation",
+      "threshold": 0.02,
+      "assessed_at": "2026-09-26T21:15:11.789+00:00",
+      "comparison": {
+        "method": "subject_cluster_percentile",
+        "seed": 42,
+        "n_resamples": 2000,
+        "confidence_level": 0.95,
+        "n_subjects": 5,
+        "estimate": -0.06756756756756754,
+        "interval": [
+          -0.1111111111111111,
+          -0.02631578947368418
+        ],
+        "variance": 0.000418842330483459,
+        "scope": "exploratory_adaptive_validation",
+        "paired": true,
+        "available": true
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "candidate_id": "x_8e552ccfe20b98f0",
+      "changed_parameters": [
+        "band"
+      ],
+      "claim": "Candidate improves reference validation balanced accuracy by at least 0.02",
+      "created_at": "2026-09-26T21:14:48.291+00:00",
+      "evidence_ids": [
+        "camp_f03bf7b8:x_3b508231bc297a6e",
+        "camp_f03bf7b8:x_9e1a7b53f1e8fb67",
+        "camp_f03bf7b8:x_2b68ae70f6d64474"
+      ],
+      "experiment_id": "camp_f03bf7b8:x_8e552ccfe20b98f0",
+      "goal_version": 2,
+      "kind": "comparison",
+      "packet_id": "pk_e2ac6eef3a01",
+      "policy_version": "research_v1",
+      "predicted_improvement": -0.09557176678514101,
+      "protocol_id": "p_6a7342086321",
+      "rationale": "Among the remaining eligible candidates, x_8e552ccfe20b98f0 has the highest expected improvement (0.0371) with a predictive_std (~0.189) comparable to other top options, and it isolates a single parameter (band=mu_8_12) versus the incumbent, extending the systematic band-dimension probing already begun with lowbeta and highbeta comparisons. This keeps the campaign within the remaining 3-experiment budget while mapping an unexplored band axis relative to the 0.6515 incumbent.",
+      "reference_experiment_id": "camp_f03bf7b8:x_3b508231bc297a6e",
+      "scope": "specific_configuration_pair_exploratory_validation",
+      "status": "inconclusive",
+      "threshold": 0.02,
+      "assessed_at": "2026-09-26T21:14:52.304+00:00",
+      "comparison": {
+        "method": "subject_cluster_percentile",
+        "seed": 42,
+        "n_resamples": 2000,
+        "confidence_level": 0.95,
+        "n_subjects": 5,
+        "estimate": -0.08072546230440958,
+        "interval": [
+          -0.32147937411095306,
+          0.1600284495021338
+        ],
+        "variance": 0.015564784646476508,
+        "scope": "exploratory_adaptive_validation",
+        "paired": true,
+        "available": true
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "candidate_id": "x_9e1a7b53f1e8fb67",
+      "changed_parameters": [
+        "window"
+      ],
+      "claim": "Candidate improves reference validation balanced accuracy by at least 0.02",
+      "created_at": "2026-09-26T21:14:26.873+00:00",
+      "evidence_ids": [
+        "camp_f03bf7b8:x_3b508231bc297a6e",
+        "camp_f03bf7b8:x_2b68ae70f6d64474",
+        "m_8e8d2c4da608"
+      ],
+      "experiment_id": "camp_f03bf7b8:x_9e1a7b53f1e8fb67",
+      "goal_version": 2,
+      "kind": "comparison",
+      "packet_id": "pk_269e4d1b1f87",
+      "policy_version": "research_v1",
+      "predicted_improvement": -0.08596283161687301,
+      "protocol_id": "p_6a7342086321",
+      "rationale": "Among remaining candidates, x_9e1a7b53f1e8fb67 has the highest expected improvement (0.0386) with comparable predictive_std (~0.185) to other top options, and it isolates a single parameter (window=w1.5_3.5) against the current incumbent (beta_13_30/central9/C=1.0), extending the window-dimension probing already begun by prior single-parameter comparisons. This keeps the campaign within budget while systematically mapping the window axis relative to the 0.6515 incumbent.",
+      "reference_experiment_id": "camp_f03bf7b8:x_3b508231bc297a6e",
+      "scope": "specific_configuration_pair_exploratory_validation",
+      "status": "contradicted_on_validation",
+      "threshold": 0.02,
+      "assessed_at": "2026-09-26T21:14:30.210+00:00",
+      "comparison": {
+        "method": "subject_cluster_percentile",
+        "seed": 42,
+        "n_resamples": 2000,
+        "confidence_level": 0.95,
+        "n_subjects": 5,
+        "estimate": -0.02596017069701273,
+        "interval": [
+          -0.0672119487908962,
+          0.014957264957264904
+        ],
+        "variance": 0.0005457156325175488,
+        "scope": "exploratory_adaptive_validation",
+        "paired": true,
+        "available": true
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "candidate_id": "x_3b508231bc297a6e",
+      "changed_parameters": [
+        "window"
+      ],
+      "claim": "Candidate improves reference validation balanced accuracy by at least 0.02",
+      "created_at": "2026-09-26T21:14:10.364+00:00",
+      "evidence_ids": [
+        "camp_f03bf7b8:x_2b68ae70f6d64474",
+        "camp_f03bf7b8:x_183cc637d1338d1d"
+      ],
+      "experiment_id": "camp_f03bf7b8:x_3b508231bc297a6e",
+      "goal_version": 2,
+      "kind": "comparison",
+      "packet_id": "pk_5a0474b7618e",
+      "policy_version": "research_v1",
+      "predicted_improvement": -0.08366830083399979,
+      "protocol_id": "p_6a7342086321",
+      "rationale": "This candidate has the highest expected improvement (0.0415) among remaining candidates and varies only the window parameter from the incumbent, providing a clean single-parameter comparison that complements prior band/C/channel probes. Its predictive_std (~0.19) is comparable to other top candidates, and testing it helps map the window dimension not yet explored against the current best (0.6266) incumbent.",
+      "reference_experiment_id": "camp_f03bf7b8:x_2b68ae70f6d64474",
+      "scope": "specific_configuration_pair_exploratory_validation",
+      "status": "inconclusive",
+      "threshold": 0.02,
+      "assessed_at": "2026-09-26T21:14:13.338+00:00",
+      "comparison": {
+        "method": "subject_cluster_percentile",
+        "seed": 42,
+        "n_resamples": 2000,
+        "confidence_level": 0.95,
+        "n_subjects": 5,
+        "estimate": 0.024893314366998487,
+        "interval": [
+          -0.05405405405405406,
+          0.12375533428164998
+        ],
+        "variance": 0.00209757287820709,
+        "scope": "exploratory_adaptive_validation",
+        "paired": true,
+        "available": true
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "candidate_id": "x_2b68ae70f6d64474",
+      "changed_parameters": [
+        "C",
+        "band",
+        "window"
+      ],
+      "claim": "Candidate improves reference validation balanced accuracy by at least 0.02",
+      "created_at": "2026-09-26T21:13:40.556+00:00",
+      "evidence_ids": [
+        "camp_f03bf7b8:x_c5153f67e82dc09a"
+      ],
+      "experiment_id": "camp_f03bf7b8:x_2b68ae70f6d64474",
+      "goal_version": 2,
+      "kind": "comparison",
+      "packet_id": "pk_b59bf9987c88",
+      "policy_version": "research_v1",
+      "predicted_improvement": -0.00515136593544685,
+      "protocol_id": "p_6a7342086321",
+      "rationale": "This candidate has the highest expected improvement (0.0735) among all listed candidates, with predicted accuracy 0.539 relative to the incumbent's 0.5441 val balanced accuracy, making it the most promising next probe. It also changes multiple parameters (C, band, window) from the reference, offering useful signal beyond the single-parameter comparisons already tried.",
+      "reference_experiment_id": "camp_f03bf7b8:x_c5153f67e82dc09a",
+      "scope": "specific_configuration_pair_exploratory_validation",
+      "status": "inconclusive",
+      "threshold": 0.02,
+      "assessed_at": "2026-09-26T21:13:43.706+00:00",
+      "comparison": {
+        "method": "subject_cluster_percentile",
+        "seed": 42,
+        "n_resamples": 2000,
+        "confidence_level": 0.95,
+        "n_subjects": 5,
+        "estimate": 0.08250355618776672,
+        "interval": [
+          0.0017857142857143349,
+          0.21367521367521358
+        ],
+        "variance": 0.003530289013714106,
+        "scope": "exploratory_adaptive_validation",
+        "paired": true,
+        "available": true
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "candidate_id": "x_ea881ea8a7b4bd7c",
+      "changed_parameters": [
+        "band"
+      ],
+      "claim": "Candidate improves reference validation balanced accuracy by at least 0.02",
+      "created_at": "2026-09-26T21:13:19.056+00:00",
+      "evidence_ids": [
+        "camp_f03bf7b8:x_183cc637d1338d1d",
+        "m_9f7982d9a064"
+      ],
+      "experiment_id": "camp_f03bf7b8:x_ea881ea8a7b4bd7c",
+      "goal_version": 1,
+      "kind": "comparison",
+      "packet_id": "pk_1662d8fd79ab",
+      "policy_version": "research_v1",
+      "predicted_improvement": -0.0887085433717072,
+      "protocol_id": "p_6a7342086321",
+      "rationale": "This candidate ties for the highest expected_improvement (0.0399) among all candidates, and changing only the band (mu_8_12 vs incumbent's beta_13_30) provides a clean single-parameter comparison against the current best config (bandpower_lr\u00b7motor21\u00b7C=1.0). Given the incumbent's wide uncertainty interval [0.468, 0.792], testing this alternate frequency band helps determine if a different rhythm improves separability while holding other settings fixed for interpretability.",
+      "reference_experiment_id": "camp_f03bf7b8:x_183cc637d1338d1d",
+      "scope": "specific_configuration_pair_exploratory_validation",
+      "status": "inconclusive",
+      "threshold": 0.02,
+      "assessed_at": "2026-09-26T21:13:29.570+00:00",
+      "comparison": {
+        "method": "subject_cluster_percentile",
+        "seed": 42,
+        "n_resamples": 2000,
+        "confidence_level": 0.95,
+        "n_subjects": 5,
+        "estimate": -0.06827880512091034,
+        "interval": [
+          -0.19999999999999996,
+          0.10149572649572647
+        ],
+        "variance": 0.006400826225256702,
+        "scope": "exploratory_adaptive_validation",
+        "paired": true,
+        "available": true
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "candidate_id": "x_183cc637d1338d1d",
+      "changed_parameters": [
+        "C",
+        "band",
+        "channels",
+        "method",
+        "n_components",
+        "window"
+      ],
+      "claim": "Seeded or unreferenced exploration",
+      "created_at": "2026-09-26T21:13:01.318+00:00",
+      "evidence_ids": [],
+      "experiment_id": "camp_f03bf7b8:x_183cc637d1338d1d",
+      "goal_version": 1,
+      "kind": "exploration",
+      "packet_id": "pk_7422f1b554f3",
+      "policy_version": "research_v1",
+      "predicted_improvement": null,
+      "protocol_id": "p_6a7342086321",
+      "rationale": "Seeded max-min diversity initialization; exploratory measurement without a comparison claim.",
+      "reference_experiment_id": null,
+      "scope": "specific_configuration_pair_exploratory_validation",
+      "status": "exploration",
+      "threshold": 0.02,
+      "assessed_at": "2026-09-26T21:13:03.577+00:00",
+      "comparison": null
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "candidate_id": "x_c474020b98842e63",
+      "changed_parameters": [
+        "C",
+        "band",
+        "channels",
+        "method",
+        "n_components",
+        "window"
+      ],
+      "claim": "Seeded or unreferenced exploration",
+      "created_at": "2026-09-26T21:12:54.144+00:00",
+      "evidence_ids": [],
+      "experiment_id": "camp_f03bf7b8:x_c474020b98842e63",
+      "goal_version": 1,
+      "kind": "exploration",
+      "packet_id": "pk_53c141ce3d23",
+      "policy_version": "research_v1",
+      "predicted_improvement": null,
+      "protocol_id": "p_6a7342086321",
+      "rationale": "Seeded max-min diversity initialization; exploratory measurement without a comparison claim.",
+      "reference_experiment_id": null,
+      "scope": "specific_configuration_pair_exploratory_validation",
+      "status": "exploration",
+      "threshold": 0.02,
+      "assessed_at": "2026-09-26T21:12:56.245+00:00",
+      "comparison": null
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "candidate_id": "x_c5153f67e82dc09a",
+      "changed_parameters": [],
+      "claim": "Seeded or unreferenced exploration",
+      "created_at": "2026-09-26T21:12:47.678+00:00",
+      "evidence_ids": [],
+      "experiment_id": "camp_f03bf7b8:x_c5153f67e82dc09a",
+      "goal_version": 1,
+      "kind": "exploration",
+      "packet_id": "pk_d688606ade48",
+      "policy_version": "research_v1",
+      "predicted_improvement": null,
+      "protocol_id": "p_6a7342086321",
+      "rationale": "Seeded max-min diversity initialization; exploratory measurement without a comparison claim.",
+      "reference_experiment_id": null,
+      "scope": "specific_configuration_pair_exploratory_validation",
+      "status": "exploration",
+      "threshold": 0.02,
+      "assessed_at": "2026-09-26T21:12:49.688+00:00",
+      "comparison": null
+    }
+  ],
+  "llm_calls": [
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "ts": "2026-09-26T21:12:46.730+00:00",
+      "type": "llm_call",
+      "worker_id": "w_Andrews-Ma_49316",
+      "payload": {
+        "packet_id": "pk_d688606ade48",
+        "model": "research_v1_initialization",
+        "request_id": null,
+        "usage": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost_usd": null,
+          "source": "estimate"
+        },
+        "action": "propose",
+        "fallback_used": false,
+        "fallback_reason": null
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "ts": "2026-09-26T21:12:53.282+00:00",
+      "type": "llm_call",
+      "worker_id": "w_Andrews-Ma_49316",
+      "payload": {
+        "packet_id": "pk_53c141ce3d23",
+        "model": "research_v1_initialization",
+        "request_id": null,
+        "usage": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost_usd": null,
+          "source": "estimate"
+        },
+        "action": "propose",
+        "fallback_used": false,
+        "fallback_reason": null
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "ts": "2026-09-26T21:13:00.275+00:00",
+      "type": "llm_call",
+      "worker_id": "w_Andrews-Ma_49316",
+      "payload": {
+        "packet_id": "pk_7422f1b554f3",
+        "model": "research_v1_initialization",
+        "request_id": null,
+        "usage": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost_usd": null,
+          "source": "estimate"
+        },
+        "action": "propose",
+        "fallback_used": false,
+        "fallback_reason": null
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "ts": "2026-09-26T21:13:18.179+00:00",
+      "type": "llm_call",
+      "worker_id": "w_Andrews-Ma_49316",
+      "payload": {
+        "packet_id": "pk_1662d8fd79ab",
+        "model": "anthropic/claude-sonnet-5",
+        "request_id": "gen-1790457194-FeOaD7FlQZ91gVjGbnI3",
+        "usage": {
+          "input_tokens": 11819,
+          "output_tokens": 642,
+          "cost_usd": 0.030058,
+          "source": "provider"
+        },
+        "action": "propose",
+        "fallback_used": false,
+        "fallback_reason": null
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "ts": "2026-09-26T21:13:39.519+00:00",
+      "type": "llm_call",
+      "worker_id": "w_Andrews-Ma_49891",
+      "payload": {
+        "packet_id": "pk_b59bf9987c88",
+        "model": "anthropic/claude-sonnet-5",
+        "request_id": "gen-1790457216-G1ijLz6JXjZNajKnFEej",
+        "usage": {
+          "input_tokens": 11732,
+          "output_tokens": 523,
+          "cost_usd": 0.028694,
+          "source": "provider"
+        },
+        "action": "propose",
+        "fallback_used": false,
+        "fallback_reason": null
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "ts": "2026-09-26T21:14:09.399+00:00",
+      "type": "llm_call",
+      "worker_id": "w_Andrews-Ma_49891",
+      "payload": {
+        "packet_id": "pk_5a0474b7618e",
+        "model": "anthropic/claude-sonnet-5",
+        "request_id": "gen-1790457246-GZqBMTXquRO0ODr9ZfQc",
+        "usage": {
+          "input_tokens": 12980,
+          "output_tokens": 572,
+          "cost_usd": 0.03168,
+          "source": "provider"
+        },
+        "action": "propose",
+        "fallback_used": false,
+        "fallback_reason": null
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "ts": "2026-09-26T21:14:25.846+00:00",
+      "type": "llm_call",
+      "worker_id": "w_Andrews-Ma_49891",
+      "payload": {
+        "packet_id": "pk_269e4d1b1f87",
+        "model": "anthropic/claude-sonnet-5",
+        "request_id": "gen-1790457260-Wr4VcqEobXJMZHF7r2eI",
+        "usage": {
+          "input_tokens": 6699,
+          "output_tokens": 341,
+          "cost_usd": 0.016808,
+          "source": "provider"
+        },
+        "action": "propose",
+        "fallback_used": false,
+        "fallback_reason": null
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "ts": "2026-09-26T21:14:47.245+00:00",
+      "type": "llm_call",
+      "worker_id": "w_Andrews-Ma_49891",
+      "payload": {
+        "packet_id": "pk_e2ac6eef3a01",
+        "model": "anthropic/claude-sonnet-5",
+        "request_id": "gen-1790457283-GkWGBqnrM0LrZCS5kvCH",
+        "usage": {
+          "input_tokens": 14136,
+          "output_tokens": 730,
+          "cost_usd": 0.035572,
+          "source": "provider"
+        },
+        "action": "propose",
+        "fallback_used": false,
+        "fallback_reason": null
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "ts": "2026-09-26T21:15:06.603+00:00",
+      "type": "llm_call",
+      "worker_id": "w_Andrews-Ma_49891",
+      "payload": {
+        "packet_id": "pk_e7fefcb8f525",
+        "model": "anthropic/claude-sonnet-5",
+        "request_id": "gen-1790457300-a9LdifO6OYElZDLoHT7j",
+        "usage": {
+          "input_tokens": 6988,
+          "output_tokens": 379,
+          "cost_usd": 0.017766,
+          "source": "provider"
+        },
+        "action": "propose",
+        "fallback_used": false,
+        "fallback_reason": null
+      }
+    },
+    {
+      "campaign_id": "camp_f03bf7b8",
+      "ts": "2026-09-26T21:15:31.784+00:00",
+      "type": "llm_call",
+      "worker_id": "w_Andrews-Ma_49891",
+      "payload": {
+        "packet_id": "pk_9f12fb06327d",
+        "model": "anthropic/claude-sonnet-5",
+        "request_id": "gen-1790457327-79OOyn6Ny4aDAvXPlSy7",
+        "usage": {
+          "input_tokens": 14486,
+          "output_tokens": 793,
+          "cost_usd": 0.036902000000000004,
+          "source": "provider"
+        },
+        "action": "propose",
+        "fallback_used": false,
+        "fallback_reason": null
+      }
+    }
+  ]
+}

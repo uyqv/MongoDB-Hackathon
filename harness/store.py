@@ -24,6 +24,7 @@ def ensure_indexes(db: Database) -> None:
     db.events.create_index([("campaign_id", ASCENDING), ("ts", ASCENDING)])
     db.packets.create_index([("campaign_id", ASCENDING), ("ts", DESCENDING)])
     db.memories.create_index([("campaign_id", ASCENDING), ("protocol_id", ASCENDING), ("status", ASCENDING)])
+    db.hypotheses.create_index([("campaign_id", ASCENDING), ("protocol_id", ASCENDING), ("created_at", DESCENDING)])
 
 
 def _iso_in(seconds: float) -> str:
@@ -33,13 +34,19 @@ def _iso_in(seconds: float) -> str:
 # ---------------------------------------------------------------- campaigns
 
 def create_campaign(db: Database, *, protocol: dict, objective: str, max_channels: int,
-                    max_experiments: int) -> str:
+                    max_experiments: int, policy: str = "legacy", research_seed: int = 42) -> str:
+    if policy not in ("legacy", "research_v1"):
+        raise ValueError("unknown campaign policy")
+    if policy == "research_v1" and protocol.get("validation_evidence_version") != 1:
+        raise ValueError("research_v1 requires version 1 validation evidence")
     cid = "camp_" + secrets.token_hex(4)
     now = now_iso()
     constraints = {"max_channels": int(max_channels)}
     db.campaigns.insert_one({
         "_id": cid,
         "objective": objective,
+        "policy": policy,
+        "research_seed": int(research_seed),
         "goal_version": 1,
         "constraints": constraints,
         "goal_history": [{"version": 1, "constraints": constraints, "changed_at": now, "reason": "initial goal"}],
@@ -91,7 +98,7 @@ def eligible_done(db: Database, campaign: dict) -> list[dict]:
 
 def incumbent(db: Database, campaign: dict) -> dict | None:
     eligible = eligible_done(db, campaign)
-    return max(eligible, key=lambda e: (e["result"]["val_balanced_accuracy"], e["result"]["val_f1"]),
+    return max(eligible, key=lambda e: (e["result"]["val_balanced_accuracy"], e["result"]["val_f1"], e["_id"]),
                default=None)
 
 
@@ -105,6 +112,13 @@ def enqueue(db: Database, campaign: dict, cfg: dict, proposed_by: dict,
     """
     cfg = normalize_config(cfg)
     cid = campaign["_id"]
+    fresh = get_campaign(db, cid)
+    if fresh["goal_version"] != campaign["goal_version"] or not is_eligible(cfg, fresh["constraints"]):
+        return "", "stale_goal"
+    if budget_used(db, cid) >= fresh["budget"]["max_experiments"]:
+        existing = db.experiments.find_one({"_id": experiment_doc_id(cid, experiment_key(campaign["protocol_id"], cfg))})
+        if not existing:
+            return "", "budget_spent"
     key = experiment_key(campaign["protocol_id"], cfg)
     eid = experiment_doc_id(cid, key)
     try:
@@ -170,6 +184,12 @@ def reclaim_expired(db: Database, cid: str, worker_id: str) -> list[str]:
 
 def commit_result(db: Database, eid: str, token: str, result: dict, worker_id: str | None = None) -> bool:
     """Fenced commit: only the attempt holding the current lease token can write the result."""
+    exp = db.experiments.find_one({"_id": eid})
+    if exp:
+        campaign = get_campaign(db, exp["campaign_id"])
+        if campaign["protocol"].get("validation_evidence_version") == 1:
+            from harness.uncertainty import validate_result
+            validate_result(result)
     res = db.experiments.update_one(
         {"_id": eid, "status": "running", "lease.token": token},
         {"$set": {"status": "done", "result": result, "finished_at": now_iso(), "lease": None}},

@@ -1,6 +1,8 @@
 # Second Shift presentation source
 
-The shareable presentation lives in `delivery/`. Open `delivery/index.html`. Read `delivery/START-HERE.md` for presentation controls and the current new-recording dependency.
+The current presentation lives in `delivery/`. Open `delivery/index.html` and follow `delivery/presenter-script.md`. It is timed for three minutes, including the finished 90-second movie at `second-shift-neuroai-90s.mp4`. `delivery/START-HERE.md` explains playback and the PowerPoint backup.
+
+The current shareable package is `Second-Shift-Presentation-Aligned.zip`. The earlier ZIP and `delivery/Second-Shift-Neuro-AI.pptx` remain as previous versions. The revised PowerPoint is `delivery/Second-Shift-Neuro-AI-Aligned.pptx`.
 
 ## Rebuild
 
@@ -10,16 +12,14 @@ From the repository root:
 node presentation/source/build_browser.mjs
 ```
 
-For PowerPoint, the Codex bundled runtime is required. Link its supplied node_modules directory at `presentation/.build/node_modules`, then run `source/build_pptx.mjs` using the bundled Node executable with `RUNTIME_NODE_MODULES` set. Pass a fresh PPTX filename as the first argument because finalization never overwrites an existing output or receipt.
+The shared slide content, positions, speaking script, and timing live in `source/content.mjs`. Rehearsal cues and short answers live in `source/presenter-cues.md`. The browser build regenerates `delivery/index.html`, `delivery/presenter-script.md`, `delivery/presenter-notes.md`, and `source/content.json`.
 
-The shared content and positions are in `source/content.mjs`. `source/eeg.json` contains the chart values and provenance. `source/extract_eeg.py` regenerates that excerpt from the existing local PhysioNet training recording without downloading data or running the research worker.
+For PowerPoint, use the Codex bundled runtime. Link its node_modules at `presentation/.build/node_modules`, then run `source/build_pptx.mjs` with the bundled Node executable and `RUNTIME_NODE_MODULES` set. Pass a fresh PPTX filename because finalization never overwrites an existing output or receipt. Temporary exports and rendered checks live under `presentation/.build/alignment/`.
 
-The approved direction and storyboard came from the user's implementation request. This explicit selection superseded Huashu's exploratory direction-selection workflow. Its exact critique rubric is retained in `review/critique-guide.md`; no numerical weights were invented.
+`source/eeg.json` contains the real waveform values and provenance. `source/extract_eeg.py` regenerates the excerpt from the existing local PhysioNet training recording.
 
-## Voice generation
+## Demo and narration
 
-From the repository root, run `.venv/bin/python presentation/source/generate_voice.py`, then `.venv/bin/python presentation/source/prepare_audio.py`. Generation uses the existing ElevenLabs adapter and configured key without changing the original adapter, narration script, or recordings. Do not print the key. A new API generation is billable; do not rerun it just to rebuild slides.
+The delivery copy at `delivery/media/second-shift-neuroai-90s.mp4` must remain byte-identical to `second-shift-neuroai-90s.mp4`. The browser plays its embedded narration and never mixes in alternate audio. The video was reviewed against its frames, the matching export transcript, experiment records, and recovery evidence under `run/video-v6/`.
 
-Only new footage may be attached. No old recording is used as a fallback. The current deliverable intentionally has no completed MP4 until the new recording arrives.
-
-The user clarified that the new demo is being created with voiceover. Preserve that soundtrack. The separately generated Eric audio is optional and must not be added over the movie’s narration. The Desktop instruction was corrected and is not an output-location request.
+`delivery/demo-narration.md` and `delivery/media/narration-cues.json` describe this finished 90-second movie. The old `source/narration.json`, `generate_voice.py`, and `prepare_audio.py` are recipes for the previous optional 60-second voiceover. They are not part of the current presentation build. Do not regenerate or layer that audio onto this movie.

@@ -1,0 +1,500 @@
+[
+  {
+    "_id": "camp_b502457a:x_c895457f2bf3a3ea",
+    "key": "x_c895457f2bf3a3ea",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "config": {
+      "method": "csp_lda",
+      "band": "mu_8_12",
+      "window": "w1.0_3.0",
+      "channels": "motor21",
+      "n_components": 4
+    },
+    "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+    "n_channels": 21,
+    "status": "done",
+    "attempt": 1,
+    "lease": null,
+    "proposed_by": {
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454313-4eYgCUOVX1R3VYamo6k6",
+      "rationale": "CSP+LDA on mu band with motor-relevant channels is a strong standard baseline for motor imagery discrimination between fists and feet.",
+      "evidence_ids": [],
+      "fallback_used": false,
+      "packet_id": "pk_298c74b2f5b5"
+    },
+    "goal_version_at_proposal": 1,
+    "result": {
+      "val_balanced_accuracy": 0.6259,
+      "val_f1": 0.625,
+      "n_train": 75,
+      "n_val": 75,
+      "n_channels": 21,
+      "fit_seconds": 0.352,
+      "evaluator_version": "eeg-eval-1",
+      "per_subject_val_balanced_accuracy": {
+        "1": 0.9375,
+        "2": 0.5268,
+        "3": 0.7321,
+        "4": 0.5089,
+        "5": 0.4018
+      }
+    },
+    "error": null,
+    "created_at": "2026-09-26T20:25:16.849+00:00",
+    "started_at": "2026-09-26T20:25:17.188+00:00",
+    "finished_at": "2026-09-26T20:25:17.882+00:00"
+  },
+  {
+    "_id": "camp_b502457a:x_179f0e198f2ab069",
+    "key": "x_179f0e198f2ab069",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "config": {
+      "method": "csp_lda",
+      "band": "beta_13_30",
+      "window": "w1.0_3.0",
+      "channels": "motor21",
+      "n_components": 4
+    },
+    "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+    "n_channels": 21,
+    "status": "done",
+    "attempt": 1,
+    "lease": null,
+    "proposed_by": {
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454321-mjFI9oFOS5PgJGzcaA7f",
+      "rationale": "Test broader beta band with same CSP+LDA settings that produced the current best result, since beta rhythms are also implicated in motor imagery.",
+      "evidence_ids": [
+        "camp_b502457a:x_c895457f2bf3a3ea",
+        "m_958578146974"
+      ],
+      "fallback_used": false,
+      "packet_id": "pk_b56fdf95a18a"
+    },
+    "goal_version_at_proposal": 1,
+    "result": {
+      "val_balanced_accuracy": 0.6924,
+      "val_f1": 0.6914,
+      "n_train": 75,
+      "n_val": 75,
+      "n_channels": 21,
+      "fit_seconds": 0.271,
+      "evaluator_version": "eeg-eval-1",
+      "per_subject_val_balanced_accuracy": {
+        "1": 0.9375,
+        "2": 0.5,
+        "3": 0.7411,
+        "4": 1.0,
+        "5": 0.3304
+      }
+    },
+    "error": null,
+    "created_at": "2026-09-26T20:25:25.383+00:00",
+    "started_at": "2026-09-26T20:25:25.727+00:00",
+    "finished_at": "2026-09-26T20:25:26.343+00:00"
+  },
+  {
+    "_id": "camp_b502457a:x_630f7073b4bccb50",
+    "key": "x_630f7073b4bccb50",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "config": {
+      "method": "csp_lda",
+      "band": "broad_8_30",
+      "window": "w1.0_3.0",
+      "channels": "motor21",
+      "n_components": 4
+    },
+    "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+    "n_channels": 21,
+    "status": "done",
+    "attempt": 2,
+    "lease": null,
+    "proposed_by": {
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454329-5XCcVspJfkpDOSlrJTWh",
+      "rationale": "Broad band combines mu and beta rhythms both implicated in motor imagery; testing if wider band improves on beta_13_30 incumbent with same CSP+LDA settings.",
+      "evidence_ids": [
+        "camp_b502457a:x_179f0e198f2ab069",
+        "camp_b502457a:x_c895457f2bf3a3ea"
+      ],
+      "fallback_used": false,
+      "packet_id": "pk_a1fc9efbd17c"
+    },
+    "goal_version_at_proposal": 1,
+    "result": {
+      "val_balanced_accuracy": 0.5843,
+      "val_f1": 0.5717,
+      "n_train": 75,
+      "n_val": 75,
+      "n_channels": 21,
+      "fit_seconds": 0.291,
+      "evaluator_version": "eeg-eval-1",
+      "per_subject_val_balanced_accuracy": {
+        "1": 0.9375,
+        "2": 0.5,
+        "3": 0.2768,
+        "4": 0.7946,
+        "5": 0.5
+      }
+    },
+    "error": null,
+    "created_at": "2026-09-26T20:25:34.173+00:00",
+    "started_at": "2026-09-26T20:25:51.471+00:00",
+    "finished_at": "2026-09-26T20:25:52.113+00:00"
+  },
+  {
+    "_id": "camp_b502457a:x_ef4ac199c19d5c65",
+    "key": "x_ef4ac199c19d5c65",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "config": {
+      "method": "csp_lda",
+      "band": "beta_13_30",
+      "window": "w1.0_3.0",
+      "channels": "motor21",
+      "n_components": 6
+    },
+    "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6",
+    "n_channels": 21,
+    "status": "done",
+    "attempt": 1,
+    "lease": null,
+    "proposed_by": {
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454356-cTWtbo3ZYsX96SwVjemS",
+      "rationale": "Beta band is the best performing so far; increasing CSP components from 4 to 6 may capture more discriminative spatial patterns within the same winning band/window/channels.",
+      "evidence_ids": [
+        "camp_b502457a:x_179f0e198f2ab069",
+        "m_d2ff69e33635"
+      ],
+      "fallback_used": false,
+      "packet_id": "pk_69d4381690c1"
+    },
+    "goal_version_at_proposal": 1,
+    "result": {
+      "val_balanced_accuracy": 0.7454,
+      "val_f1": 0.7438,
+      "n_train": 75,
+      "n_val": 75,
+      "n_channels": 21,
+      "fit_seconds": 0.269,
+      "evaluator_version": "eeg-eval-1",
+      "per_subject_val_balanced_accuracy": {
+        "1": 0.9375,
+        "2": 0.8125,
+        "3": 0.5893,
+        "4": 0.875,
+        "5": 0.5536
+      }
+    },
+    "error": null,
+    "created_at": "2026-09-26T20:26:00.427+00:00",
+    "started_at": "2026-09-26T20:26:00.808+00:00",
+    "finished_at": "2026-09-26T20:26:01.433+00:00"
+  },
+  {
+    "_id": "camp_b502457a:x_57c6273a72d0b921",
+    "key": "x_57c6273a72d0b921",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "config": {
+      "method": "csp_lda",
+      "band": "beta_13_30",
+      "window": "w1.0_3.0",
+      "channels": "central9",
+      "n_components": 6
+    },
+    "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+    "n_channels": 9,
+    "status": "done",
+    "attempt": 1,
+    "lease": null,
+    "proposed_by": {
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454364-I40mPfXHLTm1hWROVcvN",
+      "rationale": "All prior top results used motor21 (21 channels), which exceeds the current max_channels=9 constraint, making them ineligible; test the best-known band/window/n_components combo on the eligible central9 channel set to establish a valid incumbent.",
+      "evidence_ids": [
+        "camp_b502457a:x_ef4ac199c19d5c65",
+        "m_22948c114541"
+      ],
+      "fallback_used": false,
+      "packet_id": "pk_fe9a25954c41"
+    },
+    "goal_version_at_proposal": 1,
+    "result": {
+      "val_balanced_accuracy": 0.6529,
+      "val_f1": 0.6528,
+      "n_train": 75,
+      "n_val": 75,
+      "n_channels": 9,
+      "fit_seconds": 0.024,
+      "evaluator_version": "eeg-eval-1",
+      "per_subject_val_balanced_accuracy": {
+        "1": 0.9375,
+        "2": 0.625,
+        "3": 0.3393,
+        "4": 0.75,
+        "5": 0.6786
+      }
+    },
+    "error": null,
+    "created_at": "2026-09-26T20:26:09.758+00:00",
+    "started_at": "2026-09-26T20:26:10.153+00:00",
+    "finished_at": "2026-09-26T20:26:10.536+00:00"
+  },
+  {
+    "_id": "camp_b502457a:x_d042267980f0d2af",
+    "key": "x_d042267980f0d2af",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "config": {
+      "method": "csp_lda",
+      "band": "beta_13_30",
+      "window": "w1.0_3.0",
+      "channels": "central9",
+      "n_components": 4
+    },
+    "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+    "n_channels": 9,
+    "status": "done",
+    "attempt": 1,
+    "lease": null,
+    "proposed_by": {
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454373-08D22b9BXsboFipEstGD",
+      "rationale": "With central9 the only eligible channel set, test n_components=4 to see if fewer components reduce overfitting versus n=6, since motor21 comparisons showed n=6 helped but central9 has fewer channels to span.",
+      "evidence_ids": [
+        "camp_b502457a:x_57c6273a72d0b921",
+        "camp_b502457a:x_ef4ac199c19d5c65"
+      ],
+      "fallback_used": false,
+      "packet_id": "pk_110e8233e08b"
+    },
+    "goal_version_at_proposal": 2,
+    "result": {
+      "val_balanced_accuracy": 0.7055,
+      "val_f1": 0.7041,
+      "n_train": 75,
+      "n_val": 75,
+      "n_channels": 9,
+      "fit_seconds": 0.019,
+      "evaluator_version": "eeg-eval-1",
+      "per_subject_val_balanced_accuracy": {
+        "1": 0.9375,
+        "2": 0.625,
+        "3": 0.4107,
+        "4": 1.0,
+        "5": 0.6161
+      }
+    },
+    "error": null,
+    "created_at": "2026-09-26T20:26:18.734+00:00",
+    "started_at": "2026-09-26T20:26:19.077+00:00",
+    "finished_at": "2026-09-26T20:26:19.468+00:00"
+  },
+  {
+    "_id": "camp_b502457a:x_82815d2c340ea4b2",
+    "key": "x_82815d2c340ea4b2",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "config": {
+      "method": "csp_lda",
+      "band": "beta_13_30",
+      "window": "w1.0_3.0",
+      "channels": "central9",
+      "n_components": 2
+    },
+    "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+    "n_channels": 9,
+    "status": "done",
+    "attempt": 1,
+    "lease": null,
+    "proposed_by": {
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454382-bKjefL2U5ftYC69HxkVU",
+      "rationale": "Since n=6 underperformed n=4 on central9, testing n=2 explores whether even fewer components further reduce overfitting on the limited 9-channel set.",
+      "evidence_ids": [
+        "camp_b502457a:x_d042267980f0d2af",
+        "camp_b502457a:x_57c6273a72d0b921"
+      ],
+      "fallback_used": false,
+      "packet_id": "pk_21c41a9d6876"
+    },
+    "goal_version_at_proposal": 2,
+    "result": {
+      "val_balanced_accuracy": 0.7315,
+      "val_f1": 0.7275,
+      "n_train": 75,
+      "n_val": 75,
+      "n_channels": 9,
+      "fit_seconds": 0.021,
+      "evaluator_version": "eeg-eval-1",
+      "per_subject_val_balanced_accuracy": {
+        "1": 0.9375,
+        "2": 0.4911,
+        "3": 0.5893,
+        "4": 1.0,
+        "5": 0.6786
+      }
+    },
+    "error": null,
+    "created_at": "2026-09-26T20:26:27.021+00:00",
+    "started_at": "2026-09-26T20:26:27.368+00:00",
+    "finished_at": "2026-09-26T20:26:27.745+00:00"
+  },
+  {
+    "_id": "camp_b502457a:x_9ff45d527cd86889",
+    "key": "x_9ff45d527cd86889",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "config": {
+      "method": "csp_lda",
+      "band": "beta_13_30",
+      "window": "w1.5_3.5",
+      "channels": "central9",
+      "n_components": 2
+    },
+    "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.5_3.5 \u00b7 central9 \u00b7 n=2",
+    "n_channels": 9,
+    "status": "done",
+    "attempt": 1,
+    "lease": null,
+    "proposed_by": {
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454391-8dXJeuXXUKxJNXm8F2Fh",
+      "rationale": "n_components=2 is the best so far on central9 (0.7315); testing a shifted window may capture more discriminative beta activity within the same eligible channel/method configuration.",
+      "evidence_ids": [
+        "camp_b502457a:x_82815d2c340ea4b2",
+        "m_4cdbad3bc470"
+      ],
+      "fallback_used": false,
+      "packet_id": "pk_7119037615fe"
+    },
+    "goal_version_at_proposal": 2,
+    "result": {
+      "val_balanced_accuracy": 0.6515,
+      "val_f1": 0.6457,
+      "n_train": 75,
+      "n_val": 75,
+      "n_channels": 9,
+      "fit_seconds": 0.024,
+      "evaluator_version": "eeg-eval-1",
+      "per_subject_val_balanced_accuracy": {
+        "1": 0.9375,
+        "2": 0.5625,
+        "3": 0.4643,
+        "4": 0.875,
+        "5": 0.4911
+      }
+    },
+    "error": null,
+    "created_at": "2026-09-26T20:26:35.847+00:00",
+    "started_at": "2026-09-26T20:26:36.196+00:00",
+    "finished_at": "2026-09-26T20:26:36.568+00:00"
+  },
+  {
+    "_id": "camp_b502457a:x_310fc5724c1a7578",
+    "key": "x_310fc5724c1a7578",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "config": {
+      "method": "csp_lda",
+      "band": "beta_13_30",
+      "window": "w0.5_2.5",
+      "channels": "central9",
+      "n_components": 2
+    },
+    "label": "csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=2",
+    "n_channels": 9,
+    "status": "done",
+    "attempt": 1,
+    "lease": null,
+    "proposed_by": {
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454399-l9QuElMSAcgbxpO7owuU",
+      "rationale": "n=2 is the best-performing component count on central9 so far; testing an earlier window may better capture beta-band ERD onset before movement-related artifacts.",
+      "evidence_ids": [
+        "camp_b502457a:x_82815d2c340ea4b2",
+        "camp_b502457a:x_9ff45d527cd86889"
+      ],
+      "fallback_used": false,
+      "packet_id": "pk_227f97eefbba"
+    },
+    "goal_version_at_proposal": 2,
+    "result": {
+      "val_balanced_accuracy": 0.6924,
+      "val_f1": 0.6914,
+      "n_train": 75,
+      "n_val": 75,
+      "n_channels": 9,
+      "fit_seconds": 0.021,
+      "evaluator_version": "eeg-eval-1",
+      "per_subject_val_balanced_accuracy": {
+        "1": 0.875,
+        "2": 0.4911,
+        "3": 0.4732,
+        "4": 1.0,
+        "5": 0.6786
+      }
+    },
+    "error": null,
+    "created_at": "2026-09-26T20:26:44.400+00:00",
+    "started_at": "2026-09-26T20:26:44.749+00:00",
+    "finished_at": "2026-09-26T20:26:45.138+00:00"
+  },
+  {
+    "_id": "camp_b502457a:x_4e913c152ed2d717",
+    "key": "x_4e913c152ed2d717",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "config": {
+      "method": "bandpower_lr",
+      "band": "beta_13_30",
+      "window": "w1.0_3.0",
+      "channels": "central9",
+      "C": 1.0
+    },
+    "label": "bandpower_lr \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 C=1.0",
+    "n_channels": 9,
+    "status": "done",
+    "attempt": 1,
+    "lease": null,
+    "proposed_by": {
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454408-tjndGc2h4Bj37gufbBE3",
+      "rationale": "With only one experiment left and CSP variants on central9 plateauing near 0.73, testing an untried method (bandpower_lr) on the same best band/window/channel setup explores a different hypothesis space before budget exhausts.",
+      "evidence_ids": [
+        "camp_b502457a:x_82815d2c340ea4b2",
+        "camp_b502457a:x_d042267980f0d2af",
+        "camp_b502457a:x_310fc5724c1a7578"
+      ],
+      "fallback_used": false,
+      "packet_id": "pk_703ece67a917"
+    },
+    "goal_version_at_proposal": 2,
+    "result": {
+      "val_balanced_accuracy": 0.6266,
+      "val_f1": 0.6266,
+      "n_train": 75,
+      "n_val": 75,
+      "n_channels": 9,
+      "fit_seconds": 0.013,
+      "evaluator_version": "eeg-eval-1",
+      "per_subject_val_balanced_accuracy": {
+        "1": 0.875,
+        "2": 0.5,
+        "3": 0.4732,
+        "4": 0.8661,
+        "5": 0.4464
+      }
+    },
+    "error": null,
+    "created_at": "2026-09-26T20:26:53.508+00:00",
+    "started_at": "2026-09-26T20:26:53.862+00:00",
+    "finished_at": "2026-09-26T20:26:54.227+00:00"
+  }
+]

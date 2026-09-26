@@ -1,0 +1,40 @@
+{
+ "audio": "run/video-v5/voice-final/narration.wav",
+ "voice": "ypfAZhVeE0hhj0A5eGdR",
+ "model": "eleven_v3",
+ "total": 58.24,
+ "scenes": {
+  "intro": [
+   0.0,
+   6.107
+  ],
+  "position": [
+   6.107,
+   10.091
+  ],
+  "run": [
+   10.091,
+   23.48
+  ],
+  "kill": [
+   23.48,
+   30.64
+  ],
+  "recover": [
+   30.64,
+   40.0
+  ],
+  "goal": [
+   40.0,
+   46.14
+  ],
+  "adapt": [
+   46.14,
+   51.664
+  ],
+  "close": [
+   51.664,
+   58.24
+  ]
+ }
+}

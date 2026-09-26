@@ -1,31 +1,34 @@
 # Second Shift presentation
 
-Open **index.html** in Chrome, Edge, or Safari. Keep this folder together: fonts, images, and media are local. No internet connection is required for the slides.
+Open **index.html** in Chrome, Edge, or Safari. Keep this folder together. Fonts, artwork, and the finished demo are local.
+
+The pitch is timed for **2:55 within a three-minute slot**, including the complete **90-second demo**, with five seconds of reserve. Follow **presenter-script.md** for the spoken script, video cues and short answers. **presenter-notes.md** includes the same speech and source references.
 
 ## Presenting
 
-- Left and right arrows change slides. Number keys 1–6 jump to a slide.
-- **F** enters fullscreen. **O** shows all six slides.
-- **N** opens presenter notes on the same screen. Close notes before projecting. **R** resets the rehearsal timer.
-- On slide 4, **Enter** or a click starts the demo explicitly. Leaving the slide stops and resets playback.
-- The complete pitch is planned for **2:55**, including the 60-second demo, with five seconds of reserve.
+- Left and right arrows change slides. Number keys 1 to 6 jump to a slide.
+- F enters fullscreen. O shows all six slides. R resets the rehearsal timer.
+- N opens notes on the same screen. Close them before projecting.
+- Reach slide 4 at 0:45, say its introduction, then press Enter at 0:50.
+- Let the full video play with its existing narration. Advance to slide 5 at 2:20.
+- Leaving slide 4 stops and resets the movie.
 
-## New recording required
+## Included demo
 
-No previous dashboard video, raw frame, or dashboard screenshot is included. The user is creating a new demo with voiceover. Slide 4 is reserved for that finished 60-second movie.
+**media/second-shift-neuroai-90s.mp4** is an unchanged copy of the exact movie requested for this presentation. It loads automatically and starts only when you press Enter or click slide 4. The Load demo control can reconnect the file if needed.
 
-The deck includes a **Load new demo** control for opening a local video without uploading it. A file loaded this way lasts until the page reloads. For permanent inclusion, put the completed new movie at `media/second-shift-demo.mp4` and rebuild the browser deck, or use the loader after each opening.
+The video shows experiments accumulating, a worker stop and restart, context clearing, and the electrode limit changing from 64 to nine. It ends with a best eligible validation score of 0.759 using nine electrodes. Its narration remains intact. Do not play any separate voiceover on top of it.
 
-An optional alternate voiceover prepared for this presentation is in `media/second-shift-voiceover.mp3` and `.wav`. `media/second-shift-demo-audio.wav` is an exact 60-second audio bed with the same narration and silence at the beginning and end. `demo-narration.md` and `media/narration-cues.json` give the timing. Use the soundtrack embedded in the new movie. Do not add this alternate voiceover on top of it. The alternate script has not been matched to the final footage.
+The older `second-shift-voiceover` audio and `second-shift-demo-audio.wav` in this working folder were optional audio for the previous 60-second plan. The current presentation does not use them.
 
 ## PowerPoint backup
 
-Use **Second-Shift-Neuro-AI.pptx**. Text, the research-loop diagram, and the EEG chart are editable. The brain illustrations are rendered artwork. The static deck does not reproduce browser motion or contain a finished demo video.
+Use **Second-Shift-Neuro-AI-Aligned.pptx**. The six slides and speaker notes match the browser deck. The text, EEG chart and research-loop elements remain editable. This static backup does not embed the movie. Play the included MP4 in a separate player on slide 4, then return to slide 5.
 
-Install Space Grotesk and Source Sans 3 from `assets/fonts` before opening in PowerPoint on a machine that does not already have them. The browser loads these fonts automatically. The PowerPoint package and its rendered slides were checked, but it was not opened in the desktop PowerPoint application.
+Install Space Grotesk and Source Sans 3 from assets/fonts if needed. The browser loads them automatically. The deck was rendered and checked programmatically, not opened in desktop PowerPoint.
 
-## Content
+## Results and scope
 
-`presenter-notes.md` has the live script, timing, and source references. The 73.2% result belongs to the documented 21-electrode reference campaign. The 8/8 and 5/5 reliability checks are separate evaluations. Do not attribute these numbers to a newly recorded campaign unless its results independently establish them.
+Slide 5 separates the demo's **75.9% validation balanced accuracy with nine electrodes** from the reference campaign's **73.2% sealed test balanced accuracy with 21 electrodes**. The 8/8 recovery and 5/5 constraint checks are invariants from separate evaluations, not counts of independent trials. The memory stress check used 10,000 synthetic distractor notes. Billions of tokens remains a target.
 
-The brain sculptures are conceptual AI-generated illustrations, not scans, recorded brain activity, or anatomically verified electrode placements. The waveform is a real unfiltered PhysioNet EEG excerpt. Source credits are in `CREDITS.md`.
+The brain sculptures are conceptual illustrations. The waveform is a real PhysioNet EEG excerpt. See CREDITS.md for asset provenance.

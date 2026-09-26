@@ -54,6 +54,16 @@ def add_memory(db: Database, **kw) -> str:
 
 def fallback_plan(packet: dict, reason: str) -> dict:
     """Deterministic stand-in: a seeded shuffle of eligible, untried configs."""
+    if packet.get("policy") == "research_v1":
+        from harness.planner import fallback_config
+        from harness.research import proposal_metadata
+        cfg = fallback_config(packet)
+        return {"action": "propose" if cfg else "stop", "config": cfg,
+                "rationale": f"Top-ranked numerical candidate ({reason}).", "evidence_ids": [],
+                "model": "deterministic-fallback", "request_id": None,
+                "usage": {"input_tokens": None, "output_tokens": None, "cost_usd": None, "source": "estimate"},
+                "fallback_used": True, "fallback_reason": reason,
+                **(proposal_metadata(packet, cfg) if cfg else {})}
     tried = set(packet["tried_keys"])
     constraints = packet["goal"]["constraints"]
     order = all_configs()
@@ -97,6 +107,12 @@ def _call_planner_once(packet: dict) -> dict:
 
 def call_planner(packet: dict) -> dict:
     """Call the planner, waiting out provider rate limits instead of silently falling back."""
+    if (packet.get("policy") == "research_v1" and packet["research"]["phase"] == "initialization"
+            and packet["goal"]["budget"]["remaining"] > 0):
+        result = fallback_plan(packet, "seeded initialization")
+        result.update(model="research_v1_initialization", fallback_used=False, fallback_reason=None,
+                      rationale="Seeded max-min diversity initialization; exploratory measurement without a comparison claim.")
+        return result
     for wait in (*RATE_LIMIT_BACKOFF, None):
         result = _call_planner_once(packet)
         reason = result.get("fallback_reason") or ""
@@ -113,6 +129,11 @@ def guard(packet: dict, result: dict) -> str | None:
         cfg = normalize_config(result["config"])
     except (ValueError, TypeError) as exc:
         return f"outside allowed surface: {exc}"
+    if packet.get("policy") == "research_v1":
+        candidate = next((c for c in packet["research"]["candidates"]
+                          if c["candidate_id"] == result.get("candidate_id")), None)
+        if not candidate or candidate["config"] != cfg:
+            return "candidate is outside the current shortlist"
     if not is_eligible(cfg, packet["goal"]["constraints"]):
         return f"ineligible under max_channels={packet['goal']['constraints']['max_channels']}"
     if experiment_key(packet["protocol_id"], cfg) in set(packet["tried_keys"]):
@@ -124,11 +145,12 @@ def guard(packet: dict, result: dict) -> str | None:
 
 class Worker:
     def __init__(self, db: Database, campaign_id: str, *, crash_after_claim: int | None = None,
-                 strategy: str = "evidence"):
+                 strategy: str = "evidence", crash_after_commit: int | None = None):
         self.db = db
         self.cid = campaign_id
         self.worker_id = f"w_{socket.gethostname().split('.')[0][:10]}_{os.getpid()}"
         self.crash_after_claim = crash_after_claim
+        self.crash_after_commit = crash_after_commit
         self.strategy = strategy
         self.claims = 0
         self.protocol: dict | None = None
@@ -151,6 +173,9 @@ class Worker:
         self.epoch_seen = camp["context_epoch"]
         store.reclaim_expired(self.db, self.cid, self.worker_id)
         self.repair_projections(camp)
+        if camp.get("policy") == "research_v1":
+            from harness.hypotheses import reconcile
+            reconcile(self.db, camp)
         return camp
 
     def repair_projections(self, camp: dict) -> None:
@@ -209,7 +234,8 @@ class Worker:
         self.log("worker_start", resumed=any(counts.values()), pid=os.getpid(), counts=counts,
                  note=(f"resuming: {counts['done']} done experiments will be reused, not recomputed"
                        if counts["done"] else "fresh start"))
-        self.protocol, self.data = eeg.load_protocol(camp["protocol"]["mode"])
+        self.protocol, self.data = eeg.load_protocol(camp["protocol"]["mode"],
+                                                     camp["protocol"].get("validation_evidence_version"))
         if protocol_id(self.protocol) != camp["protocol_id"]:
             self.state("FAILED", reason="data/split/evaluator changed; refusing to reuse old measurements")
             raise SystemExit("protocol mismatch")
@@ -264,6 +290,10 @@ class Worker:
                              config=result.get("config"))
                     result = fallback_plan(packet, f"guard rejected planner proposal: {problem}")
             self.db.packets.update_one({"_id": packet["packet_id"]}, {"$set": {"planner_result": result}})
+            camp = store.get_campaign(self.db, self.cid)
+            if camp["goal_version"] != packet["goal"]["goal_version"]:
+                self.log("proposal_rejected", packet_id=packet["packet_id"], reason="goal changed during planning")
+                continue
             if result["action"] == "stop":
                 return False
 
@@ -271,15 +301,25 @@ class Worker:
             cfg = normalize_config(result["config"])
             self.log("proposal", packet_id=packet["packet_id"], config=cfg, rationale=result["rationale"],
                      evidence_ids=result["evidence_ids"], model=result["model"])
-            _, outcome = store.enqueue(self.db, camp, cfg, {
+            eid, outcome = store.enqueue(self.db, camp, cfg, {
                 "model": result["model"], "request_id": result["request_id"], "rationale": result["rationale"],
                 "evidence_ids": result["evidence_ids"], "fallback_used": result["fallback_used"],
                 "packet_id": packet["packet_id"],
+                **({"candidate_id": result["candidate_id"], "hypothesis": result["hypothesis"]}
+                   if camp.get("policy") == "research_v1" else {}),
             }, self.worker_id)
+            if outcome == "stale_goal":
+                camp = store.get_campaign(self.db, self.cid)
+                continue
+            if outcome == "budget_spent":
+                return False
+            if camp.get("policy") == "research_v1":
+                from harness.hypotheses import register
+                register(self.db, camp, self.db.experiments.find_one({"_id": eid}))
             if outcome != "reused":
                 return True
             camp = store.get_campaign(self.db, self.cid)  # reused: no budget spent, plan again
-        return False
+        return True  # repeated concurrent goal changes: rebuild on the next loop
 
     def execute(self, camp: dict) -> None:
         """EXECUTE -> COMMIT."""
@@ -287,6 +327,16 @@ class Worker:
         job = store.claim_next(self.db, self.cid, self.worker_id)
         if job is None:
             return
+        camp = store.get_campaign(self.db, self.cid)
+        if not is_eligible(job["config"], camp["constraints"]):
+            self.db.experiments.update_one({"_id": job["_id"], "lease.token": job["lease"]["token"]},
+                {"$set": {"status": "cancelled", "lease": None, "finished_at": now_iso(),
+                          "error": "outside current constraints before execution"}})
+            self.log("job_cancelled", experiment_id=job["_id"], reason="goal changed before execution")
+            return
+        if camp.get("policy") == "research_v1":
+            from harness.hypotheses import register
+            register(self.db, camp, job)
         self.claims += 1
         if self.crash_after_claim and self.claims >= self.crash_after_claim:
             self.log("fault_injection", experiment_id=job["_id"], attempt=job["attempt"],
@@ -305,6 +355,13 @@ class Worker:
             return
         self.state("COMMIT")
         if store.commit_result(self.db, job["_id"], token, result, self.worker_id):
+            if self.crash_after_commit and self.claims == self.crash_after_commit:
+                self.log("fault_injection", experiment_id=job["_id"],
+                         note="SIGKILL after result commit, before hypothesis assessment")
+                os.kill(os.getpid(), signal.SIGKILL)
+            if camp.get("policy") == "research_v1":
+                from harness.hypotheses import reconcile
+                reconcile(self.db, camp)
             done = self.db.experiments.find_one({"_id": job["_id"]})
             self.write_result_memory(camp, done)
             self.route_rationale(camp, done)
@@ -332,6 +389,9 @@ def main() -> None:
     ap.add_argument("--budget", type=int, default=10)
     ap.add_argument("--max-steps", type=int)
     ap.add_argument("--crash-after-claim", type=int)
+    ap.add_argument("--crash-after-commit", type=int)
+    ap.add_argument("--policy", choices=["legacy", "research_v1"], default="legacy")
+    ap.add_argument("--research-seed", type=int, default=42)
     ap.add_argument("--strategy", default="evidence", choices=["evidence", "recent_window"])
     ap.add_argument("--create-only", action="store_true", help="with --new: create the campaign, print its id, exit")
     args = ap.parse_args()
@@ -343,9 +403,9 @@ def main() -> None:
     except Exception as exc:  # retrieval falls back to exact reads; never block the worker
         print(f"vector index unavailable, retrieval will fall back: {exc}", file=sys.stderr)
     if args.new:
-        protocol, _ = eeg.load_protocol(args.mode)
+        protocol, _ = eeg.load_protocol(args.mode, 1 if args.policy == "research_v1" else None)
         cid = store.create_campaign(db, protocol=protocol, objective=OBJECTIVE, max_channels=args.max_channels,
-                                    max_experiments=args.budget)
+                                    max_experiments=args.budget, policy=args.policy, research_seed=args.research_seed)
         print(cid, flush=True)
         if args.create_only:
             return
@@ -353,7 +413,8 @@ def main() -> None:
         cid = args.campaign
     else:
         ap.error("pass --campaign <id> or --new")
-    Worker(db, cid, crash_after_claim=args.crash_after_claim, strategy=args.strategy).run(args.max_steps)
+    Worker(db, cid, crash_after_claim=args.crash_after_claim, strategy=args.strategy,
+           crash_after_commit=args.crash_after_commit).run(args.max_steps)
 
 
 if __name__ == "__main__":

@@ -12,14 +12,14 @@ from __future__ import annotations
 import hashlib
 import json
 from itertools import product
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, NotRequired, TypedDict
 
 # --------------------------------------------------------------------------
 # Constants
 # --------------------------------------------------------------------------
 
 DB_NAME_DEFAULT = "second_shift"
-COLLECTIONS = ("campaigns", "experiments", "memories", "events", "packets")
+COLLECTIONS = ("campaigns", "experiments", "memories", "events", "packets", "hypotheses")
 EVALUATOR_VERSION = "eeg-eval-1"
 SEED = 42
 LEASE_SECONDS = 15
@@ -28,7 +28,7 @@ CAMPAIGN_STATES = (
     "REHYDRATE", "PLAN", "VALIDATE", "QUEUE", "EXECUTE", "COMMIT",
     "WAITING", "PAUSED", "FAILED", "DONE",
 )
-EXPERIMENT_STATUSES = ("queued", "running", "done", "failed")
+EXPERIMENT_STATUSES = ("queued", "running", "done", "failed", "cancelled")
 MEMORY_KINDS = ("verified_result", "failure", "hypothesis", "research_note", "synthetic_stress")
 MEMORY_STATUSES = ("active", "obsolete")
 EVENT_TYPES = (
@@ -37,6 +37,7 @@ EVENT_TYPES = (
     "job_queued", "job_reused", "job_claimed", "job_committed", "job_failed",
     "lease_expired", "stale_commit_rejected", "context_reset", "goal_changed",
     "memory_added", "finalized", "fault_injection", "jev_routed",
+    "job_cancelled",
 )
 PACKET_STRATEGIES = ("evidence", "recent_window")
 
@@ -224,6 +225,8 @@ class GoalChange(TypedDict):
 
 
 class CampaignDoc(TypedDict):
+    policy: NotRequired[Literal["legacy", "research_v1"]]
+    research_seed: NotRequired[int]
     _id: str                 # "camp_<8 hex>"
     objective: str
     goal_version: int
@@ -240,6 +243,9 @@ class CampaignDoc(TypedDict):
 
 
 class ExperimentResult(TypedDict):
+    validation_evidence_version: NotRequired[int]
+    validation_predictions: NotRequired[list[dict]]
+    uncertainty: NotRequired[dict]
     val_balanced_accuracy: float
     val_f1: float
     n_train: int
@@ -320,6 +326,30 @@ class EvidencePacket(TypedDict):
     surface: dict            # surface_summary()
     token_estimate: int      # estimate, labeled as such in the UI
     budget_tokens: int
+    policy: NotRequired[str]
+    research: NotRequired[dict]
+    hypotheses: NotRequired[list[dict]]
+    research_audit: NotRequired[dict]  # growing provenance, omitted from planner input
+
+
+class HypothesisDoc(TypedDict):
+    _id: str
+    campaign_id: str
+    protocol_id: str
+    experiment_id: str
+    candidate_id: str
+    policy_version: str
+    goal_version: int
+    kind: Literal["exploration", "comparison"]
+    reference_experiment_id: str | None
+    threshold: float
+    changed_parameters: list[str]
+    predicted_improvement: float | None
+    rationale: str
+    evidence_ids: list[str]
+    status: str
+    comparison: NotRequired[dict | None]
+    assessed_at: NotRequired[str]
 
 
 class PlannerUsage(TypedDict):
@@ -330,6 +360,8 @@ class PlannerUsage(TypedDict):
 
 
 class PlannerResult(TypedDict):
+    candidate_id: NotRequired[str]
+    hypothesis: NotRequired[dict]
     action: Literal["propose", "stop"]
     config: dict | None      # normalized effective config when action == "propose"
     rationale: str

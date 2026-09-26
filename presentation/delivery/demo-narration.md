@@ -1,31 +1,47 @@
-# Optional alternate demo narration
+# Finished demo narration
 
-The final user-created movie will include its own voiceover. Preserve that soundtrack; do not add this alternate narration over it.
+This is the existing narration inside `media/second-shift-neuroai-90s.mp4`. Do not read it live or play a second voiceover. Times are relative to the 90-second movie.
 
-ElevenLabs Eric. No music. Narration is timed inside a 60-second audio bed. These are editorial cues for the NEW recording, not claims that new footage has been supplied or reviewed.
+## 0:00.42 to 0:03.82
 
-## 0.6–5.9 seconds: intro
+NeuroAI needs research that survives a crash.
 
-This is Second Shift, an autonomous research assistant for brain signals.
+## 0:04.66 to 0:13.10
 
-## 5.9–19.5 seconds: run
+We built Second Shift, a neuroscience harness for recorded EEG brain data, distinguishing imagined hand and foot movements.
 
-It searches EEG recordings for patterns of imagined hand and foot movement. The planner chooses an experiment. Numerical code measures the result, and MongoDB Atlas preserves the evidence.
+## 0:14.14 to 0:19.98
 
-## 19.5–30.3 seconds: crash
+OpenRouter connects Claude for experiment planning and Jev for classifying research notes.
 
-Now we kill the worker. A replacement rebuilds its context from Atlas. Completed experiments are reused. An interrupted attempt can run again.
+## 0:20.86 to 0:26.38
 
-## 30.3–41.5 seconds: goal
+Our EEG pipeline measures accuracy. Hard metrics guide the next experiment.
 
-Next, we reset its context and cut the electrode limit from sixty four to nine. It checks existing results against the new limit and continues the search.
+## 0:27.32 to 0:38.94
 
-## 41.5–52.0 seconds: results
+MongoDB Atlas stores experiments, results, and research memories. Voyage AI creates note embeddings; Atlas Vector Search retrieves relevant notes.
 
-Separate checks passed all eight recovery tests and all five goal change tests. Here is the code that rebuilds each decision from evidence.
+## 0:40.00 to 0:52.70
 
-## 52.0–56.9 seconds: close
+Our target is coherent memory across billions of tokens in one session. Each decision rebuilds compact context from durable history, tested against ten thousand distractor notes.
 
-Second Shift keeps the research moving, even when the agent starts over.
+## 0:54.62 to 0:58.36
 
-Keep the final frame on screen until 60 seconds. Show code during the results segment. Label time compression. Completed experiments are reused; interrupted attempts can rerun. Separate reliability checks are not events from the demo campaign.
+Now let's pull the plug. The research survives.
+
+## 1:00.10 to 1:05.92
+
+Restart it. Saved results are reused; the interrupted experiment runs again.
+
+## 1:07.36 to 1:12.36
+
+Now erase context and cut the electrode limit from sixty four to nine.
+
+## 1:13.86 to 1:21.94
+
+The long term goal holds: improve EEG classification. It rechecks evidence and keeps optimizing.
+
+## 1:23.26 to 1:28.02
+
+The agent starts over. Your NeuroAI research moves forward.

@@ -1,48 +1,72 @@
 {
-  "duration_seconds": 60,
-  "spoken_audio_seconds": 56.293083,
-  "lead_seconds": 0.6,
-  "voice": "Eric",
-  "provider": "ElevenLabs",
-  "model": "eleven_v3",
-  "tempo_factor": 0.8937833037300178,
-  "new_recording_required": true,
-  "scenes": [
+  "video": "second-shift-neuroai-90s.mp4",
+  "duration": 90,
+  "cues": [
     {
       "id": "intro",
-      "text": "This is Second Shift, an autonomous research assistant for brain signals.",
-      "start": 0.6,
-      "end": 5.851
+      "start": 0.42,
+      "end": 3.82,
+      "text": "NeuroAI needs research that survives a crash."
     },
     {
-      "id": "run",
-      "text": "It searches EEG recordings for patterns of imagined hand and foot movement. The planner chooses an experiment. Numerical code measures the result, and MongoDB Atlas preserves the evidence.",
-      "start": 5.851,
-      "end": 19.508
+      "id": "position",
+      "start": 4.66,
+      "end": 13.1,
+      "text": "We built Second Shift, a neuroscience harness for recorded EEG brain data, distinguishing imagined hand and foot movements."
     },
     {
-      "id": "crash",
-      "text": "Now we kill the worker. A replacement rebuilds its context from Atlas. Completed experiments are reused. An interrupted attempt can run again.",
-      "start": 19.508,
-      "end": 30.316
+      "id": "planning",
+      "start": 14.14,
+      "end": 19.98,
+      "text": "OpenRouter connects Claude for experiment planning and Jev for classifying research notes."
+    },
+    {
+      "id": "metrics",
+      "start": 20.86,
+      "end": 26.38,
+      "text": "Our EEG pipeline measures accuracy. Hard metrics guide the next experiment."
+    },
+    {
+      "id": "memory",
+      "start": 27.32,
+      "end": 38.94,
+      "text": "MongoDB Atlas stores experiments, results, and research memories. Voyage AI creates note embeddings; Atlas Vector Search retrieves relevant notes."
+    },
+    {
+      "id": "scale",
+      "start": 40.0,
+      "end": 52.7,
+      "text": "Our target is coherent memory across billions of tokens in one session. Each decision rebuilds compact context from durable history, tested against ten thousand distractor notes."
+    },
+    {
+      "id": "kill",
+      "start": 54.62,
+      "end": 58.36,
+      "text": "Now let's pull the plug. The research survives."
+    },
+    {
+      "id": "recover",
+      "start": 60.1,
+      "end": 65.92,
+      "text": "Restart it. Saved results are reused; the interrupted experiment runs again."
     },
     {
       "id": "goal",
-      "text": "Next, we reset its context and cut the electrode limit from sixty four to nine. It checks existing results against the new limit and continues the search.",
-      "start": 30.316,
-      "end": 41.464
+      "start": 67.36,
+      "end": 72.36,
+      "text": "Now erase context and cut the electrode limit from sixty four to nine."
     },
     {
-      "id": "results",
-      "text": "Separate checks passed all eight recovery tests and all five goal change tests. Here is the code that rebuilds each decision from evidence.",
-      "start": 41.464,
-      "end": 52.003
+      "id": "adapt",
+      "start": 73.86,
+      "end": 81.94,
+      "text": "The long term goal holds: improve EEG classification. It rechecks evidence and keeps optimizing."
     },
     {
       "id": "close",
-      "text": "Second Shift keeps the research moving, even when the agent starts over.",
-      "start": 52.003,
-      "end": 56.9
+      "start": 83.26,
+      "end": 88.02,
+      "text": "The agent starts over. Your NeuroAI research moves forward."
     }
   ]
 }

@@ -42,6 +42,7 @@ def test_snapshot_routes_are_honest_scoped_and_do_not_connect_to_atlas(monkeypat
         "/api/campaigns": [{"_id": "a"}],
         "/api/campaigns/a/packets/p": {"_id": "p", "campaign_id": "a"},
         "/api/campaigns/a/packets/latest?strategy=evidence": {"_id": "p"},
+        "/api/campaigns/a/hypotheses": [{"experiment_id": "a:x", "status": "inconclusive"}],
         "/api/campaigns/a/events": [{"ts": "01"}, {"ts": "02"}, {"ts": "03"}],
     }}
     monkeypatch.setattr(snapshot, "load_snapshot", lambda: saved)
@@ -53,6 +54,8 @@ def test_snapshot_routes_are_honest_scoped_and_do_not_connect_to_atlas(monkeypat
     assert c.get("/api/worker/status").json()["data_mode"] == "snapshot"
     assert c.get("/api/campaigns").json() == [{"_id": "a"}]
     assert c.get("/api/campaigns/a/packets/p").status_code == 200
+    assert c.get("/api/campaigns/a/hypotheses").json()[0]["status"] == "inconclusive"
+    assert c.get("/api/campaigns/b/hypotheses").status_code == 404
     assert c.get("/api/campaigns/b/packets/p").status_code == 404
     assert c.get("/api/campaigns/a/packets/latest").json()["_id"] == "p"
     assert c.get("/api/campaigns/a/events?limit=1").json() == [{"ts": "03"}]

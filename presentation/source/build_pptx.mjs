@@ -1,10 +1,11 @@
 import fs from 'node:fs/promises';
+import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {createRequire} from 'node:module';
 import {deck,C} from './content.mjs';
 const here=path.dirname(fileURLToPath(import.meta.url));
-const root=path.resolve(here,'../..'),out=path.resolve(here,'../delivery'),build=path.resolve(here,'../.build');
+const root=path.resolve(here,'../..'),out=path.resolve(here,'../delivery'),build=path.resolve(here,'../.build/alignment');
 const require=createRequire(path.join(build,'runtime-loader.cjs'));
 const {Presentation,PresentationFile}=await import(pathToFileURL(require.resolve('@oai/artifact-tool')));
 const {GlobalFonts}=require('@napi-rs/canvas');
@@ -46,7 +47,7 @@ for(const d of deck.slides){
   }
  }
  // PPTX is the static backup. The browser owns motion and explicit video playback.
- s.speakerNotes.textFrame.setText(`${d.start}–${d.start+d.duration} seconds\n\n${d.notes}\n\nSources and context\n${d.sources.map(t=>'- '+t).join('\n')}${d.id==='demo'?'\n\nPlay the accompanying new 60-second MP4 from the media folder. Do not use previous demo recordings.':''}`);
+ s.speakerNotes.textFrame.setText(`${d.start}–${d.start+d.duration} seconds\n\n${d.notes}${d.cue?'\n\n'+d.cue:''}\n\nSources and context\n${d.sources.map(t=>'- '+t).join('\n')}${d.id==='demo'?'\n\nPlay media/second-shift-neuroai-90s.mp4 with its existing narration. This static backup does not embed the movie.':''}`);
 }
 const candidate=path.join(build,'candidate.pptx');
 await(await PresentationFile.exportPptx(p)).save(candidate);
@@ -66,7 +67,7 @@ const result=await finalizePresentation({
  integrityValidatorPath:path.join(SKILL,'container_tools/inspect_presentation_package_integrity.py'),
  layoutValidatorPath:path.join(SKILL,'container_tools/inspect_presentation_layout_geometry.py'),
  layoutArgs:['--expected-slide-size-emu','12192000,6858000','--validate-heading-fit'],
- fontPolicy:{basis:'design',families:['Space Grotesk','Source Sans 3']},verifyArtifactToolImport:true,
+ fontPolicy:{basis:'reference',families:['Space Grotesk','Source Sans 3'],referencePath:path.join(out,'Second-Shift-Neuro-AI.pptx'),referenceSha256:createHash('sha256').update(await fs.readFile(path.join(out,'Second-Shift-Neuro-AI.pptx'))).digest('hex')},verifyArtifactToolImport:true,
  receiptPath:path.join(build,path.basename(finalPath)+'.validation.json')
 });
 console.log(JSON.stringify(result,null,2));
