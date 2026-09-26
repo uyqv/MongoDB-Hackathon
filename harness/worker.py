@@ -82,7 +82,10 @@ def route_note(text: str) -> dict | None:
     return _route(text)
 
 
-def call_planner(packet: dict) -> dict:
+RATE_LIMIT_BACKOFF = (10, 20, 30)   # seconds; OpenRouter new accounts get 20 requests/min per model
+
+
+def _call_planner_once(packet: dict) -> dict:
     try:
         from harness.planner import plan
         return plan(packet)
@@ -90,6 +93,18 @@ def call_planner(packet: dict) -> dict:
         return fallback_plan(packet, "planner not implemented yet")
     except Exception as exc:  # the planner must never take the worker down
         return fallback_plan(packet, f"planner error: {type(exc).__name__}: {exc}"[:300])
+
+
+def call_planner(packet: dict) -> dict:
+    """Call the planner, waiting out provider rate limits instead of silently falling back."""
+    for wait in (*RATE_LIMIT_BACKOFF, None):
+        result = _call_planner_once(packet)
+        reason = result.get("fallback_reason") or ""
+        if not (result["fallback_used"] and ("RateLimitError" in reason or "429" in reason)) or wait is None:
+            return result
+        print(f"planner rate limited; retrying in {wait}s", file=sys.stderr, flush=True)
+        time.sleep(wait)
+    return result
 
 
 def guard(packet: dict, result: dict) -> str | None:
