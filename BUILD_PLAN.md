@@ -44,11 +44,29 @@ Trial results arrive on a simulated clock over 28+ days. Messy lab notes put res
 - [ ] Short project description, submitted on the Cerebral Valley platform, **with both teammates added**.
 - [ ] At least one of us at **MongoDB.local NYC, Pier 36, Sept 30, 10:00–4:30** if we're a finalist.
 
-**Partner credits (codes from 10:30 after check-in):**
-- OpenRouter: reasoning model plus Jev as `typesafe/jev-1.13`
-- Voyage AI: 200M tokens of embeddings
-- Vercel v0: $30, dashboard plus public URL
-- LangSmith: tracing (optional)
+- [ ] **Record the demo video on site today** (the guide says "Record an on-site demo Sept 26").
+- [ ] **Ask in the event Discord for the submission deadline.** The guide lists "Submissions due" with **no time**, and the live doc has none either. Plan backwards from whatever they say, not from "10 hours."
+
+### Credits: what each one is, where to redeem it, and whether we need it
+
+| Partner | What | How to redeem | Need it? |
+|---|---|---|---|
+| **OpenRouter** | **$10 per person** (Notion page) | Sign in at openrouter.ai → open `openrouter.ai/c/MONGODB-OR-FCVGBH` → check that $10 shows at openrouter.ai/credits. **Code expires Oct 1.** | **Yes, both of us.** Pays for the reasoning model *and* Jev. $20 total for the team |
+| **Vercel v0** | $30 of v0 credits | v0.app → profile → Credits → **Redeem Code** (the "Redeem a Usage Code" button on `v0.app/andrewshatsky/settings/billing`). Code arrives by email at 10:30 | **Yes, whoever builds the dashboard** |
+| **Voyage AI** | 200M tokens | dashboard.voyageai.com → API key. **Add a payment method** to get Tier 1 rate limits (not charged within the free allowance) | Only if Automated Embedding doesn't work on the sandbox. Set it up anyway in case |
+| **LangSmith** | $50 + Deployments | Airtable form in the guide, within 10 days; needs a card on file to show credits (not charged) | Optional, tracing only. The free tier covers a day of traces |
+| **OpenAI Codex** | 1,250 Codex credits | Code by email from 10:30 | Optional coding assistant. Not used by the product |
+| **ElevenLabs** | 1 month Creator | Event Discord bot | No |
+| **Kiro** | 50/mo + 500 bonus credits | kiro.dev sign-in | No |
+
+### Model budget ($20 of OpenRouter for the team)
+
+Jev is essentially free at this scale ($0.042 per 1M input tokens). **The reasoning model is the whole budget.**
+- **Set a credit limit on each OpenRouter API key** (e.g. $8) so a runaway loop can't drain the account.
+- **Use the strong model only for the recorded demo run.** Run the 15-seed × 2-LLM-system eval matrix on the cheap model. Baseline A is a script and costs $0.
+- **Keep the context card ≤ 6k tokens**, which also caps cost per step.
+- **Before launching the matrix:** read per-run cost from the `ledger` of one run, multiply it out, and cut seeds if it doesn't fit.
+- **The spend is itself a demo metric:** "$X for Y campaigns, Z% of notes never touched the expensive model."
 
 ---
 
@@ -584,6 +602,8 @@ Our claim is narrower: **correct completion of a long campaign under invalidated
 
 ## 18. Submission checklist
 
+- [ ] Submitted before the deadline confirmed in Discord
+- [ ] Video recorded on site today
 - [ ] Built on the emailed Atlas Hackathon Sandbox cluster
 - [ ] Repo public; README has the pitch, architecture diagram, how to run, data attribution (MIT + BOxCrete citation), and the synthetic-vs-real statement
 - [ ] 60s video with audio: code visible, functionality visible, real numbers
