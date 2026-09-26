@@ -29,7 +29,11 @@ All numbers below come from real runs against real PhysioNet data and our Atlas 
 - Final pick: CSP + LDA, 13 to 30 Hz, 0.5 to 2.5 s window, 21 channels. **0.774 validation, 0.732 on the sealed test set** (75 trials, scored once)
 - The planner stopped with 1 experiment unspent, arguing nearby variants were exhausted. That call is recorded with its rationale.
 
-**Recovery and constraint checks** (`python -m eval.demo_checks all`): _RESULTS PENDING: filled in from eval/checks.json._
+**Recovery check** (`python -m eval.demo_checks recovery`, `camp_51b0f538`, real planner): **8 of 8 invariants passed.** The worker was SIGKILLed mid job after 2 finished experiments. A new process reported the resume, reused both finished experiments (each committed exactly once), waited out the dead lease, reran the orphaned job as attempt 2, finished the campaign and scored the sealed test set once (0.678).
+
+**Constraint change check** (`python -m eval.demo_checks constraint`, `camp_66e4900c`, real planner): **5 of 5 invariants passed.** After 4 experiments the channel limit dropped from 64 to 9. Eligibility was recomputed with zero new runs, every later proposal used 9 channels, and the final pick respected the new goal: CSP + LDA on the central 9 channels, 0.759 validation, 0.719 sealed test.
+
+Raw output for both is in `eval/checks.json`.
 
 **Context comparison** (`python -m eval.run_ablation`): _RESULTS PENDING: filled in from eval/results.json, whichever arm wins._
 

@@ -1,0 +1,46 @@
+[
+  {
+    "check": "recovery",
+    "campaign_id": "camp_51b0f538",
+    "passed": true,
+    "checks": {
+      "worker_was_sigkilled": true,
+      "job_left_running_by_crash": true,
+      "restart_exited_cleanly": true,
+      "restart_reported_resume": true,
+      "done_experiments_not_recomputed": true,
+      "every_experiment_committed_once": true,
+      "crashed_job_rerun_as_attempt_2": true,
+      "sealed_test_scored_once": true
+    },
+    "done_before_crash": 2,
+    "experiments": 5,
+    "final_test_balanced_accuracy": 0.6782,
+    "db": "second_shift",
+    "ran_at": "2026-09-26T17:01:36.401+00:00"
+  },
+  {
+    "check": "constraint",
+    "campaign_id": "camp_66e4900c",
+    "passed": true,
+    "checks": {
+      "goal_version_bumped": true,
+      "eligibility_recomputed_without_new_runs": true,
+      "incumbent_is_eligible_after_change": true,
+      "all_later_proposals_eligible": true,
+      "final_respects_current_goal": true
+    },
+    "incumbent_before": {
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6",
+      "val": 0.7454
+    },
+    "incumbent_after_change": null,
+    "final": {
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=6",
+      "val_balanced_accuracy": 0.7592,
+      "test_balanced_accuracy": 0.7194
+    },
+    "db": "second_shift",
+    "ran_at": "2026-09-26T17:01:36.401+00:00"
+  }
+]
