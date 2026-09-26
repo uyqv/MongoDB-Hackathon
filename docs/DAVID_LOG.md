@@ -16,10 +16,20 @@ Branch `david`. Dev DB `second_shift_david`.
 ### Prompt 2
 
 - 13:00 ET: merged `origin/main` (merge 1 + Andrew's A1-A3, A5, A6 scaffold) into `david`, no conflicts. Full suite after merge: 41 passed, 2 live skipped.
-- Andrew: Voyage card added, so full rate limits apply. Real campaign id for D6: _pending, Andrew sends it in ~5 min_.
+- Andrew: Voyage card added, so full rate limits apply. D6 source campaign (from Andrew): **`camp_0f8981ee` in DB `second_shift`**. After prompt 2, go straight to prompt 3 (no merge wait).
 - **D5** `harness/control.py` + POST endpoints + dashboard buttons (Start worker, Kill worker SIGKILL, Reset context, channel budget 9/21/64 + reason). `change_constraint` does the `$inc goal_version`, `$set constraints`, and `$push goal_history` in ONE `find_one_and_update` guarded on the old `goal_version` (so version and history can never disagree), then logs `goal_changed`. `start_worker` strips empty exported keys from the child env (so the worker's `load_dotenv()` fills them from `.env`), pins the child's `DB_NAME` to the API's DB, and runs it in its own session; `kill_worker` SIGKILLs, reaps, logs `worker_killed`, removes `run/worker.json`. Endpoint errors: 400 bad max_channels, 404 unknown campaign, 409 worker already running.
   - Read-only check against the real DB (`DB_NAME=second_shift` on port 8001, no buttons pressed): campaign `camp_51b0f538` rendered all panels, vector retrieval live (scores 0.75), planner usage from the provider, `fault_injection` and resumed `worker_start` on the timeline.
   - The worker pill only tracks workers the API started (`run/worker.json`). A worker Andrew starts from the CLI shows as "API worker: stopped", and Start worker would launch a second one, so don't press it while a CLI worker runs.
+- **D6** `eval/fixtures.py` + `tests/test_fixtures.py`. `build_scenario` copies the source campaign's finished experiments (re-keyed to the new campaign, `copied_from` set, results untouched, only `created_at` reordered) and re-renders a verified_result/failure memory per copy with `contracts.render_*_text`, embedded through `memory.add_memories`. Injected records are all `synthetic: True, kind: "synthetic_stress"`. `score()` returns the contract keys plus `expected_in_packet` (did the context strategy surface the evidence at all) and, for `buried_failure`, `repeated_bad_family`.
+  - 13:05 ET: built from `camp_0f8981ee` into `second_shift_eval` (vector index `memories_vec` created there, READY; 1,846 memories, 0 without embedding). `eval/scenarios.json`:
+    - `buried_best_eligible`: `camp_5abba2f8` (9 experiments, 200 synthetic notes)
+    - `buried_failure`: `camp_9e778811` (9 experiments, 200 synthetic notes)
+    - `obsolete_protocol`: `camp_64a220b5` (10 experiments, 200 synthetic notes)
+    - `goal_changed`: `camp_75ae27d2` (9 experiments, 200 synthetic notes)
+    - `distractor_flood`: `camp_99e13e91` (9 experiments, 1000 synthetic notes)
+  - `buried_failure`: the source has no failed experiment, so the worst-scoring one (csp_lda · beta_13_30 · all64, 0.571) sits first. "Family" = method + band + channels, because every real experiment is csp_lda · beta_13_30.
+  - `obsolete_protocol`: the trap is a synthetic experiment under a different protocol_id (evaluator `eeg-eval-0`), val bal acc = real incumbent + 0.12, created last. `store.incumbent` excludes it; the recent_window packet shows it.
+  - Rebuild: `python -m eval.fixtures --src-campaign camp_0f8981ee --reset` (reset deletes only `fixture: true` docs and their packets/events).
 
 ## Tests
 
@@ -41,6 +51,8 @@ Branch `david`. Dev DB `second_shift_david`.
 - Confirmed after merge: `job_reused.payload.experiment_id` matches store.enqueue; `worker_start.payload.counts.done` drives the timeline's resumed count.
 
 ## Requests for Andrew
+
+- **Finding, not tuned away:** on the real fixtures, the evidence packet's 4 retrieved memories are ALL synthetic distractors in every scenario (scores 0.77-0.79; verified results rank lower). The evidence arm still carries the expected evidence in 4 of 5 scenarios through the exact incumbent read; `buried_failure` is surfaced by neither arm. The distractors share the query's vocabulary (bands, channel sets, methods) with no results in them. Options in `context.py` (yours): pass `kinds=["verified_result","failure"]`, or add a `synthetic: False` filter, to `search_memories`. Either one is a design change, so report whichever arm wins on the version you run.
 
 - ~~Voyage key rate limit~~ resolved: Andrew added a card. Original note: The Voyage key in `.env` has no payment method, so it is capped at 3 requests/min and 10K tokens/min (live error text says so). The worker embeds every memory and every search query, and D6 embeds 1,000+ distractor notes. Add a payment method at dashboard.voyageai.com (free 200M tokens still apply), or the demo will run on the fallback retrieval path.
 

@@ -118,7 +118,8 @@ def add_memory(db, *, campaign_id: str, protocol_id: str, kind: str, text: str, 
 
 
 def add_memories(db, docs: list[dict]) -> list[str]:
-    """Bulk variant for fixtures: one embed call per batch. Each dict has add_memory's kwargs."""
+    """Bulk variant for fixtures: one embed call per batch. Each dict has add_memory's kwargs,
+    plus optional `created_at` and `extra` (fields merged into the stored doc, e.g. fixture labels)."""
     texts = [d["text"] for d in docs]
     try:
         vecs = embed(texts)
@@ -136,6 +137,7 @@ def add_memories(db, docs: list[dict]) -> list[str]:
             "verified": bool(d.get("verified", False)) and d["kind"] == "verified_result",
             "status": "active", "synthetic": bool(d.get("synthetic", False)), "embedding": vec,
             "created_at": d.get("created_at") or now_iso(),
+            **d.get("extra", {}),
         })
     if rows:
         db.memories.insert_many(rows)
