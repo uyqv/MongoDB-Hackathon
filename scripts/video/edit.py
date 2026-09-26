@@ -1,10 +1,11 @@
-"""Cut the recorded frames and narration into a one minute video.
+"""Cut the recorded frames and the narration into a one minute video.
 
     python scripts/video/edit.py [out.mp4]
 
-Inputs: run/video/frames.json, marks.json, voice/*.wav (+ durations.json).
-Every part is timed to its narration. Parts shown faster than real time carry
-a "sped up Nx" caption.
+Inputs: run/video/frames.json and marks.json (from record_demo.py) and
+run/video/voice/timeline.json (from tts_elevenlabs.py). The narration is one
+continuous track; each part of the footage is timed to its scene's span in
+that track. Parts shown faster than real time carry a "sped up Nx" caption.
 """
 import json
 import subprocess
@@ -15,17 +16,15 @@ from PIL import Image, ImageDraw, ImageFont
 
 V = Path("run/video")
 CAP = V / "captioned"
-TEMPO = 1.08                    # narration speed up
-PAD = 0.25                      # silence after each narration clip
+LEAD, TAIL = 0.3, 0.4           # silence before and after the narration
 FONT = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Bold.ttf", 34)
 SMALL = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial.ttf", 24)
 
 frames = json.loads((V / "frames.json").read_text())
-marks = json.loads((V / "marks.json").read_text())["marks"]
-voice = json.loads((V / "voice" / "durations.json").read_text())
-m = marks
+m = json.loads((V / "marks.json").read_text())["marks"]
+timeline = json.loads((V / "voice" / "timeline.json").read_text())
 
-# (narration id, [(video start, video end, share of the narration time, caption)])
+# (scene id, [(video start, video end, share of the scene's narration time, caption)])
 PLAN = [
     ("intro", [(0.0, m["run"], 1.0, "Real EEG from PhysioNet eegmmidb · all campaign state lives in MongoDB Atlas")]),
     ("run", [(m["run"], m["crash"], 1.0, "Live run · Claude Sonnet 5 picks the experiment, code computes every metric")]),
@@ -40,13 +39,13 @@ PLAN = [
 
 
 def caption(src: str, text: str, speed: float) -> Path:
-    tag = f"{Path(src).stem}_{abs(hash((text, round(speed, 1)))) % 10**8}.jpg"
-    out = CAP / tag
+    label = text + (f"  ·  sped up {speed:.1f}x" if 1.3 <= speed < 3 else
+                    f"  ·  sped up {speed:.0f}x" if speed >= 3 else "")
+    out = CAP / f"{Path(src).stem}_{abs(hash(label)) % 10**10}.jpg"
     if out.exists():
         return out
     im = Image.open(V / "frames" / src).convert("RGB")
     d = ImageDraw.Draw(im, "RGBA")
-    label = text + (f"  ·  sped up {speed:.1f}x" if 1.3 <= speed < 3 else f"  ·  sped up {speed:.0f}x" if speed >= 3 else "")
     w = d.textlength(label, font=FONT)
     x, y = (im.width - w) / 2, im.height - 92
     d.rounded_rectangle([x - 22, y - 14, x + w + 22, y + 50], radius=14, fill=(0, 0, 0, 200))
@@ -59,24 +58,21 @@ def caption(src: str, text: str, speed: float) -> Path:
 
 def main(out_path: str) -> None:
     CAP.mkdir(exist_ok=True)
-    concat, audio_parts, total = [], [], 0.0
-    for nid, parts in PLAN:
-        seg_len = voice[nid] / TEMPO + PAD
+    scenes = timeline["scenes"]
+    last = PLAN[-1][0]
+    concat, total = [], 0.0
+    for sid, parts in PLAN:
+        a0, b0 = scenes[sid]
+        seg_len = (b0 - a0) + (LEAD if sid == PLAN[0][0] else 0) + (TAIL if sid == last else 0)
         for a, b, share, text in parts:
             target = seg_len * share
             speed = (b - a) / target
             src = [f for f in frames if a <= f[0] < b] or [min(frames, key=lambda f: abs(f[0] - a))]
             for i, (t, name) in enumerate(src):
                 nxt = src[i + 1][0] if i + 1 < len(src) else b
-                dur = max((nxt - t) / speed, 0.001)
-                concat.append((caption(name, text, speed), dur))
+                concat.append((caption(name, text, speed), max((nxt - t) / speed, 0.001)))
             total += target
-            print(f"{nid:8s} {a:6.1f}-{b:6.1f}s  real {b - a:5.1f}s  shown {target:4.1f}s  speed {speed:4.1f}x")
-        clip = V / "voice" / f"{nid}.wav"
-        seg = V / f"aud_{nid}.wav"
-        subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(clip), "-af", f"atempo={TEMPO},apad",
-                        "-t", f"{seg_len:.3f}", "-ar", "48000", "-ac", "2", str(seg)], check=True)
-        audio_parts.append(seg)
+            print(f"{sid:8s} {a:6.1f}-{b:6.1f}s  real {b - a:5.1f}s  shown {target:4.1f}s  speed {speed:4.1f}x")
 
     lst = V / "concat.txt"
     lines = []
@@ -84,17 +80,18 @@ def main(out_path: str) -> None:
         lines += [f"file '{path.resolve()}'", f"duration {dur:.4f}"]
     lines.append(f"file '{concat[-1][0].resolve()}'")
     lst.write_text("\n".join(lines) + "\n")
-    alist = V / "audio.txt"
-    alist.write_text("".join(f"file '{p.resolve()}'\n" for p in audio_parts))
 
+    delay = int(LEAD * 1000)
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst),
-                    "-f", "concat", "-safe", "0", "-i", str(alist),
+                    "-i", timeline["audio"],
+                    "-filter_complex", f"[1:a]loudnorm=I=-16:TP=-1.5:LRA=11,adelay={delay}|{delay},apad[a]",
+                    "-map", "0:v", "-map", "[a]", "-t", f"{total:.3f}",
                     "-vf", "fps=30,format=yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "18",
-                    "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", out_path], check=True)
-    dur = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", out_path],
-                         capture_output=True, text=True).stdout.strip()
-    print(f"planned {total:.1f}s, file {float(dur):.1f}s -> {out_path}")
-    assert float(dur) <= 60.0, "over one minute"
+                    "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", out_path], check=True)
+    dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0",
+                                out_path], capture_output=True, text=True).stdout)
+    print(f"planned {total:.1f}s, file {dur:.1f}s -> {out_path}  (voice {timeline['voice']}, {timeline['model']})")
+    assert dur <= 60.0, "over one minute"
 
 
 if __name__ == "__main__":
