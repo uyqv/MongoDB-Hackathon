@@ -101,3 +101,35 @@ D9. STRETCH, only if D5–D8 are done before 3:05 PM: harness/jev.py + tests/tes
 
 AT 3:25 PM, OR WHEN DONE: commit, push, update DAVID_LOG.md, then STOP and print a summary for Andrew under 15 lines: what's done, tests passing, what's stubbed, the eval/scenarios.json location, and requests for Andrew.
 ```
+
+---
+
+## Prompt 3 (paste when Prompt 2 is done, before 3:10 PM)
+
+```
+Continue on branch `david`. Same hard rules, same file ownership. First: `git fetch origin && git merge origin/main`, then run the tests.
+
+Context: Andrew ran a real campaign (DB second_shift, camp_0f8981ee): 10 planner calls, 0 fallbacks, $0.085. Two issues surfaced, and these tasks fix them and polish the demo. Do them in order, commit and push after each.
+
+P1. harness/planner.py: no early stop (≤15 min)
+- In that campaign the model called `stop` with 1 of 10 experiments left, claiming nothing could beat the incumbent, after exploring only csp_lda in one band. Statement 2 asks for relentless optimization within budget.
+- Change the system prompt and code: `stop` is valid only when packet goal.budget.remaining == 0 or no eligible untried config exists. Treat any other stop as a validation failure: one repair asking for a proposal, then the deterministic fallback. When nearby variants look exhausted, the prompt tells the model to explore a different method, band, or window.
+- Update tests: premature stop → repair → proposal; stop with remaining 0 → accepted.
+
+P2. Dashboard polish for the video (≤30 min). Recorded at 1440 px wide, so readability matters.
+- Header "Second Shift" plus a one-line subtitle. Larger base font, high contrast.
+- Timeline: also show fault_injection (red), proposal_rejected, and a compact llm_call line (model, provider input tokens, cost).
+- Experiments table: highlight the incumbent row. Expandable row shows the planner rationale and evidence_ids, each id linking to its memory or experiment.
+- Goal panel: when campaign.final exists, show final validation vs sealed test balanced accuracy and n_test. Show running totals of provider input tokens and cost from llm_call events, labeled "provider".
+- Show the WAITING state and the lease expiry countdown when a job is stuck in running.
+- Screenshot every panel with a real campaign from second_shift (read only) and describe the result in DAVID_LOG.md.
+
+P3. eval/stress.py + stress results (≤30 min)
+- Copy the real campaign camp_0f8981ee (experiments + verified memories) into a new campaign in DB second_shift_eval. Insert synthetic distractor notes (kind synthetic_stress, synthetic True, varied plausible EEG-ish text), embedded in batches with memory.add_memories: first 1,000, then 10,000 total.
+- At 0, 1,000 and 10,000 distractors, measure: search_memories latency p50/p95 over 20 queries; whether the real incumbent's verified_result memory is in the top 4 for a query about the best eligible configuration; the evidence packet token_estimate from harness.context.build_packet (it must stay under budget_tokens as history grows); the total memory count.
+- Write eval/stress.json and a markdown table in DAVID_LOG.md. Report whatever happens, including misses.
+
+P4. If D9 (Jev) is still undone and it's before 3:05, do it now as specified in Prompt 2.
+
+AT 3:25 PM, OR WHEN DONE: commit, push, update DAVID_LOG.md, then STOP and print a summary for Andrew under 15 lines.
+```
