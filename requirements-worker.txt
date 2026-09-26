@@ -1,0 +1,9 @@
+-r requirements.txt
+numpy
+scipy
+scikit-learn
+mne>=1.8
+httpx
+openai
+voyageai
+pytest

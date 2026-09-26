@@ -1,84 +1,59 @@
 <!doctype html>
-<!-- Dashboard. OWNER: David. Served by api/main.py at "/". See docs/CONTRACTS.md. -->
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Second Shift</title>
-  <link rel="stylesheet" href="/static/styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Second Shift · Research that continues</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='black'/%3E%3Cpath d='M7 21c4 0 5-10 9-10s5 10 9 10' fill='none' stroke='white' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/fonts/fonts.css"><link rel="stylesheet" href="/static/styles.css">
 </head>
-<body>
-  <div id="fake-banner" class="fake-banner" hidden>FAKE DATA: seeded UI fixtures, not results</div>
-  <header>
-    <div class="brand">
-      <h1>Second Shift</h1>
-      <span class="sub">long-horizon EEG research agent · state lives in MongoDB Atlas</span>
+<body data-phase="ready" data-connected="true">
+<header class="app-header">
+  <a class="wordmark" href="/" aria-label="Second Shift home"><svg viewBox="0 0 36 36" aria-hidden="true"><rect width="36" height="36" rx="10"/><path d="M7 24c5 0 5-12 11-12s6 12 11 12"/></svg><span>Second Shift<span class="brand-period">.</span></span></a>
+  <nav class="views" aria-label="Workspace"><button data-view="live" aria-current="page">The loop</button><button data-view="results">Proof</button><button data-view="code">Under the hood</button></nav>
+  <div class="header-right"><span id="connection" class="connection"><i></i>Connecting</span><select id="campaign-select" aria-label="Campaign"></select></div>
+</header>
+<main id="view-live" class="view">
+  <section class="mission-header"><div><div class="eyebrow">AUTONOMOUS RESEARCH / EEG</div><h1>Every experiment.<br><span class="quiet">A little more memory.</span></h1></div><div class="mission-right"><div id="state-label" class="state-label" aria-live="polite">Ready to begin</div><div class="mission-tools"><button id="btn-follow" class="small-button" aria-pressed="true">Follow activity <span>↗</span></button><button id="btn-inspect" class="small-button">Inspect <span>+</span></button></div></div></section>
+  <section id="research-canvas" class="research-canvas" aria-label="Live research loop">
+    <div class="workspace-caption"><span>01 / WORKING CONTEXT</span><span id="worker-caption">Process not started</span></div>
+    <div id="camera" class="camera" data-focus="overview">
+      <svg class="connections" viewBox="0 0 1400 350" preserveAspectRatio="none" aria-hidden="true">
+        <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L8 5L1 9" fill="none" stroke="currentColor" stroke-width="1.4"/></marker></defs>
+        <path id="edge-context" class="edge" d="M225 348 V302 Q225 285 242 285 H270 V263" marker-end="url(#arrow)"/>
+        <path id="edge-decide" class="edge" d="M425 152 H567" marker-end="url(#arrow)"/>
+        <path id="edge-experiment" class="edge" d="M832 152 H975" marker-end="url(#arrow)"/>
+        <path id="edge-memory" class="edge" d="M1138 263 V303 Q1138 319 1155 319 H1176 V348" marker-end="url(#arrow)"/>
+        <g id="travel-signals"></g>
+      </svg>
+      <button class="loop-node context-node" id="node-context" aria-label="Inspect the evidence packet">
+        <div class="node-top"><span class="node-number">01</span><h2>Remember</h2><span class="node-mark">↗</span></div>
+        <div class="packet-art" id="packet-art"><div class="packet-layer rear"></div><div class="packet-layer middle"></div><div class="packet-layer face"><span class="packet-label">EVIDENCE</span><div id="evidence-marks" class="evidence-marks"></div><div class="packet-bottom"><span id="packet-count">0 sources</span><span class="packet-cross">+</span></div></div></div>
+        <div class="node-foot"><span id="packet-tokens">Awaiting a decision</span><span class="mini-label" id="packet-version"></span></div>
+      </button>
+      <button class="loop-node decide-node" id="node-decide" aria-label="Inspect the agent decision">
+        <div class="node-top"><span class="node-number">02</span><h2>Decide</h2><span class="node-mark">↗</span></div>
+        <div class="decision-art"><svg viewBox="0 0 220 160" aria-hidden="true"><g class="orbit"><ellipse cx="110" cy="80" rx="79" ry="52"/><ellipse cx="110" cy="80" rx="79" ry="52" transform="rotate(60 110 80)"/><ellipse cx="110" cy="80" rx="79" ry="52" transform="rotate(120 110 80)"/></g><circle class="decision-core" cx="110" cy="80" r="29"/><path class="core-wave" d="M91 87c7 0 9-17 19-17s12 17 19 17"/></svg></div>
+        <div class="node-foot"><span id="decision-caption">A fresh start, every step</span></div>
+      </button>
+      <button class="loop-node experiment-node" id="node-experiment" aria-label="Inspect the numerical experiment">
+        <div class="node-top"><span class="node-number">03</span><h2>Experiment</h2><span class="node-mark">↗</span></div>
+        <div class="experiment-art"><div id="electrode-grid" class="electrode-grid" aria-label="Electrode budget, represented as a count"></div><div class="experiment-readout"><strong id="electrode-count">64</strong><span>electrodes</span><svg id="eeg-trace" viewBox="0 0 130 38" role="img" aria-label="Recorded EEG sample"><path d=""/></svg><small>RECORDED EEG</small></div></div>
+        <div class="node-foot"><span id="experiment-caption">Numerical evaluation</span><span id="attempt" class="mini-label"></span></div>
+      </button>
     </div>
-    <div class="header-controls">
-      <label>Campaign <select id="campaign-select"></select></label>
-      <span id="db-name" class="pill"></span>
-      <span id="last-poll" class="muted"></span>
+    <div id="memory" class="memory-foundation">
+      <div class="memory-heading"><span class="eyebrow">02 / DURABLE MEMORY</span><h2>The work stays.</h2><span class="memory-vendor">MongoDB Atlas <span>↗</span></span></div>
+      <div class="memory-content"><div class="memory-summary"><strong id="saved-count">0</strong><span>results saved</span></div><div id="memory-records" class="memory-records" aria-label="Persisted experiment results"></div><div class="memory-total"><span>BEST ELIGIBLE</span><strong id="best-result">—</strong><small id="best-detail">No measured result yet</small></div></div>
+      <div class="memory-base"><span id="memory-status">Campaign state persists across restarts</span><span id="campaign-id">—</span></div>
     </div>
-  </header>
-
-  <div id="controls" class="controls">
-    <span id="worker-status" class="pill">worker: ?</span>
-    <button id="btn-start">Start worker</button>
-    <button id="btn-kill" class="danger">Kill worker (SIGKILL)</button>
-    <button id="btn-reset">Reset context</button>
-    <span class="sep"></span>
-    <label>Channel budget
-      <select id="sel-channels"><option>9</option><option>21</option><option>64</option></select>
-    </label>
-    <input id="constraint-reason" placeholder="reason (shown in goal history)">
-    <button id="btn-constraint">Apply</button>
-    <span id="control-msg" class="muted"></span>
-  </div>
-
-  <main class="grid">
-    <section class="panel" id="panel-goal">
-      <h2>1 · Goal</h2>
-      <div id="goal"></div>
-    </section>
-
-    <section class="panel wide" id="panel-metric">
-      <h2>2 · Metric trajectory <span class="muted">val balanced accuracy, done experiments</span></h2>
-      <div class="chart-box"><canvas id="metric-chart"></canvas></div>
-      <div class="legend muted">solid = eligible under current goal · hollow grey = ineligible · line = best eligible so far · dashed = chance 0.5</div>
-    </section>
-
-    <section class="panel full" id="panel-experiments">
-      <h2>3 · Experiments</h2>
-      <div class="table-wrap"><table id="exp-table">
-        <thead><tr><th>#</th><th>Config</th><th>Status</th><th>Attempt</th><th>Ch</th><th>Eligible</th><th>Val bal acc</th><th>Proposer</th><th></th></tr></thead>
-        <tbody></tbody>
-      </table></div>
-    </section>
-
-    <section class="panel" id="panel-packet">
-      <h2>4 · Latest context packet</h2>
-      <div id="packet"></div>
-    </section>
-
-    <section class="panel" id="panel-timeline">
-      <h2>5 · Timeline</h2>
-      <ol id="timeline"></ol>
-    </section>
-
-    <section class="panel" id="panel-eeg">
-      <h2>6 · EEG input</h2>
-      <div id="eeg">
-        <p class="placeholder" id="eeg-placeholder">Loading real EEG from PhysioNet…</p>
-        <div class="muted" id="eeg-trace-title"></div>
-        <div class="chart-box small"><canvas id="eeg-trace"></canvas></div>
-        <div class="muted" id="eeg-psd-title"></div>
-        <div class="chart-box small"><canvas id="eeg-psd"></canvas></div>
-        <p class="muted" id="eeg-caption"></p>
-      </div>
-    </section>
-  </main>
-
-  <script src="/static/app.js"></script>
-</body>
-</html>
+    <div class="memory-shadow one"></div><div class="memory-shadow two"></div>
+  </section>
+  <section class="bottom-rail"><div class="progress-heading"><strong id="progress-count">0 / 10</strong><span>experiments</span></div><div class="results-trace"><svg id="results-chart" viewBox="0 0 820 78" preserveAspectRatio="none" role="img" aria-label="Validation balanced accuracy by experiment"></svg></div><div class="chart-key"><span><i class="key-solid"></i>eligible</span><span><i class="key-hollow"></i>outside limit</span></div></section>
+  <footer class="control-bar"><div class="run-controls"><button id="btn-start" class="primary" disabled><span>▶</span> Start worker</button><button id="btn-kill" class="secondary" disabled>Stop worker <span>×</span></button><button id="btn-reset" class="secondary" disabled>Clear context <span>↺</span></button></div><div id="limit-seg" class="constraint-control"><span>Electrode limit</span><button data-v="64" aria-pressed="true">64</button><button data-v="21" aria-pressed="false">21</button><button data-v="9" aria-pressed="false">9</button></div><button id="btn-history" class="text-button">Activity <span>↗</span></button></footer>
+</main>
+<main id="view-results" class="view secondary-view" hidden><div class="section-heading"><span class="eyebrow">MEASURED / VERIFIED</span><h1>The proof is in<br>the recovery.</h1><p>Independent checks. Real experiments.</p></div><div id="proof-content"></div></main>
+<main id="view-code" class="view secondary-view" hidden><div class="section-heading"><span class="eyebrow">FROM THIS REPOSITORY</span><h1>Memory is<br>an engineering decision.</h1></div><div class="source-layout"><div class="source-nav"><button data-source="commit_result" class="on">01 <span>Commit a result</span></button><button data-source="rehydrate">02 <span>Rebuild the context</span></button><button data-source="build_packet">03 <span>Assemble evidence</span></button></div><div class="source-panel"><div id="source-path"></div><pre><code id="source-code"></code></pre></div></div></main>
+<dialog id="inspector"><div class="inspector-top"><span id="inspector-kicker" class="eyebrow">EVIDENCE</span><button id="close-inspector" aria-label="Close inspector">×</button></div><h2 id="inspector-title"></h2><div id="inspector-body"></div></dialog>
+<div id="toast" class="toast" role="status" hidden></div>
+<script type="module" src="/static/app.js"></script>
+</body></html>
