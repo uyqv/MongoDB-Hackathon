@@ -1251,9 +1251,11 @@ body[data-phase="paused"] * {
 }
 @media (max-width: 850px) {
   .app-header {
-    height: 72px;
-    flex-wrap: wrap;
-    gap: 15px;
+    height: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding-top: 14px;
     margin: 0 16px;
   }
   .wordmark {
@@ -1264,12 +1266,17 @@ body[data-phase="paused"] * {
   }
   .views {
     gap: 13px;
+    height: 36px;
   }
   .views button {
     font-size: 12px;
   }
   .header-right {
-    display: none;
+    display: flex;
+    margin-left: 0;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
   }
   .view {
     padding: 0 16px;
