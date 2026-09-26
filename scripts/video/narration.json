@@ -1,9 +1,8 @@
 [
- {"id": "intro",   "text": "Long running agents forget why they ran old experiments. Second Shift keeps the whole campaign in MongoDB Atlas, and rebuilds every decision from that evidence."},
- {"id": "run",     "text": "The workload is real brain signal data. Claude picks each experiment and cites evidence. Code computes every number."},
- {"id": "crash",   "text": "Now we kill the worker mid job. A new process rebuilds from Atlas, reuses the finished work, and reruns the orphaned job."},
- {"id": "goal",    "text": "We wipe the context and cut the electrode budget from sixty four to nine. It reranks what it measured, and keeps going."},
- {"id": "packet",  "text": "Each decision sees a small evidence packet. Jev routes notes into memory, and Vector Search brings them back."},
- {"id": "numbers", "text": "Measured today: all thirteen recovery and constraint checks passed, and context stayed near twelve hundred tokens at ten thousand notes."},
- {"id": "outro",   "text": "One persistent mission. Bounded context. Measured results."}
+ {"id": "intro",   "text": "Every AI agent has the same flaw. It forgets. Crash it, or change its goal, and its reasoning is gone."},
+ {"id": "run",     "text": "This is Second Shift. Its memory lives in MongoDB Atlas, not in the model. Claude designs each experiment on real brain signals, code measures it, and Jev files every insight away."},
+ {"id": "crash",   "text": "Now, watch. We kill the worker in the middle of the run. A new one rebuilds everything from Atlas, and picks up right where it fell. Nothing lost. Nothing repeated."},
+ {"id": "goal",    "text": "Then we change the rules. We wipe its context, and cut the electrodes from sixty four to nine. It already knows which results still count, and it keeps going."},
+ {"id": "results", "text": "Thirteen of thirteen reliability checks passed. Ten thousand memories, and every decision still fits in twelve hundred tokens."},
+ {"id": "close",   "text": "Second Shift. Agents that never lose the plot."}
 ]
