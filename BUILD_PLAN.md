@@ -56,19 +56,46 @@ Trial results arrive on a simulated clock over 28+ days. Messy lab notes put res
 
 **Real:** Meta's open-source BOxCrete dataset, `facebookresearch/SustainableConcrete/data/boxcrete_data.csv` (MIT; cite the BOxCrete paper, arXiv 2603.21525).
 - 149 mixes, 145 with both day-1 and day-28 results. Columns include composition, **GWP**, and mean strength at days 1, 3, 5, (14), 28.
-- **We use Material Source 0: 65 mixes** (mortar records). One consistent source; we never mix sources.
+- **Candidate pool: Material Source 0, cured at 22 °C → 58 mixes** (mortar records). One consistent source.
+  - The 7 source-0 rows cured at 4.5 °C are the *same recipes* cured cold. We drop them from the pool.
+  - They stay in the story: they are the real evidence behind the demo's quality hold (see below).
 
 **The objective, checked against the data:**
 
-| Fact (source 0) | Value |
+| Fact (58-mix pool) | Value |
 |---|---|
 | Mixes meeting both strength targets | 21 |
-| …that also have GWP ≤ 240 (the "win" set) | **4** |
-| Lowest GWP among strength-passing mixes | 200.1 |
+| …that also have GWP ≤ 240 (the **win set**) | **4: M19 (200.1), M31 (236.3), M9 (237.5), M22 (239.7)** |
 | "Traps": ≥ 3,000 psi at day 1 but < 8,000 at day 28 | **9** |
-| Blind picking with 8 trials hits a winner | ~42% (computed) |
+| Blind picking with 8 trials hits a winner | ~46% (computed) |
 
-The traps are what make this long-horizon for real: the early leader is often not the final winner. Example from the spike: M6 leads at day 1 (6,279 psi), but M1 wins at day 28.
+**The two nastiest traps are also the two lowest-carbon "passers" at day 1:**
+
+| Mix | GWP | Day 1 | Day 28 |
+|---|---|---|---|
+| M4 | 194.0 | 3,115 ✓ | 4,433 ✗ |
+| M2 | 209.2 | 3,440 ✓ | 6,222 ✗ |
+
+An agent that trusts early results "wins" with M4 at day 1 and is wrong. That's the long-horizon test, straight from real data.
+
+### The two scripted disruptions (decided)
+
+**1. Quality hold → M19, the best winner (GWP 200.1).**
+- **Trigger:** the day after M19's day-28 result arrives. That's the moment it has just become "best verified."
+- **Note:** *"heads up — M19's cylinders may have sat in the cold room over the weekend, don't use those numbers until QA re-checks."*
+- **Grounded in the real data:** the same recipe cured at 4.5 °C (M35) hit only **224 psi at day 1 vs. 3,105** at 22 °C. Cold curing really does wreck these results.
+- **If the agent never tests M19,** the hold hits the first win-set mix it verifies instead, so the hold always lands on something that matters. The README will state this adaptive rule openly.
+- **The "best verified" line visibly drops.** The agent must find another winner with its remaining budget.
+- **Default ending:** the hold is **not** released inside the campaign window. Seed variants release it (rev 3) late, to test that the agent re-qualifies M19 correctly.
+
+**2. Requirement change → slag cap of 320 kg/m³, announced on sim day 6.**
+- **Note:** *"slag supplier says they can't do more than 320 per m³ on our orders going forward."*
+- **It removes exactly one winner: M31** (slag 352.1, the *strongest* winner at 11,357 psi day 28). Any in-flight M31 trial stops counting toward success.
+- **It removes 9 mixes in all** (M14, M31, M51, M58, M61, M62, M64, M65, M66), shrinking the pool to 49. Several are low-GWP high-slag mixes, so the recommender's map shifts too.
+
+**After both disruptions, only M9 (237.5) and M22 (239.7) can still win.** Blind 8-trial odds drop to ~30%. The correct final answer is **M9** (M19 if its hold is released).
+
+**Stale clearance:** on the day after the hold, a revision-1 note arrives: *"QA signed off on last week's cylinders."* It was written before the hold and must be ignored.
 
 **Synthetic, and labeled that way everywhere:**
 - the budget, the virtual clock, lab notes, quality holds, requirement changes, delivery order
@@ -140,6 +167,47 @@ flowchart LR
 | **Recommender** | Ranks untested mixes by predicted day-28 strength ± uncertainty and GWP | Talk |
 | **Vector Search** (Voyage embeddings) | Pulls prior notes relevant to the current decision | Stand in for the obligation list (open work is always a plain query) |
 | **Evaluator** | Scores runs against the hidden oracle | Feed anything back to the agent |
+
+---
+
+## 4b. Tech stack (chosen from the organizer guide)
+
+Everything below is either linked from the guide or paid for by its partner credits, except Jev, which we reach through the event's OpenRouter credits.
+
+| Layer | Choice | Why | Fallback |
+|---|---|---|---|
+| **Database** | **MongoDB Atlas Hackathon Sandbox**, `pymongo` | Required for finalists | none, this is mandatory |
+| **Run state** | **LangGraph** + `langgraph-checkpoint-mongodb` (`MongoDBSaver`) | The guide's *"Build an AI Agent with LangGraph and MongoDB Atlas"* | plain `checkpoints` collection |
+| **Mission memory** | Our own collections (§7): obligations, validity, ledger… | *State & Persistence* post, Pattern 4: keep state and memory separate | none |
+| **Semantic memory** | **Atlas Vector Search** on `notes`, via **Automated Embedding** (`voyage-4-lite`) | Guide: Vector Search + Automated Embeddings. No embedding pipeline to build | Automated Embedding is *public preview* and may not be on the sandbox tier. Fall back to the `voyageai` client (200M free tokens) + our own `$vectorSearch` index |
+| **Jev** | `typesafe-sdk` with `base_url="https://openrouter.ai/api"`, key = `OPENROUTER_API_KEY`, `model="jev-1.13"` | Paid by event OpenRouter credits; $0.042/1M input, output free | Raw `requests.post` to `https://openrouter.ai/api/v1/systemone` with the same JSON → then the `llm_structured` backend |
+| **Reasoning model** | OpenRouter via `langchain-openai` `ChatOpenAI(base_url="https://openrouter.ai/api/v1")`. Claude Sonnet for planning, Claude Haiku for eval-matrix volume. **Confirm exact model ids on openrouter.ai** | Event OpenRouter credits | Any OpenRouter model with tool calling |
+| **Recommender** | `scikit-learn` `GaussianProcessRegressor` on composition features → d1, d28 ± σ | Fast to build | nearest-neighbour + GWP sort. (BOxCrete itself uses BoTorch/Ax; optional stretch) |
+| **Tracing** | **LangSmith** (`LANGSMITH_TRACING=true`) | Guide credits; free trace viewer for debugging and the video | skip |
+| **Worker + control API** | Python 3.12, **FastAPI** inside the worker process. `/kill` does a real `SIGKILL` on itself | Real crash, not a pause | — |
+| **Worker hosting** | **Railway** with restart-on-failure (already connected) | Automatic restart *is* the recovery demo | local `while true; do python -m harness; done` |
+| **Dashboard** | **v0 → Next.js on Vercel**, reading Atlas through the Node driver in server routes, with a **read-only DB user** | Guide's step-by-step v0 flow; $30 credits; public URL | run locally for the video |
+| **Dev tooling** | Claude Code + **MongoDB Agent Skills** + **MongoDB MCP Server** (already in this repo) | Guide's recommended starting point | — |
+
+**Skip:**
+- the LangChain Jev wrapper (`langchain-typesafe`, alpha)
+- LiteLLM (needs a proxy) and Vercel AI Gateway for Jev (JS-first, and the free promo ended Sept 25)
+- `typesafe/jev-router`: a *chat router*, not Jev decisions
+- ElevenLabs, Kiro, Deep Agents, Solace Agent Mesh
+
+### Reliability checklist, taken from MongoDB's own post
+
+The guide links *State & Persistence: The Problem of Agent Reliability*. We implement its checklist literally and say so in the pitch:
+
+| The post says | We do |
+|---|---|
+| "Run the kill test: SIGKILL a worker mid-task." | The **Kill** button, live in the demo |
+| Separate state from memory (Pattern 4) | LangGraph checkpoints = run state. Mission collections = durable memory |
+| Checkpoint at tool-call boundaries | Trial + ledger entry written **before** dispatch |
+| Replay the recorded decision on recovery, don't re-invoke the model (avoids "semantic rollback") | Restart reconciles `dispatched` trials from the ledger by `action_id`. **No LLM call during recovery** |
+| Version the model + prompt + code bundle | `campaigns.bundle = {models, prompt_hash, git_sha}`; a resumed campaign runs on the bundle it started with |
+
+**Baseline B is this post's "default LangGraph" case:** the same graph with `MongoDBSaver` + a rolling summary, no separate mission memory. That's a fair baseline in MongoDB's own terms.
 
 ---
 
@@ -262,9 +330,18 @@ erDiagram
 
 One call per note, all questions answered in a single pass.
 
+```python
+from typesafe_sdk import TypeSafeClient, Choice, Noul
+jev = TypeSafeClient(api_key=os.environ["OPENROUTER_API_KEY"], base_url="https://openrouter.ai/api")
+r = jev.system_one(model="jev-1.13", state=state, questions=questions)
+r.choices["kind"].choice, r.choices["kind"].confidence, r.nouls["refers_to_open_trial"].noul
+```
+
+Raw request body. Same shape for `POST https://openrouter.ai/api/v1/systemone` and `https://api.typesafe.ai/v1/systemone`. The response's top-level key is **`answers`**; retry 429/529 with backoff.
+
 ```json
 {
-  "model": "jev-1.13.0",
+  "model": "jev-1.13",
   "state": {
     "note": "<raw lab note>",
     "open_trials": [{"action_id": "t-3", "mix": "M9", "ages_received": [1,3]}],
@@ -322,22 +399,21 @@ The dashboard shows this card for every step, so judges can see memory coming fr
 
 | Sim day | Event | Required behavior |
 |---|---|---|
-| 0 | Campaign starts: 8-trial budget | Agent schedules a first batch (e.g. 4) from recommender + GWP |
-| 1 | Day-1 results | A **trap** mix looks great. Agent does **not** declare success; opens `await_result` for d28 |
-| 3 | Note: *"cylinders from Tuesday's pour for the low-slag one were cured in the wrong room, hold those numbers until QA looks"* | Jev → `quality_hold`; LLM maps it to the right trial; validity rev 2 = held |
-| 4 | **Kill the worker** after a trial is written `dispatched` but before the ack | On restart: reconcile by `action_id`, no double spend, same next due work |
-| 6 | Note: *"sustainability wants anything with fly ash from supplier B out"* | `requirement_change` → version 3; pending trials re-checked; a scheduled mix may become ineligible |
-| 7 | **Stale** note: *"QA cleared the Tuesday cylinders"* (from before the hold, rev 1) | Ignored; hold stands; logged as superseded |
-| 8–10 | Agent spends remaining budget | Recommender plus the updated picture of valid evidence |
-| 28+ | Day-28 results roll in | The trap fails d28. **"Best verified" moves only on valid evidence** and can go *down* |
-| ~30 | QA properly releases (rev 3) or not, per seed | Qualification recomputed |
-| ~38 | End | `propose_completion` with valid evidence, **or** honest "budget insufficient" |
+| 0 | Campaign starts: 8-trial budget, req v1 | Agent schedules a first batch (e.g. 4) from recommender + GWP |
+| 1 | Day-1 results | If a trap (M4/M2) is in the batch, it looks like a low-carbon winner. Agent must **not** declare success; `await_result` for d28 stays open |
+| 3 | Noise notes (logistics, acks) | Jev → `logistics` / `ack_only`; **no reasoning-model call**. This is where the cost savings show |
+| 6 | Note: slag cap 320 kg/m³ | Jev → `requirement_change`; LLM → typed proposal; validator → req **v2**. 9 mixes excluded, including winner M31 and any in-flight M31 trial |
+| ~10 | **Kill the worker** (SIGKILL) right after a trial is written `dispatched`, before the ack | On restart: reconcile by `action_id` and **replay the recorded decision**, never re-ask the model. No double spend; same open obligations |
+| 28 | First day-28 results | Traps fail. The first valid win-set result becomes **best verified** (M19 in the canonical seed) |
+| 29 | Note: cold-room hold on M19 (rev 2) | Jev → `quality_hold`; validity rev 2 = held. **"Best verified" drops.** Agent reopens the search |
+| 30 | **Stale** note: QA sign-off written before the hold (rev 1) | Ignored; hold stands; logged as superseded |
+| 30–40 | Agent spends remaining budget | Recommender over the valid picture; realistic targets are M9 / M22 |
+| ~58–68 | Day-28 results for the late trials | `propose_completion(M9 or M22)` with valid evidence, **or** an honest "budget insufficient" |
+| (variant) | QA release of M19 (rev 3) | Agent re-qualifies M19 and reports it as best verified |
 
-**Seeds:** 5 wording variants per note type and 3 event orderings, i.e. 15 runs per system.
+**Seeds:** 5 wording variants per note type × 3 event orderings = 15 runs per system. Orderings include the stale clearance arriving before the hold and the result arriving after the hold.
 
 **Dev/test split:** tune on seeds 1–5; report on seeds 6–15, which nobody looks at while tuning.
-
-**Hour-1 task:** pick which mix the hold hits and which supplier the requirement change excludes, **from the data**, so both actually bite (the hold hits a real contender; the exclusion removes a real candidate).
 
 ---
 
@@ -407,7 +483,10 @@ second-shift/
   api/                  FastAPI: campaigns, timeline, context cards, kill/restart, run
   web/                  v0 Next.js dashboard
   tests/                ported spike tests (12) + restart/reconcile + gate tests
-  .env.example          MONGODB_URI (sandbox), OPENROUTER_API_KEY, TYPESAFE_API_KEY, VOYAGE_API_KEY
+  .env.example          MONGODB_URI (sandbox, worker user), MONGODB_URI_SIM (sim user), MONGODB_URI_RO (dashboard),
+                        OPENROUTER_API_KEY, TYPESAFE_API_KEY (optional), VOYAGE_API_KEY (fallback), LANGSMITH_API_KEY
+  requirements.txt      pymongo langgraph langgraph-checkpoint-mongodb langchain-openai typesafe-sdk
+                        voyageai scikit-learn fastapi uvicorn python-dotenv
 ```
 
 **Starting point:** the feasibility spike (`second_shift_feasibility_spike.zip`), whose 12 passing state tests port straight into `tests/`. Its 12-mix / 6-trial setup is **too easy**: exactly 6 mixes fit its cement cap, so any script finds the single winner. That's why we switch to the full source-0 pool and the GWP objective.
@@ -439,6 +518,7 @@ gantt
     Record video + submit                               :crit, s1, 09:00, 60m
 ```
 
+- **H0 + 15 min, smoke tests:** one Jev Noul call through OpenRouter, one Atlas insert on the sandbox cluster, one OpenRouter chat call. If Jev fails, switch `classify_note()` to `llm_structured` and move on.
 - **Milestone 1 (~H3.5), non-negotiable before anything else:** the apparent winner gets held → worker killed → restart → no double spend → agent keeps spending budget on valid evidence.
 - **Milestone 2 (~H6):** Jev routing live, requirement change and stale-note handling pass.
 - **Milestone 3 (~H8):** 15-seed matrix for A/B/C; numbers on the dashboard.
@@ -465,8 +545,9 @@ Fill in the proof numbers **from the real eval run**. Placeholders never ship.
 
 | Risk | Fallback |
 |---|---|
-| Jev call format through OpenRouter differs from the TypeSafe API | Call TypeSafe directly (`api.typesafe.ai/v1/systemone`); else the `llm_structured` backend. **Test one call in H1.** |
-| OpenRouter credits don't cover Jev | Same as above; say so in the README |
+| Jev model string (`jev-1.13` vs `typesafe/jev-1.13`) or SDK/OpenRouter mismatch | **Smoke-test one Noul call in the first 15 minutes.** Then raw POST to `/api/v1/systemone`, then the `llm_structured` backend |
+| OpenRouter credits don't cover Jev | TypeSafe direct needs its own key: signups gave $5 free, but were paused Sept 22. Otherwise `llm_structured`, and say so in the README |
+| Automated Embedding not on the sandbox tier (public preview) | `voyageai` client + our own vector index |
 | Change streams unavailable on the sandbox tier | Poll `events` every 1s; the design stays the same |
 | GP recommender takes too long | Nearest-neighbor predicted d28 + GWP sort |
 | Baseline B ties C | Report it; lead with false completions and double-spends, which the explicit ledger targets |
