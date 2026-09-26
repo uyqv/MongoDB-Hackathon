@@ -30,6 +30,7 @@ Branch `david`. Dev DB `second_shift_david`.
   - `buried_failure`: the source has no failed experiment, so the worst-scoring one (csp_lda · beta_13_30 · all64, 0.571) sits first. "Family" = method + band + channels, because every real experiment is csp_lda · beta_13_30.
   - `obsolete_protocol`: the trap is a synthetic experiment under a different protocol_id (evaluator `eeg-eval-0`), val bal acc = real incumbent + 0.12, created last. `store.incumbent` excludes it; the recent_window packet shows it.
   - Rebuild: `python -m eval.fixtures --src-campaign camp_0f8981ee --reset` (reset deletes only `fixture: true` docs and their packets/events).
+- **D7** `/api/eeg/preview` + panel 6 (13:08 ET). Real `S001R06.edf` via `eegbci.load_data(1, [6])` + `standardize`: C3/Cz/C4, 1-40 Hz zero-phase FIR, 6 s from the first task cue, shown at 80 Hz; Welch PSD 4-40 Hz on 1-3 s epochs, T1 fists (n=7) vs T2 feet (n=8). Cached to `data/eeg_preview.json` (gitignored). Returns 503 with the reason if the download fails. Caption names the PhysioNet source and says it is display only.
 
 ## Tests
 

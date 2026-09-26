@@ -69,7 +69,12 @@
     <section class="panel" id="panel-eeg">
       <h2>6 · EEG input</h2>
       <div id="eeg">
-        <p class="placeholder">Real EEG from PhysioNet loads here.</p>
+        <p class="placeholder" id="eeg-placeholder">Loading real EEG from PhysioNet…</p>
+        <div class="muted" id="eeg-trace-title"></div>
+        <div class="chart-box small"><canvas id="eeg-trace"></canvas></div>
+        <div class="muted" id="eeg-psd-title"></div>
+        <div class="chart-box small"><canvas id="eeg-psd"></canvas></div>
+        <p class="muted" id="eeg-caption"></p>
       </div>
     </section>
   </main>

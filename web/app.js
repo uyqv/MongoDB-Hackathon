@@ -198,6 +198,60 @@ function renderTimeline(events) {
   ).join("") || '<li class="empty">no timeline events yet</li>';
 }
 
+// ---------------------------------------------------------------- panel 6 (display only, loaded once)
+const EEG_COLORS = { C3: "#7cc4ff", Cz: "#00ed64", C4: "#f5b942" };
+const axis = (title) => ({ ticks: { color: "#8b95a3", maxTicksLimit: 7 }, grid: { color: "#262c35" },
+  title: { display: true, text: title, color: "#8b95a3" } });
+
+async function loadEeg() {
+  let d;
+  try {
+    d = await api("/api/eeg/preview");
+  } catch (err) {
+    $("eeg-placeholder").textContent = `EEG preview unavailable: ${err.message}`;
+    return;
+  }
+  $("eeg-placeholder").hidden = true;
+  const tr = d.trace;
+  // Offset channels vertically so the three traces don't overlap.
+  const offsets = { C3: 60, Cz: 0, C4: -60 };
+  new Chart($("eeg-trace"), {
+    type: "line",
+    data: {
+      datasets: Object.entries(tr.channels).map(([ch, ys]) => ({
+        label: ch, data: ys.map((y, i) => ({ x: tr.t[i], y: y + (offsets[ch] || 0) })),
+        borderColor: EEG_COLORS[ch], borderWidth: 1, pointRadius: 0,
+      })),
+    },
+    options: {
+      animation: false, maintainAspectRatio: false, parsing: false,
+      plugins: { legend: { labels: { color: "#e6e9ee", boxWidth: 10 } }, tooltip: { enabled: false } },
+      scales: { x: { type: "linear", ...axis("s after cue") }, y: { ...axis(`${tr.units} (offset)`), ticks: { display: false } } },
+    },
+  });
+  const f = d.psd.freqs;
+  const avg = (byCh) => f.map((_, i) => Object.values(byCh).reduce((a, v) => a + v[i], 0) / Object.keys(byCh).length);
+  new Chart($("eeg-psd"), {
+    type: "line",
+    data: {
+      datasets: [
+        { label: `T1 ${d.labels.T1} (n=${d.psd.n_epochs.T1})`, data: avg(d.psd.by_class.T1).map((y, i) => ({ x: f[i], y })),
+          borderColor: "#7cc4ff", borderWidth: 1.5, pointRadius: 0 },
+        { label: `T2 ${d.labels.T2} (n=${d.psd.n_epochs.T2})`, data: avg(d.psd.by_class.T2).map((y, i) => ({ x: f[i], y })),
+          borderColor: "#f5b942", borderWidth: 1.5, pointRadius: 0 },
+      ],
+    },
+    options: {
+      animation: false, maintainAspectRatio: false, parsing: false,
+      plugins: { legend: { labels: { color: "#e6e9ee", boxWidth: 10 } } },
+      scales: { x: { type: "linear", ...axis("Hz") }, y: axis(d.psd.units) },
+    },
+  });
+  $("eeg-trace-title").textContent = `C3 / Cz / C4, ${tr.filter}, 6 s from the ${tr.cue} (${tr.cue_label})`;
+  $("eeg-psd-title").textContent = `PSD mean of C3/Cz/C4, ${d.psd.window}`;
+  $("eeg-caption").textContent = `Source: ${d.source}. Display only; no metric uses this panel.`;
+}
+
 // ---------------------------------------------------------------- controls
 const post = (path, body) => api(path, {
   method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}),
@@ -273,3 +327,4 @@ $("campaign-select").addEventListener("change", () => {
 
 poll();
 setInterval(poll, POLL_MS);
+loadEeg();

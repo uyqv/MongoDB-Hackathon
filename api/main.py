@@ -9,6 +9,8 @@ and the incumbent are computed on read with contracts.is_eligible. The
 """
 from __future__ import annotations
 
+import json
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -161,9 +163,71 @@ class ConstraintBody(BaseModel):
     reason: str = ""
 
 
+EEG_SOURCE = "PhysioNet eegmmidb v1.0.0, S001 run 6"
+EEG_CHANNELS = ("C3", "Cz", "C4")
+
+
+def build_eeg_preview() -> dict:
+    """Display only: never feeds any metric. Real S001 run 6 (imagined both fists vs both feet)."""
+    import mne
+    import numpy as np
+    from mne.datasets import eegbci
+
+    mne.set_log_level("ERROR")
+    data_dir = os.environ.get("EEG_DATA_DIR", "data/eeg")
+    path = eegbci.load_data(1, [6], path=data_dir, update_path=False)[0]
+    raw = mne.io.read_raw_edf(path, preload=True)
+    eegbci.standardize(raw)
+    sf = raw.info["sfreq"]
+    events, event_id = mne.events_from_annotations(raw)
+    cues = [(int(s), code) for s, _, code in events if code in (event_id["T1"], event_id["T2"])]
+    first = cues[0][0]
+    picks = [raw.ch_names.index(c) for c in EEG_CHANNELS]
+    x = raw.get_data(picks=picks) * 1e6  # volts to microvolts
+
+    filt = mne.filter.filter_data(x, sf, 1.0, 40.0, phase="zero")
+    step = 2  # 160 Hz -> 80 Hz for display, after the 40 Hz low-pass
+    seg = filt[:, first:first + int(6 * sf):step]
+    t = (np.arange(seg.shape[1]) * step / sf).round(4)
+
+    lo, hi = int(1 * sf), int(3 * sf)
+    by_class: dict[str, list] = {"T1": [], "T2": []}
+    code_name = {event_id["T1"]: "T1", event_id["T2"]: "T2"}
+    for s0, code in cues:
+        if s0 + hi <= x.shape[1]:
+            by_class[code_name[code]].append(x[:, s0 + lo:s0 + hi])
+    psd = {}
+    freqs = None
+    for cls, epochs in by_class.items():
+        arr = np.stack(epochs)  # (n_epochs, n_channels, n_times)
+        p, freqs = mne.time_frequency.psd_array_welch(arr, sf, fmin=4.0, fmax=40.0, n_fft=int(2 * sf))
+        psd[cls] = {ch: (10 * np.log10(p[:, i, :].mean(axis=0))).round(3).tolist()
+                    for i, ch in enumerate(EEG_CHANNELS)}
+    return {
+        "source": EEG_SOURCE,
+        "labels": {"T1": "imagined both fists", "T2": "imagined both feet"},
+        "trace": {"t": t.tolist(), "sfreq_display": sf / step, "units": "µV", "filter": "1-40 Hz zero-phase FIR",
+                  "cue": "first task cue", "cue_label": code_name[cues[0][1]],
+                  "channels": {ch: seg[i].round(3).tolist() for i, ch in enumerate(EEG_CHANNELS)}},
+        "psd": {"freqs": np.asarray(freqs).round(3).tolist(), "units": "dB (µV²/Hz)",
+                "window": "1-3 s after cue, Welch", "n_epochs": {k: len(v) for k, v in by_class.items()},
+                "by_class": psd},
+        "display_only": True,
+    }
+
+
 @app.get("/api/eeg/preview")
 def eeg_preview():
-    return JSONResponse({"error": "EEG preview not implemented yet"}, status_code=501)
+    cache = Path(os.environ.get("EEG_PREVIEW_CACHE", "data/eeg_preview.json"))
+    if cache.exists():
+        return json.loads(cache.read_text())
+    try:
+        out = build_eeg_preview()
+    except Exception as e:  # download or parse failure: the panel says so, nothing else breaks
+        return JSONResponse({"error": f"EEG preview unavailable: {type(e).__name__}: {e}"}, status_code=503)
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_text(json.dumps(out))
+    return out
 
 
 @app.get("/api/worker/status")

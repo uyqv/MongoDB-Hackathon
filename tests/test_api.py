@@ -163,3 +163,15 @@ def test_control_endpoints(client, camp, tmp_path, monkeypatch):
     assert client.post("/api/worker/start", json={"campaign_id": camp}).status_code == 409
     assert client.post("/api/worker/kill").json() == {"killed": True, "pid": pid}
     assert client.get("/api/worker/status").json()["running"] is False
+
+
+def test_eeg_preview_is_real_and_display_only(client):
+    r = client.get("/api/eeg/preview")
+    if r.status_code == 503:
+        pytest.skip(r.json()["error"])
+    d = r.json()
+    assert d["source"] == "PhysioNet eegmmidb v1.0.0, S001 run 6" and d["display_only"] is True
+    assert set(d["trace"]["channels"]) == {"C3", "Cz", "C4"}
+    assert len(d["trace"]["t"]) == len(d["trace"]["channels"]["C3"])
+    assert d["psd"]["n_epochs"]["T1"] > 0 and d["psd"]["n_epochs"]["T2"] > 0
+    assert d["psd"]["freqs"][0] >= 4 and d["psd"]["freqs"][-1] <= 40
