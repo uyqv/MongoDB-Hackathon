@@ -21,6 +21,7 @@ LEAD, TAIL = 0.35, 1.1
 W, H = 1920, 1080
 F = "/System/Library/Fonts/Supplemental/"
 CHIP = ImageFont.truetype(F + "Arial Bold.ttf", 26)
+MUSIC = "--no-music" not in sys.argv
 
 frames = json.loads((V / "frames.json").read_text())
 m = json.loads((V / "marks.json").read_text())["marks"]
@@ -41,13 +42,19 @@ def frame(name: str) -> Image.Image:
 
 
 def chip(im: Image.Image, speed: float) -> Image.Image:
+    """Small fast-forward indicator (two drawn triangles + the speed), top right."""
     im = im.copy()
     d = ImageDraw.Draw(im, "RGBA")
-    label = f"▶▶  {speed:.0f}×" if speed >= 3 else f"▶▶  {speed:.1f}×"
-    w = d.textlength(label, font=CHIP)
-    x, y = W - w - 56, 104
-    d.rounded_rectangle([x - 16, y - 9, x + w + 16, y + 37], radius=12, fill=(0, 0, 0, 150))
-    d.text((x, y), label, font=CHIP, fill=(255, 255, 255, 215))
+    label = f"{speed:.0f}×" if speed >= 3 else f"{speed:.1f}×"
+    tw = d.textlength(label, font=CHIP)
+    icon = 34
+    w = icon + 10 + tw
+    x, y = W - w - 60, 106
+    d.rounded_rectangle([x - 16, y - 10, x + w + 16, y + 38], radius=12, fill=(0, 0, 0, 150))
+    col = (255, 255, 255, 215)
+    for dx in (0, 16):
+        d.polygon([(x + dx, y + 4), (x + dx + 16, y + 14), (x + dx, y + 24)], fill=col)
+    d.text((x + icon + 10, y - 1), label, font=CHIP, fill=col)
     return im
 
 
@@ -92,11 +99,15 @@ def main(out_path: str) -> None:
     idle = frame(min(frames, key=lambda f: abs(f[0] - 2.0))[1])
     intro_len = (S["intro"][1] - S["intro"][0]) + LEAD
     k = int(intro_len * FPS)
+    black = Image.new("RGB", (W, H), (0, 0, 0))
     for i in range(k):
         z = 1.0 + 0.045 * (i / max(1, k - 1))
         cw, ch = W / z, H / z
         x0, y0 = (W - cw) / 2, (H - ch) * 0.35
-        put(idle.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.LANCZOS), 1 / FPS)
+        im = idle.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.LANCZOS)
+        if i < 18:   # fade in from black
+            im = Image.blend(black, im, (i + 1) / 18)
+        put(im, 1 / FPS)
     print(f"intro    push-in {intro_len:4.1f}s")
 
     total = intro_len
@@ -131,9 +142,20 @@ def main(out_path: str) -> None:
     body.append(f"file '{seq[-1][0].resolve()}'")
     lst.write_text("\n".join(body) + "\n")
     delay = int(LEAD * 1000)
-    subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-i", tl["audio"],
-                    "-filter_complex", f"[1:a]loudnorm=I=-16:TP=-1.5:LRA=11,adelay={delay}|{delay},apad[a]",
-                    "-map", "0:v", "-map", "[a]", "-t", f"{total:.3f}",
+    voice = f"[1:a]loudnorm=I=-16:TP=-1.5:LRA=11,adelay={delay}|{delay},apad"
+    music = V / "voice" / "music.mp3"
+    if MUSIC and music.exists():
+        audio_in = ["-i", tl["audio"], "-i", str(music)]
+        graph = (f"{voice},asplit=2[v1][vsc];"
+                 f"[2:a]aformat=sample_rates=48000:channel_layouts=stereo,volume=0.18,"
+                 f"afade=t=in:st=0:d=1.5,afade=t=out:st={total - 2.5:.2f}:d=2.5,apad[mus];"
+                 f"[mus][vsc]sidechaincompress=threshold=0.02:ratio=5:attack=15:release=450[duck];"
+                 f"[v1][duck]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.9[a]")
+    else:
+        audio_in = ["-i", tl["audio"]]
+        graph = f"{voice}[a]"
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst), *audio_in,
+                    "-filter_complex", graph, "-map", "0:v", "-map", "[a]", "-t", f"{total:.3f}",
                     "-vf", f"fps={FPS},format=yuv420p", "-c:v", "libx264", "-preset", "slow", "-crf", "17",
                     "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", out_path], check=True)
     dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", out_path],
@@ -143,4 +165,5 @@ def main(out_path: str) -> None:
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else str(V / "second_shift_demo_v2.mp4"))
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    main(args[0] if args else str(V / "second_shift_demo_v2.mp4"))

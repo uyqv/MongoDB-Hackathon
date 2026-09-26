@@ -2,7 +2,17 @@
 
 Record on site. Record the real run at normal speed, then cut it down to 60 seconds. If a cut skips time, put a small "cut" or "sped up" caption on it. Never show a replay as if it were live.
 
-## Setup (3:30 PM, about 5 minutes)
+## Automated recording (what produced the submitted video)
+
+```bash
+DB_NAME=second_shift .venv/bin/uvicorn api.main:app --port 8000            # dashboard
+CID=$(DB_NAME=second_shift .venv/bin/python -m harness.worker --new --mode demo --budget 10 --create-only)
+.venv/bin/python scripts/video/record_demo_v2.py $CID                         # drives the dashboard's own buttons, captures frames
+.venv/bin/python scripts/video/tts_elevenlabs.py                              # narration (scripts/video/narration.json), one read + timestamps
+.venv/bin/python scripts/video/edit_v2.py ~/Desktop/SecondShift_demo.mp4      # cut, no subtitles, speed chip on fast parts
+```
+
+## Manual setup (live on stage)
 
 Terminal A, the dashboard:
 ```bash
@@ -28,7 +38,7 @@ Check: `.venv/bin/python -m pytest -q` is green, and the dashboard shows the new
    Experiments stream into the table and the chart. The context packet panel shows the retrieved evidence IDs.
 2. **Crash.** On the 4th job the worker logs `fault_injection` and SIGKILLs itself. The dashboard shows a job stuck in `running`.
 3. **Recover.** Press **Start worker** in the dashboard. The timeline shows `worker_start` with "resuming: 3 done experiments will be reused, not recomputed". Then `WAITING` while the dead lease runs out, then `lease_expired`, and the job reruns as attempt 2.
-4. **Change the goal.** After about 6 experiments, press **Reset context**, then set the channel budget to **9** with reason "new headset has 9 electrodes". The incumbent switches to the best 9 channel result already measured, with no new job. Every later proposal uses 9 channels, and the packet panel shows goal version 2.
+4. **Change the goal.** After about 6 experiments, press **Reset context**, then press **9** in the Electrodes selector. The incumbent switches to the best 9 channel result already measured, with no new job. Every later proposal uses 9 channels, and the packet panel shows goal version 2.
 5. **Finish.** The worker finalizes and scores the sealed test set once. The goal panel shows the final validation and test numbers.
 
 Backup, if a live step misbehaves: `python -m eval.demo_checks all` reproduces the recovery and constraint proofs end to end. Record its PASS output instead.
