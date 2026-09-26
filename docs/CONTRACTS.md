@@ -30,7 +30,7 @@ Field-level shapes are the TypedDicts in `harness/contracts.py`. Summary:
 | `experiments` | `<campaign_id>:<experiment_key>` | config, status, attempt, lease, **result metrics**, error | worker only |
 | `memories` | `m_<12 hex>` | notes and code-rendered verified results, embedding | worker via `memory.add_memory`; fixtures |
 | `events` | ObjectId | append-only audit/UI timeline | everyone via `db.log_event` |
-| `packets` | ObjectId | the exact evidence packet each planner call saw, plus the planner result and usage | `context.build_packet` (packet), worker (adds `planner_result`) |
+| `packets` | `pk_<12 hex>` (= `packet_id`) | the exact evidence packet each planner call saw, plus the planner result and usage | `context.build_packet` (packet), worker (adds `planner_result`) |
 
 Indexes (Andrew's `store.ensure_indexes`): `experiments {campaign_id:1, status:1, created_at:1}`, `events {campaign_id:1, ts:1}`, `packets {campaign_id:1, ts:-1}`, `memories {campaign_id:1, protocol_id:1, status:1}`. Vector index `memories_vec` belongs to David's `memory.ensure_vector_index`.
 
