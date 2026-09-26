@@ -24,6 +24,8 @@ from harness.db import log_event, now_iso
 RECENT_EVIDENCE = 3
 RECENT_BASELINE = 6
 RETRIEVE_K = 4
+LEADERS = 3
+LAGGARDS = 2
 
 
 def estimate_tokens(obj) -> int:
@@ -81,6 +83,9 @@ def build_packet(db: Database, campaign_id: str, strategy: str = "evidence", bud
         "recent": [],
         "retrieved": [],
         "tried_keys": [e["key"] for e in exps],
+        "tried": [e["label"] for e in exps],
+        "leaders": [],
+        "laggards": [],
         "surface": surface_summary(),
         "token_estimate": 0,
         "budget_tokens": budget_tokens,
@@ -94,6 +99,12 @@ def build_packet(db: Database, campaign_id: str, strategy: str = "evidence", bud
         packet["pending"] = [{"experiment_id": e["_id"], "label": e["label"], "status": e["status"]}
                              for e in exps if e["status"] in ("queued", "running")]
         packet["recent"] = [_exp_row(e, constraints) for e in finished[-RECENT_EVIDENCE:]]
+        # Numerical evidence by exact read, never by semantic similarity.
+        done = sorted((e for e in finished if e["status"] == "done" and e["protocol_id"] == campaign["protocol_id"]),
+                      key=lambda e: e["result"]["val_balanced_accuracy"], reverse=True)
+        packet["leaders"] = [_exp_row(e, constraints) for e in done if is_eligible(e["config"], constraints)][:LEADERS]
+        packet["laggards"] = ([_exp_row(e, constraints) for e in finished if e["status"] == "failed"]
+                              + [_exp_row(e, constraints) for e in done[::-1]])[:LAGGARDS]
         query = (f"Choosing the next EEG motor imagery experiment with at most {constraints['max_channels']} "
                  f"channels. Useful: results and failures for eligible channel sets"
                  + (f"; current best is {inc['label']}" if inc else "") + ".")
