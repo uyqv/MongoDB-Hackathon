@@ -33,6 +33,14 @@ Check: `.venv/bin/python -m pytest -q` is green, and the dashboard shows the new
 
 Backup, if a live step misbehaves: `python -m eval.demo_checks all` reproduces the recovery and constraint proofs end to end. Record its PASS output instead.
 
+## Dry run notes (1:42 PM, `camp_9099ead8`, every beat worked)
+
+- The whole run took about 2 minutes: crash on the 4th job at 0:41, restart plus lease wait about 5 s, 6 done at 1:10, finished at 2:00. 10 planner calls, 0 fallbacks, $0.10. Jev routed 10 of 10.
+- Press **Start worker only after the terminal worker has crashed.** An earlier run had two workers overlap. Nothing broke (the lease serialized them), but it muddies the story.
+- After 64 to 9, the incumbent can be empty if no 9 channel experiment ran yet. Then the right line is "nothing measured qualifies, so it keeps searching under the new goal", and the next proposals are all 9 channel. Don't promise a switch on camera unless the table already shows a central9 row.
+- The timeline panel fills with `llm_call` lines, so by the end the crash and restart events have scrolled off. Film them when they happen, or scroll the timeline.
+- 9 channel results are weaker: the sealed test for the 9 channel pick was 0.547. Don't narrate it as an improvement.
+
 ## Storyboard (60 s)
 
 | Time | Show | Say |
