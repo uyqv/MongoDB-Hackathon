@@ -14,6 +14,7 @@ The reference workload is a real one: classifying imagined movement (both fists 
 - **The model picks, code measures.** Claude Sonnet 5 (through OpenRouter) chooses the next configuration from a fixed menu of 225 and cites evidence IDs. It never computes or reports a metric. Every number comes from the numerical runner and is stored in the experiment document.
 - **Bounded context, rebuilt every step.** Each decision gets a fresh evidence packet: the latest goal (exact read), the best eligible result (exact read), pending jobs, a short recent window, and a few older notes ranked by Atlas Vector Search over Voyage embeddings. The packet has a token budget, and it is saved so you can see exactly what the model saw.
 - **Goals can change mid campaign.** Drop the electrode budget from 64 to 9 and eligibility is recomputed from results already measured. Nothing is rerun and nothing comparable is thrown away.
+- **A small decision model triages notes.** After each experiment, the planner's free text hypothesis plus a code computed outcome goes to Jev (`typesafe/jev-1.13` through OpenRouter's Decisions API). Jev labels it `research_note`, `failure_memory`, `ignore` or `review`. Useful notes become unverified memories that Vector Search can surface later. Jev never computes or compares numbers, and a Jev label never makes a note verified.
 - **Work is never paid for twice.** Experiments are keyed by a hash of the effective configuration plus the protocol (data file hashes, exact splits, evaluator version, seed). A finished experiment is reused. A changed dataset or evaluator can never silently reuse old numbers.
 
 ## Measured today
@@ -28,6 +29,18 @@ All numbers below come from real runs against real PhysioNet data and our Atlas 
 - The planner noticed from measured results that 21 motor channels beat all 64 and narrowed its search accordingly
 - Final pick: CSP + LDA, 13 to 30 Hz, 0.5 to 2.5 s window, 21 channels. **0.774 validation, 0.732 on the sealed test set** (75 trials, scored once)
 - The planner stopped with 1 experiment unspent, arguing nearby variants were exhausted. That call is recorded with its rationale.
+
+**Jev in the loop** (`camp_87e974bd`, full campaign): 10 of 10 notes routed by `typesafe/jev-1.13-20260917` (provider TypeSafe), 0 fallbacks, $0.000226 for all 10 calls. All 10 were labeled `research_note` and stored as unverified memories. The campaign used its whole budget and reached the same best result as the first run (0.774 validation, 0.732 sealed test). One of its 10 planner decisions hit OpenRouter's new account limit (20 requests per minute) and fell back; the worker now waits out rate limits instead. A separate 20 note smoke test of the Jev integration agreed with our hand labels on 19 of 20 and sent all 4 prompt injection style notes to `review`. That is a smoke test, not an accuracy estimate.
+
+**Memory growth** (`eval/stress.json`): we copied the real campaign and buried it under synthetic distractor notes, all labeled `synthetic_stress`.
+
+| Notes in memory | Search p50 | Search p95 | Evidence packet |
+|---|---|---|---|
+| 9 | 240 ms | 318 ms | 940 tokens |
+| 1,009 | 261 ms | 310 ms | 780 tokens |
+| 10,009 | 727 ms | 4,614 ms | 781 tokens (1,204 with the current packet) |
+
+The packet stays far under its 4,000 token budget while memory grows by three orders of magnitude, and it always carries the best eligible result. One honest miss shaped the design: Vector Search never put the best result's note in its top 4, even with zero distractors, because embeddings cannot rank by a number. So numerical evidence (best result, top and bottom results, recent results) reaches the model by exact MongoDB reads, and Vector Search is used only for notes. Latency is end to end from a laptop, including the Voyage query embedding, on the free Sandbox tier.
 
 **Recovery check** (`python -m eval.demo_checks recovery`, `camp_51b0f538`, real planner): **8 of 8 invariants passed.** The worker was SIGKILLed mid job after 2 finished experiments. A new process reported the resume, reused both finished experiments (each committed exactly once), waited out the dead lease, reran the orphaned job as attempt 2, finished the campaign and scored the sealed test set once (0.678).
 
