@@ -4,8 +4,8 @@
 
 const POLL_MS = 2000;
 const TIMELINE_TYPES = new Set([
-  "worker_start", "worker_killed", "context_reset", "goal_changed", "job_reused",
-  "lease_expired", "stale_commit_rejected", "finalized",
+  "worker_start", "worker_stop", "worker_killed", "fault_injection", "context_reset", "goal_changed",
+  "job_reused", "lease_expired", "stale_commit_rejected", "finalized",
 ]);
 
 const state = { campaignId: null, userPicked: false, chart: null, fake: false };
@@ -17,10 +17,12 @@ const fmt = (x, d = 3) => (x === null || x === undefined ? "—" : Number(x).toF
 const localTime = (iso) => (iso ? new Date(iso).toLocaleTimeString() : "—");
 const badge = (text, cls) => `<span class="badge ${cls}">${esc(text)}</span>`;
 
-async function api(path) {
-  const r = await fetch(path);
+async function api(path, opts) {
+  const r = await fetch(path, opts);
   if (!r.ok) {
-    const err = new Error(`${r.status} ${path}`);
+    let detail = "";
+    try { detail = (await r.json()).detail || ""; } catch (_) { /* not json */ }
+    const err = new Error(`${r.status} ${detail || path}`);
     err.status = r.status;
     throw err;
   }
@@ -172,7 +174,12 @@ function renderPacket(p) {
 function describe(ev) {
   const p = ev.payload || {};
   switch (ev.type) {
-    case "worker_start": return p.resumed ? `resumed · ${p.reused_done ?? 0} done reused` : "fresh start";
+    case "worker_start": {
+      const done = p.counts?.done ?? p.reused_done ?? 0;
+      return p.resumed ? `resumed · ${done} done reused, not recomputed` : "fresh start";
+    }
+    case "worker_stop": return `clean exit · ${p.steps ?? 0} steps`;
+    case "fault_injection": return `${p.experiment_id ?? ""} · attempt ${p.attempt ?? "?"} · self-SIGKILL`;
     case "worker_killed": return `pid ${p.pid ?? "?"} · ${p.signal ?? ""}`;
     case "context_reset": return `epoch ${p.context_epoch}`;
     case "goal_changed": return `v${p.from_version} → v${p.to_version} · max_channels ${p.old_constraints?.max_channels} → ${p.new_constraints?.max_channels}${p.reason ? " · " + p.reason : ""}`;
@@ -191,12 +198,105 @@ function renderTimeline(events) {
   ).join("") || '<li class="empty">no timeline events yet</li>';
 }
 
+// ---------------------------------------------------------------- panel 6 (display only, loaded once)
+const EEG_COLORS = { C3: "#7cc4ff", Cz: "#00ed64", C4: "#f5b942" };
+const axis = (title) => ({ ticks: { color: "#8b95a3", maxTicksLimit: 7 }, grid: { color: "#262c35" },
+  title: { display: true, text: title, color: "#8b95a3" } });
+
+async function loadEeg() {
+  let d;
+  try {
+    d = await api("/api/eeg/preview");
+  } catch (err) {
+    $("eeg-placeholder").textContent = `EEG preview unavailable: ${err.message}`;
+    return;
+  }
+  $("eeg-placeholder").hidden = true;
+  const tr = d.trace;
+  // Offset channels vertically so the three traces don't overlap.
+  const offsets = { C3: 60, Cz: 0, C4: -60 };
+  new Chart($("eeg-trace"), {
+    type: "line",
+    data: {
+      datasets: Object.entries(tr.channels).map(([ch, ys]) => ({
+        label: ch, data: ys.map((y, i) => ({ x: tr.t[i], y: y + (offsets[ch] || 0) })),
+        borderColor: EEG_COLORS[ch], borderWidth: 1, pointRadius: 0,
+      })),
+    },
+    options: {
+      animation: false, maintainAspectRatio: false, parsing: false,
+      plugins: { legend: { labels: { color: "#e6e9ee", boxWidth: 10 } }, tooltip: { enabled: false } },
+      scales: { x: { type: "linear", ...axis("s after cue") }, y: { ...axis(`${tr.units} (offset)`), ticks: { display: false } } },
+    },
+  });
+  const f = d.psd.freqs;
+  const avg = (byCh) => f.map((_, i) => Object.values(byCh).reduce((a, v) => a + v[i], 0) / Object.keys(byCh).length);
+  new Chart($("eeg-psd"), {
+    type: "line",
+    data: {
+      datasets: [
+        { label: `T1 ${d.labels.T1} (n=${d.psd.n_epochs.T1})`, data: avg(d.psd.by_class.T1).map((y, i) => ({ x: f[i], y })),
+          borderColor: "#7cc4ff", borderWidth: 1.5, pointRadius: 0 },
+        { label: `T2 ${d.labels.T2} (n=${d.psd.n_epochs.T2})`, data: avg(d.psd.by_class.T2).map((y, i) => ({ x: f[i], y })),
+          borderColor: "#f5b942", borderWidth: 1.5, pointRadius: 0 },
+      ],
+    },
+    options: {
+      animation: false, maintainAspectRatio: false, parsing: false,
+      plugins: { legend: { labels: { color: "#e6e9ee", boxWidth: 10 } } },
+      scales: { x: { type: "linear", ...axis("Hz") }, y: axis(d.psd.units) },
+    },
+  });
+  $("eeg-trace-title").textContent = `C3 / Cz / C4, ${tr.filter}, 6 s from the ${tr.cue} (${tr.cue_label})`;
+  $("eeg-psd-title").textContent = `PSD mean of C3/Cz/C4, ${d.psd.window}`;
+  $("eeg-caption").textContent = `Source: ${d.source}. Display only; no metric uses this panel.`;
+}
+
+// ---------------------------------------------------------------- controls
+const post = (path, body) => api(path, {
+  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}),
+});
+
+function renderWorker(st) {
+  const el = $("worker-status");
+  el.textContent = st.running ? `API worker: running pid ${st.pid} · ${st.campaign_id}` : "API worker: stopped";
+  el.style.color = st.running ? "var(--accent)" : "var(--muted)";
+  $("btn-start").disabled = st.running || !state.campaignId;
+  $("btn-kill").disabled = !st.running;
+}
+
+async function control(label, fn) {
+  const msg = $("control-msg");
+  msg.textContent = `${label}…`;
+  try {
+    const out = await fn();
+    msg.textContent = `${label}: ok ${out ? JSON.stringify(out).slice(0, 80) : ""}`;
+  } catch (err) {
+    msg.textContent = `${label} failed: ${err.message}`;
+  }
+  poll();
+}
+
+$("btn-start").addEventListener("click", () =>
+  control("start", () => post("/api/worker/start", { campaign_id: state.campaignId })));
+$("btn-kill").addEventListener("click", () => control("SIGKILL", () => post("/api/worker/kill")));
+$("btn-reset").addEventListener("click", () =>
+  control("context reset", () => post(`/api/campaigns/${state.campaignId}/context-reset`)));
+$("btn-constraint").addEventListener("click", () => control("constraint", async () => {
+  const c = await post(`/api/campaigns/${state.campaignId}/constraint`, {
+    max_channels: Number($("sel-channels").value), reason: $("constraint-reason").value,
+  });
+  $("constraint-reason").value = "";
+  return { goal_version: c.goal_version, max_channels: c.constraints.max_channels };
+}));
+
 // ---------------------------------------------------------------- loop
 async function poll() {
   try {
     const health = await api("/api/health");
     $("db-name").textContent = `db: ${health.db}`;
     await loadCampaigns();
+    renderWorker(await api("/api/worker/status"));
     const cid = state.campaignId;
     if (!cid) { $("goal").innerHTML = '<p class="empty">no campaigns yet</p>'; return; }
     const [camp, exps, events, packet] = await Promise.all([
@@ -227,3 +327,4 @@ $("campaign-select").addEventListener("change", () => {
 
 poll();
 setInterval(poll, POLL_MS);
+loadEeg();

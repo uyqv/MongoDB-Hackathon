@@ -1,0 +1,104 @@
+[
+  {
+    "campaign_id": "camp_5abba2f8",
+    "protocol_id": "p_8b1175a416b1",
+    "name": "buried_best_eligible",
+    "expected_evidence_ids": [
+      "camp_5abba2f8:x_950ecac7d6682ddc",
+      "m_cfd868f4788e"
+    ],
+    "forbidden_evidence_ids": [],
+    "description": "Constraint lowered to 9 channels. The best eligible result sits first, followed by 200 synthetic notes and every later experiment.",
+    "avoid_family": null,
+    "constraints": {
+      "max_channels": 9
+    },
+    "src_campaign_id": "camp_0f8981ee",
+    "db": "second_shift_eval",
+    "n_distractors": 200,
+    "n_experiments": 9
+  },
+  {
+    "campaign_id": "camp_9e778811",
+    "protocol_id": "p_8b1175a416b1",
+    "name": "buried_failure",
+    "expected_evidence_ids": [
+      "camp_9e778811:x_7ca0c7c59633633c",
+      "m_2e1ee7e01bbb"
+    ],
+    "forbidden_evidence_ids": [],
+    "description": "A real worst-scoring config (csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 all64 \u00b7 n=4) sits first and is buried under 200 synthetic notes. Correct move: avoid its csp_lda \u00b7 beta_13_30 \u00b7 all64 family.",
+    "avoid_family": {
+      "method": "csp_lda",
+      "band": "beta_13_30",
+      "channels": "all64"
+    },
+    "constraints": {
+      "max_channels": 64
+    },
+    "src_campaign_id": "camp_0f8981ee",
+    "db": "second_shift_eval",
+    "n_distractors": 200,
+    "n_experiments": 9
+  },
+  {
+    "campaign_id": "camp_64a220b5",
+    "protocol_id": "p_8b1175a416b1",
+    "name": "obsolete_protocol",
+    "expected_evidence_ids": [
+      "camp_64a220b5:x_951c0606000fc825",
+      "m_ae771574ef0a"
+    ],
+    "forbidden_evidence_ids": [
+      "camp_64a220b5:x_769cb7fc5f06470f",
+      "m_eb45cbd196f5"
+    ],
+    "description": "A SYNTHETIC higher-scoring record under a different protocol_id is the most recent experiment. Citing it is a mistake.",
+    "avoid_family": null,
+    "constraints": {
+      "max_channels": 64
+    },
+    "src_campaign_id": "camp_0f8981ee",
+    "db": "second_shift_eval",
+    "n_distractors": 200,
+    "n_experiments": 10
+  },
+  {
+    "campaign_id": "camp_75ae27d2",
+    "protocol_id": "p_8b1175a416b1",
+    "name": "goal_changed",
+    "expected_evidence_ids": [
+      "camp_75ae27d2:x_951c0606000fc825",
+      "m_e0bc6b841a2a"
+    ],
+    "forbidden_evidence_ids": [],
+    "description": "History crosses a 64 -> 21 channel change. The proposal must be eligible under 21.",
+    "avoid_family": null,
+    "constraints": {
+      "max_channels": 21
+    },
+    "src_campaign_id": "camp_0f8981ee",
+    "db": "second_shift_eval",
+    "n_distractors": 200,
+    "n_experiments": 9
+  },
+  {
+    "campaign_id": "camp_99e13e91",
+    "protocol_id": "p_8b1175a416b1",
+    "name": "distractor_flood",
+    "expected_evidence_ids": [
+      "camp_99e13e91:x_951c0606000fc825",
+      "m_da483839607f"
+    ],
+    "forbidden_evidence_ids": [],
+    "description": "1000 synthetic notes flood memory. Correct move: retrieve the real incumbent.",
+    "avoid_family": null,
+    "constraints": {
+      "max_channels": 64
+    },
+    "src_campaign_id": "camp_0f8981ee",
+    "db": "second_shift_eval",
+    "n_distractors": 1000,
+    "n_experiments": 9
+  }
+]
