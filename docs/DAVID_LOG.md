@@ -37,6 +37,11 @@ Branch `david`. Dev DB `second_shift_david`.
   - Authenticated call: provider `TypeSafe`, model `typesafe/jev-1.13-20260917`, request id `gen-dec-1790442586-oeMIa4WHgWSzvMgDcADH`, usage 356-ish in / ~41 out tokens, cost $0.00002 per call.
   - **Smoke test (not accuracy):** 20 hand-labeled notes (4 per label plus 4 ambiguous/adversarial), agreement 19/20, total cost $0.000395. All 4 prompt-injection / unsupported-metric / goal-change notes went to `review` at confidence 1.0. The one miss: "mu band failed... or maybe it was beta, the log got overwritten" (hand label `review`) went to `failure_memory` at 0.82. Hand labels are ours and n=20, so this says the integration works, not how accurate Jev is.
 
+### Prompt 3
+
+- 13:11 ET: merged origin/main (prompt 3 added to DAVID_PROMPTS.md). Suite: 59 passed, 3 live skipped.
+- **P1** planner no early stop. `stop` validates only when `goal.budget.remaining == 0` or no eligible untried config exists; any other stop is a validation failure, gets one repair ("propose one; explore a different method, band, or window"), then the deterministic fallback proposes. With `remaining == 0` the planner returns `stop` without calling the model. System prompt now says optimize relentlessly within budget. New tests: premature stop, repair, proposal; double premature stop, fallback proposal; stop at remaining 0 accepted; no call when budget spent. Live call re-run after the change: valid proposal, no fallback.
+
 ## Tests
 
 - `tests/test_planner.py`: 9 passed, 1 live skipped by default; live passed with `LIVE=1`.

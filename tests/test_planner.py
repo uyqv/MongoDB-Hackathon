@@ -136,10 +136,38 @@ def test_provider_error_falls_back(fake):
     assert r["usage"]["source"] == "estimate"
 
 
-def test_stop_tool_accepted(fake):
-    fake(tool_resp("stop", {"rationale": "done", "evidence_ids": []}))
+def test_premature_stop_repaired_into_proposal(fake):
+    client = fake(tool_resp("stop", {"rationale": "nothing beats the incumbent", "evidence_ids": []}, 0),
+                  tool_resp("propose_experiment", propose(NEW_CFG), 1))
     r = planner.plan(make_packet())
-    assert r["action"] == "stop" and not r["fallback_used"]
+    assert r["action"] == "propose" and not r["fallback_used"]
+    assert "stop is not allowed" in client.calls[1]["messages"][-1]["content"]
+    assert "different method, band, or window" in client.calls[1]["messages"][-1]["content"]
+
+
+def test_repeated_premature_stop_falls_back_to_proposal(fake):
+    fake(tool_resp("stop", {"rationale": "done", "evidence_ids": []}, 0),
+         tool_resp("stop", {"rationale": "still done", "evidence_ids": []}, 1))
+    r = planner.plan(make_packet())
+    assert r["action"] == "propose" and r["fallback_used"] and "stop is not allowed" in r["fallback_reason"]
+
+
+def test_stop_accepted_when_budget_spent():
+    p = make_packet()
+    p["goal"]["budget"]["remaining"] = 0
+    assert planner.validate(p, "stop", {"rationale": "budget spent", "evidence_ids": []}) == (None, None)
+
+
+def test_budget_spent_stops_without_call(fake):
+    client = fake()
+    p = make_packet()
+    p["goal"]["budget"]["remaining"] = 0
+    r = planner.plan(p)
+    assert r["action"] == "stop" and client.calls == []
+
+
+def test_system_prompt_forbids_early_stop():
+    assert "ONLY valid when goal.budget.remaining is 0" in planner.SYSTEM_PROMPT
 
 
 @pytest.mark.skipif(os.environ.get("LIVE") != "1", reason="live OpenRouter call; set LIVE=1")
