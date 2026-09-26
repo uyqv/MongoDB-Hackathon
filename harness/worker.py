@@ -18,6 +18,7 @@ import os
 import random
 import signal
 import socket
+import sys
 import time
 import traceback
 
@@ -271,6 +272,11 @@ def main() -> None:
     args = ap.parse_args()
     db = get_db()
     store.ensure_indexes(db)
+    try:
+        from harness.memory import ensure_vector_index
+        ensure_vector_index(db)
+    except Exception as exc:  # retrieval falls back to exact reads; never block the worker
+        print(f"vector index unavailable, retrieval will fall back: {exc}", file=sys.stderr)
     if args.new:
         protocol, _ = eeg.load_protocol(args.mode)
         cid = store.create_campaign(db, protocol=protocol, objective=OBJECTIVE, max_channels=args.max_channels,
