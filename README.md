@@ -67,6 +67,21 @@ An earlier run of this comparison is kept in `eval/results_run1_invalid.json` an
 
 ## How it works
 
+### Optional uncertainty-aware research policy
+
+Start a campaign with `--policy research_v1` to use a Gaussian-process shortlist, structured
+comparison hypotheses, and paired subject-bootstrap uncertainty. Numerical code ranks the
+next candidates; the planner selects an ID; committed trial evidence determines whether a
+two-percentage-point improvement claim is supported, contradicted, or inconclusive on validation.
+The dashboard shows predictions, measured intervals and assessment provenance. Existing
+campaigns keep their original behavior. See [the research policy](docs/RESEARCH_POLICY.md) for
+the frozen algorithm, recovery checks, benchmark commands and scientific limitations.
+
+Across 40 equal-budget validation rollouts, the hybrid averaged **0.748 vs 0.727** for the
+current planner when the channel limit changed, and **0.736 vs 0.762** under a constant limit.
+It used more tokens and remains opt-in. A real crash/restart campaign passed **10/10** recovery
+checks. [Full measured results and limitations](docs/RESEARCH_RESULTS.md).
+
 ```mermaid
 flowchart LR
     subgraph Worker["Worker (one long lived Python process)"]

@@ -73,3 +73,16 @@ def test_split_overlap_blocked():
     with pytest.raises(ValueError, match="duplicate"):
         check_splits({"train": ["a", "a"]})
     check_splits({"train": ["a"], "val": ["b"]})
+
+
+def test_research_evidence_is_additive_and_tracks_epoch_identity():
+    from harness.uncertainty import validate_result
+    cfg = {"method": "csp_lda", "band": "mu_8_12", "window": "w1.0_3.0",
+           "channels": "central9", "n_components": 2}
+    legacy = run_experiment(cfg, PROTOCOL, _data())
+    research = run_experiment(cfg, {**PROTOCOL, "validation_evidence_version": 1}, _data())
+    assert legacy["val_balanced_accuracy"] == research["val_balanced_accuracy"]
+    assert "validation_predictions" not in legacy
+    rows = validate_result(research)
+    assert {r["trial_id"] for r in rows} == set(_data().recordings[(1, 10)].trial_ids)
+    assert not research["uncertainty"]["available"]

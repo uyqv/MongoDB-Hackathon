@@ -114,8 +114,10 @@ def check_splits(split_ids: dict[str, list[str]]) -> None:
             seen[i] = split
 
 
-def load_protocol(mode: str = "demo") -> tuple[dict, EEGData]:
+def load_protocol(mode: str = "demo", evidence_version: int | None = None) -> tuple[dict, EEGData]:
     """Download (cached) and parse train/val runs for `mode`. Test runs are hashed, not parsed."""
+    if evidence_version not in (None, 1):
+        raise ValueError("unsupported validation evidence version")
     subjects = MODES[mode]
     files: dict[str, str] = {}
     recordings: dict[tuple[int, int], Recording] = {}
@@ -143,6 +145,8 @@ def load_protocol(mode: str = "demo") -> tuple[dict, EEGData]:
         "evaluator_version": EVALUATOR_VERSION,
         "seed": SEED,
     }
+    if evidence_version is not None:
+        protocol["validation_evidence_version"] = evidence_version
     return protocol, EEGData(recordings)
 
 
@@ -187,7 +191,8 @@ def _checked(value: float, name: str) -> float:
     return round(float(value), 4)
 
 
-def _fit_predict(cfg: dict, protocol: dict, data: EEGData, eval_run: int) -> tuple[list, list, dict, int, int]:
+def _fit_predict(cfg: dict, protocol: dict, data: EEGData, eval_run: int,
+                 predictions: list | None = None) -> tuple[list, list, dict, int, int]:
     y_true: list[int] = []
     y_pred: list[int] = []
     per_subject: dict[str, float] = {}
@@ -196,6 +201,13 @@ def _fit_predict(cfg: dict, protocol: dict, data: EEGData, eval_run: int) -> tup
         X_tr, y_tr = _epochs(data, s, SPLIT_RUNS["train"], cfg)
         X_ev, y_ev = _epochs(data, s, eval_run, cfg)
         pred = _pipeline(cfg).fit(X_tr, y_tr).predict(X_ev)
+        if predictions is not None:
+            rec = data.recordings[(s, eval_run)]
+            lo, hi = WINDOWS[cfg["window"]]
+            ends = rec.onsets + int(round(lo * rec.sfreq)) + int(round((hi - lo) * rec.sfreq))
+            ids = [tid for tid, keep in zip(rec.trial_ids, ends <= rec.signal.shape[1]) if keep]
+            predictions.extend({"trial_id": tid, "subject": int(s), "run": eval_run,
+                                "y_true": int(y), "y_pred": int(p)} for tid, y, p in zip(ids, y_ev, pred))
         per_subject[str(s)] = round(float(balanced_accuracy_score(y_ev, pred)), 4)
         y_true.extend(y_ev.tolist())
         y_pred.extend(pred.tolist())
@@ -208,9 +220,10 @@ def run_experiment(cfg: dict, protocol: dict, data: EEGData) -> dict:
     """Fit on train (run 6), score on validation (run 10). Returns a contracts.ExperimentResult."""
     c = normalize_config(cfg)
     t0 = time.perf_counter()
-    y_true, y_pred, per_subject, n_train, n_val = _fit_predict(c, protocol, data, SPLIT_RUNS["val"])
+    predictions = [] if protocol.get("validation_evidence_version") == 1 else None
+    y_true, y_pred, per_subject, n_train, n_val = _fit_predict(c, protocol, data, SPLIT_RUNS["val"], predictions)
     n_ch = len(CHANNEL_SETS[c["channels"]] or data.recordings[(protocol["subjects"][0], SPLIT_RUNS["train"])].ch_names)
-    return {
+    result = {
         "val_balanced_accuracy": _checked(balanced_accuracy_score(y_true, y_pred), "val_balanced_accuracy"),
         "val_f1": _checked(f1_score(y_true, y_pred, average="macro"), "val_f1"),
         "n_train": n_train,
@@ -220,6 +233,11 @@ def run_experiment(cfg: dict, protocol: dict, data: EEGData) -> dict:
         "evaluator_version": EVALUATOR_VERSION,
         "per_subject_val_balanced_accuracy": per_subject,
     }
+    if predictions is not None:
+        from harness.uncertainty import summarize
+        result.update(validation_evidence_version=1, validation_predictions=predictions,
+                      uncertainty=summarize(predictions))
+    return result
 
 
 def score_test_once(cfg: dict, protocol: dict, data: EEGData) -> dict:

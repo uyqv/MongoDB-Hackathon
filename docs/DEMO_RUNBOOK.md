@@ -1,6 +1,6 @@
 # Second Shift product demonstration
 
-The current delivery is the single file `presentation/second-shift-neuroai-90s.mp4`. It is exactly 90 seconds at 1920 × 1080, narrated with the requested ElevenLabs voice `ypfAZhVeE0hhj0A5eGdR`. It covers NeuroAI and EEG, coherent memory as the billion-token design target, long-term goals, hard metric feedback, and the MongoDB Atlas/OpenRouter/Voyage AI integrations. The raw footage, voice, edit decisions, and verification remain in `run/video-v6/`. Previous shorter editions are preserved.
+The current delivery is the single file `presentation/second-shift-neuroai-90s-zoom-music.mp4`. It is exactly 90 seconds at 1920 × 1080, narrated with the requested ElevenLabs voice `ypfAZhVeE0hhj0A5eGdR`. Slow camera moves follow the narration through EEG, planning, measured results, and memory. A soft instrumental melody fades in and out and dips beneath speech. It covers NeuroAI and EEG, coherent memory as the billion-token design target, long-term goals, hard metric feedback, and the MongoDB Atlas/OpenRouter/Voyage AI integrations. The raw footage and voice remain in `run/video-v6/`; camera, music, mix, and final verification are in `run/video-v7/`. Previous editions are preserved.
 
 Use the monochrome dashboard at http://localhost:8000. The working context, decision, experiment, and durable memory form one live diagram. Click a node or **Inspect** for evidence, **Activity** for historical decisions, or **Under the hood** for actual repository code. **Follow activity** switches to a fixed overview when disabled.
 
@@ -39,12 +39,19 @@ Listen to the voice before choosing cuts. Do not mechanically accelerate the voi
 
 ```bash
 .venv/bin/python scripts/video/edit_demo_v6.py
-VIDEO_REVIEW_ROOT=run/video-v6 VIDEO_EVIDENCE_DIR=run/video-v6/take-1 VIDEO_MAX_SECONDS=90 VIDEO_TARGET_SECONDS=90 .venv/bin/python scripts/video/review_demo_v3.py
+.venv/bin/python scripts/video/polish_demo_v7.py video
+.venv/bin/python scripts/video/polish_demo_v7.py audio
+.venv/bin/python scripts/video/polish_demo_v7.py mux
+VIDEO_REVIEW_ROOT=run/video-v7 VIDEO_EVIDENCE_DIR=run/video-v6/take-1 VIDEO_MAX_SECONDS=90 VIDEO_TARGET_SECONDS=90 .venv/bin/python scripts/video/review_demo_v3.py
 ```
 
 The 90-second revision uses a fresh continuous take with the corrected connector arrow and harness label. Its shot list is tied to `run/video-v6/take-1`, campaign `camp_639cfbea`. A new campaign has different timings, so build a new edit decision list from its marks and events. Do not reuse these cut times blindly. The generated narration lasts 84.32 seconds. Sentence boundaries are located from independent transcription so inserted pauses do not split words. Speech and footage retain their original speed.
 
-All included footage plays at normal speed. Clean cuts omit waiting periods; list those omissions in delivery notes. The video contains no captions, subtitles, lower thirds, speed badges, marketing overlays, music, or sound effects. The cursor and labels are part of the recorded interface. No historical events are replayed as a live campaign.
+The camera pass reads the original continuous capture with the same cut decisions. Floating-point framing and quintic easing create slow moves with settled holds, ranging from overview to 1.85× magnification. The view widens for the stop and restart controls, follows the nine-electrode change, and returns to overview for the code and closing. The original voice timing and pitch are unchanged.
+
+The instrumental source is `run/video-v7/music/soft-melody.mp3`; its generation request and provenance are alongside it. The mix fades the music over 3.2 seconds at the opening and 4.5 seconds at the close, with smooth speech ducking. The measured voice level is 17.91 dB above the music during narration. See `run/video-v7/export/mix.json` and `run/video-v7/review/audio-levels.json` for measurements.
+
+All included footage plays at normal speed. Clean cuts omit waiting periods; list those omissions in delivery notes. The video contains no captions, subtitles, lower thirds, speed badges, marketing overlays, or sound effects. The soft instrumental music follows the user's latest request. The cursor and labels are part of the recorded interface. No historical events are replayed as a live campaign.
 
 ## Verify
 

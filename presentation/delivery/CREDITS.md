@@ -8,6 +8,7 @@
 - Fonts: Space Grotesk and Source Sans 3, distributed with their SIL Open Font Licenses in `assets/fonts`.
 - Second Shift mark: existing project wave logo, unchanged.
 - Design review framework: Huashu Design, https://github.com/alchaincyf/huashu-design/blob/master/references/critique-guide.md . An unmodified copy and its MIT license are saved in `presentation/review` in the project.
-- Optional alternate narration: newly generated through ElevenLabs, Eric voice, `eleven_v3`. Script in `demo-narration.md`.
-
-The intended final demo is being created by the user with its own voiceover. It has not yet been included or reviewed.
+- Demo: the exact supplied `presentation/second-shift-neuroai-90s.mp4`, campaign `camp_639cfbea`, with its existing narration. The delivery copy is byte-identical. Spoken transcript and edit timing: `run/video-v6/export/transcript-review.json` and `edit-decisions.json`.
+- Demo result: `run/video-v6/take-1/experiments.json`, validation balanced accuracy 0.7592 using nine electrodes. The movie displays 0.759. Recovery evidence: `run/video-v6/take-1/recovery-proof.json`.
+- Memory stress evidence: `eval/stress.json` and `eval/stress_current_packet.json`, 10,000 synthetic distractor notes. Billion-token operation remains a target.
+- The optional alternate ElevenLabs Eric voiceover in the working media folder belongs to the earlier 60-second plan and is unused. `demo-narration.md` now documents the finished movie’s actual soundtrack.

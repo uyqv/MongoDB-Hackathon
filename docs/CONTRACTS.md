@@ -31,6 +31,7 @@ Field-level shapes are the TypedDicts in `harness/contracts.py`. Summary:
 | `memories` | `m_<12 hex>` | notes and code-rendered verified results, embedding | worker via `memory.add_memory`; fixtures |
 | `events` | ObjectId | append-only audit/UI timeline | everyone via `db.log_event` |
 | `packets` | `pk_<12 hex>` (= `packet_id`) | the exact evidence packet each planner call saw, plus the planner result and usage | `context.build_packet` (packet), worker (adds `planner_result`) |
+| `hypotheses` | `h_<experiment_id>` | research comparison assessment, projected from the experiment's pre-execution proposal and committed results | `hypotheses.reconcile` |
 
 Indexes (Andrew's `store.ensure_indexes`): `experiments {campaign_id:1, status:1, created_at:1}`, `events {campaign_id:1, ts:1}`, `packets {campaign_id:1, ts:-1}`, `memories {campaign_id:1, protocol_id:1, status:1}`. Vector index `memories_vec` belongs to David's `memory.ensure_vector_index`.
 
@@ -45,6 +46,7 @@ Rules both sides rely on:
 ```
 python -m harness.worker --campaign <campaign_id>
 python -m harness.worker --new --mode {smoke,demo} --max-channels 64 --budget 10
+python -m harness.worker --new --mode demo --budget 10 --policy research_v1 --research-seed 42
 ```
 Writes `worker_start` on boot (with `resumed: true` and the count of reused done experiments when the campaign already existed) and `worker_stop` on a clean exit. A SIGKILL writes nothing, so `control.kill_worker` writes `worker_killed`.
 
@@ -108,6 +110,7 @@ All responses are JSON. ObjectIds become strings. **The `embedding` field is nev
 | GET | `/api/campaigns/{cid}/packets/latest?strategy=evidence` | latest packet doc |
 | GET | `/api/campaigns/{cid}/packets/{packet_id}` | stored packet for this campaign only; 404 for a missing campaign or a packet owned by another campaign; embeddings omitted |
 | GET | `/api/campaigns/{cid}/memories?kind=&include_synthetic=false` | memories without embeddings |
+| GET | `/api/campaigns/{cid}/hypotheses` | hypotheses scoped to this campaign and protocol; missing campaign returns 404 |
 | GET | `/api/eeg/preview` | real EEG trace + per-class PSD from S001 run 6 (see §7) |
 | GET | `/api/worker/status` | `control.worker_status()` |
 | POST | `/api/worker/start` `{campaign_id}` | `{pid}` |
@@ -133,3 +136,22 @@ Copies real experiments and verified memories from a real source campaign into a
 5. `distractor_flood`: 1,000 synthetic notes. The correct move is to retrieve the real incumbent.
 
 Every injected record carries `synthetic: True, kind: "synthetic_stress"`, except copies of real experiments. `score(scenario, packet, planner_result) -> {cited_expected, cited_forbidden, eligible, fallback_used, input_tokens, cost_usd}` is computed by code.
+
+## Optional research contract
+
+A missing campaign `policy` means legacy behavior. `research_v1` persists its seed and adds
+`validation_evidence_version: 1` to the protocol identity. New results contain trial predictions
+and subject-bootstrap uncertainty; existing scalar results and legacy resume remain supported.
+Research `propose_experiment` takes `candidate_id`, `rationale`, and `evidence_ids`; code resolves
+the configuration and registers the fixed comparison hypothesis in the returned PlannerResult.
+The first three seeded initialization decisions are numerical and require no planner API call.
+
+Research packets add `research`, `hypotheses`, and `research_audit`. The latter stores the full
+source experiment IDs and frozen policy settings. `context.planner_view` excludes audit data,
+opaque tried keys, the full tried list, and the full surface from research planner input. Its
+4,000-token budget is an estimate of that view; provider input tokens include instructions and
+tool schemas. `cancelled` identifies queued work excluded by a new goal before computation.
+
+The hypothesis index is `{campaign_id:1, protocol_id:1, created_at:-1}`. Experiment API responses
+include their hypothesis, and snapshot exports include the hypotheses endpoint. See
+[RESEARCH_POLICY.md](RESEARCH_POLICY.md) for numerical settings, status semantics and verification.

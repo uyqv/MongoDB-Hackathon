@@ -587,12 +587,23 @@ $("inspector").addEventListener("click", (e) => {
   )
     $("inspector").close();
 });
+function intervalText(u) {
+  return u?.available && u.interval ? `${fmt(u.interval[0])} to ${fmt(u.interval[1])}` : "Unavailable";
+}
+function hypothesisView(h) {
+  if (!h) return "";
+  return `<section class="inspector-section"><h3>Research hypothesis</h3><p>${esc(h.claim || h.kind)}</p><p><strong>${esc(h.status || "pending")}</strong></p>${h.reference_experiment_id ? `<p>Reference: <code>${esc(h.reference_experiment_id)}</code></p>` : ""}${h.comparison ? `<p>Measured difference: ${fmt(h.comparison.estimate)}<br>95% paired subject interval: ${intervalText(h.comparison)}</p>` : ""}${h.reason ? `<p>${esc(h.reason)}</p>` : ""}<p>Exploratory validation evidence for this configuration comparison.</p></section>`;
+}
+function researchView(p) {
+  if (!p?.research) return "";
+  return `<section class="inspector-section"><h3>Uncertainty-aware experiment design</h3><p>${esc(p.policy)} · ${esc(p.research.phase)}</p>${p.research.fallback_reason ? `<p>${esc(p.research.fallback_reason)}</p>` : ""}<p>Predictions are model estimates. Measured results appear above.</p>${p.research.candidates.map((c, i) => `<div class="research-candidate"><h4>${i + 1}. ${esc(c.label)}</h4><p>${esc(c.selection_reason.replaceAll("_", " "))}</p><div class="source-row"><span>Predicted accuracy</span><strong>${fmt(c.predicted_accuracy)}</strong></div><div class="source-row"><span>Predictive standard deviation</span><strong>${fmt(c.predictive_std)}</strong></div><div class="source-row"><span>Expected improvement</span><strong>${fmt(c.expected_improvement)}</strong></div><code>${esc(c.candidate_id)}</code></div>`).join("")}</section>${(p.hypotheses || []).map(hypothesisView).join("")}`;
+}
 function showPacket(packet, manual = true) {
   if (manual) drawerPacket = null;
   const p = packet,
     exact = numericalEvidence(p);
   let body = p
-    ? `<div class="inspector-stats"><div><strong>${num(p.token_estimate)}</strong><span>tokens / ${num(p.budget_tokens)} budget</span></div><div><strong>${p.goal?.goal_version ?? data.campaign.goal_version}</strong><span>goal version</span></div></div><section class="inspector-section"><h3>Measured results · exact reads</h3>${exact.length ? exact.map((e) => `<div class="source-row"><span>${esc(e.label || e.experiment_id?.split(":").at(-1).slice(0, 10))}</span><strong>${fmt(e.val_balanced_accuracy ?? e.result?.val_balanced_accuracy)}</strong></div>`).join("") : "<p>No prior numerical evidence.</p>"}</section><section class="inspector-section"><h3>Research notes · vector search</h3>${(p.retrieved || []).map((n) => `<p>${esc(n.text)}</p><code>${esc(n.memory_id)}</code>`).join("") || "<p>No notes retrieved.</p>"}</section><section class="inspector-section"><code>${esc(p.packet_id || p._id)}</code></section>`
+    ? `<div class="inspector-stats"><div><strong>${num(p.token_estimate)}</strong><span>tokens / ${num(p.budget_tokens)} budget</span></div><div><strong>${p.goal?.goal_version ?? data.campaign.goal_version}</strong><span>goal version</span></div></div><section class="inspector-section"><h3>Measured results · exact reads</h3>${exact.length ? exact.map((e) => `<div class="source-row"><span>${esc(e.label || e.experiment_id?.split(":").at(-1).slice(0, 10))}</span><strong>${fmt(e.val_balanced_accuracy ?? e.result?.val_balanced_accuracy)}</strong></div>`).join("") : "<p>No prior numerical evidence.</p>"}</section>${researchView(p)}<section class="inspector-section"><h3>Research notes · vector search</h3>${(p.retrieved || []).map((n) => `<p>${esc(n.text)}</p><code>${esc(n.memory_id)}</code>`).join("") || "<p>No notes retrieved.</p>"}</section><section class="inspector-section"><code>${esc(p.packet_id || p._id)}</code></section>`
     : '<section class="inspector-section"><p>A fresh evidence packet will appear when the next decision begins.</p></section>';
   openInspector("WORKING CONTEXT", "What the agent sees", body, "packet");
 }
@@ -621,6 +632,11 @@ function showExperiment(id) {
     return;
   }
   const cfg = e.config || {};
+  const reference = data?.experiments.find((row) => row._id === e.hypothesis?.reference_experiment_id);
+  const predicted = e.hypothesis?.predicted_improvement != null && reference?.result?.val_balanced_accuracy != null
+    ? reference.result.val_balanced_accuracy + e.hypothesis.predicted_improvement
+    : null;
+  const predictionView = predicted == null ? "" : `<section class="inspector-section"><h3>Prediction and observation</h3><div class="source-row"><span>Predicted before execution</span><strong>${fmt(predicted)}</strong></div><div class="source-row"><span>Measured validation accuracy</span><strong>${fmt(e.result?.val_balanced_accuracy)}</strong></div><p>The forecast is reconstructed from the registered predicted improvement and its measured reference.</p></section>`;
   openInspector(
     "MEASURED BY CODE",
     METHOD[cfg.method] || "Experiment",
@@ -642,7 +658,7 @@ function showExperiment(id) {
       )
       .join(
         "",
-      )}</section><section class="inspector-section"><code>${esc(e._id)}</code></section>`,
+      )}</section>${predictionView}${e.result?.uncertainty ? `<section class="inspector-section"><h3>Measured uncertainty</h3><p>95% subject interval: ${intervalText(e.result.uncertainty)}</p><p>${num(e.result.uncertainty.n_subjects)} subjects · 2,000 cluster resamples</p><p>Exploratory adaptive validation. This interval does not establish population performance.</p></section>` : ""}${hypothesisView(e.hypothesis)}<section class="inspector-section"><code>${esc(e._id)}</code></section>`,
     "experiment",
   );
 }

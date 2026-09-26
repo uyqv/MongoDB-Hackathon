@@ -13,3 +13,4 @@ run/
 /.vercel/
 /.env.local
 /output/vercel-dashboard/
+/output/research/

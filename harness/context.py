@@ -62,15 +62,24 @@ def _exp_row(e: dict, constraints: dict) -> dict:
     }
 
 
-def build_packet(db: Database, campaign_id: str, strategy: str = "evidence", budget_tokens: int = 4000,
-                 worker_id: str | None = None) -> dict:
-    campaign = store.get_campaign(db, campaign_id)
+def planner_view(packet: dict) -> dict:
+    """Audit-only membership/provenance may grow; planner input stays bounded."""
+    view = {k: v for k, v in packet.items() if k not in ("tried_keys", "packet_id", "research_audit")}
+    if packet.get("policy") == "research_v1":
+        view.pop("tried", None)
+        view.pop("surface", None)
+    return view
+
+
+def assemble_packet(campaign: dict, exps: list[dict], strategy: str = "evidence", budget_tokens: int = 4000,
+                    notes: list | None = None, hypotheses: list | None = None) -> dict:
+    if campaign.get("policy") == "research_v1":
+        strategy = "evidence"
+    campaign_id = campaign["_id"]
     constraints = campaign["constraints"]
-    exps = store.experiments(db, campaign_id)
     used = len(exps)
     max_exp = campaign["budget"]["max_experiments"]
-    finished = [e for e in exps if e["status"] in ("done", "failed")]
-
+    finished = [e for e in exps if e["status"] in ("done", "failed", "cancelled")]
     packet: dict = {
         "packet_id": "pk_" + secrets.token_hex(6),
         "campaign_id": campaign_id,
@@ -96,7 +105,9 @@ def build_packet(db: Database, campaign_id: str, strategy: str = "evidence", bud
     }
 
     if strategy == "evidence":
-        inc = store.incumbent(db, campaign)
+        inc = max((e for e in finished if e["status"] == "done"
+                   and e["protocol_id"] == campaign["protocol_id"] and is_eligible(e["config"], constraints)),
+                  key=lambda e: (e["result"]["val_balanced_accuracy"], e["result"]["val_f1"], e["_id"]), default=None)
         if inc:
             packet["incumbent"] = {"experiment_id": inc["_id"], "label": inc["label"], "config": inc["config"],
                                    "val_balanced_accuracy": inc["result"]["val_balanced_accuracy"]}
@@ -109,25 +120,61 @@ def build_packet(db: Database, campaign_id: str, strategy: str = "evidence", bud
         packet["leaders"] = [_exp_row(e, constraints) for e in done if is_eligible(e["config"], constraints)][:LEADERS]
         packet["laggards"] = ([_exp_row(e, constraints) for e in finished if e["status"] == "failed"]
                               + [_exp_row(e, constraints) for e in done[::-1]])[:LAGGARDS]
-        query = (f"Choosing the next EEG motor imagery experiment with at most {constraints['max_channels']} "
-                 f"channels. Useful: results and failures for eligible channel sets"
-                 + (f"; current best is {inc['label']}" if inc else "") + ".")
-        packet["retrieved"] = _search(db, campaign, query, RETRIEVE_K, NOTE_KINDS)
+        packet["retrieved"] = list(notes or [])
     elif strategy == "recent_window":
         packet["recent"] = [_exp_row(e, constraints) for e in finished[-RECENT_BASELINE:]]
     else:
         raise ValueError(f"unknown strategy {strategy!r}")
 
-    # Enforce the finite budget: drop retrieved notes, then the oldest recent rows.
-    packet["token_estimate"] = estimate_tokens(packet)
-    while packet["token_estimate"] > budget_tokens and (packet["retrieved"] or packet["recent"]):
-        if packet["retrieved"]:
-            packet["retrieved"].pop()        # lowest-ranked note first
-        else:
-            packet["recent"].pop(0)          # then the oldest recent row
-        packet["token_estimate"] = estimate_tokens(packet)
+    research = campaign.get("policy") == "research_v1"
+    if research:
+        from harness.research import rank
+        ranking = rank(campaign, exps)
+        packet["policy"] = "research_v1"
+        packet["research_audit"] = {k: ranking.pop(k) for k in ("source_experiment_ids", "settings")}
+        packet["research"] = ranking
+        packet["hypotheses"] = list(hypotheses or [])[:3]
+        if packet["incumbent"]:
+            packet["incumbent"]["uncertainty"] = inc["result"].get("uncertainty")
 
-    # Stored flat so the API/UI read the same fields the planner saw.
+    def size():
+        return estimate_tokens(planner_view(packet) if research else packet)
+    packet["token_estimate"] = size()
+    # Always preserve goal, incumbent and at least the highest-ranked candidate.
+    for field in ("retrieved", "recent", "hypotheses", "laggards", "leaders"):
+        while packet["token_estimate"] > budget_tokens and packet.get(field):
+            packet[field].pop(0 if field == "recent" else -1)
+            packet["token_estimate"] = size()
+    if research:
+        while packet["token_estimate"] > budget_tokens and len(packet["research"]["candidates"]) > 1:
+            packet["research"]["candidates"].pop()
+            packet["token_estimate"] = size()
+        if packet["token_estimate"] > budget_tokens:
+            raise ValueError("packet budget cannot hold required research evidence")
+    # Account for the estimate's own digit count.
+    packet["token_estimate"] = size()
+    return packet
+
+
+def build_packet(db: Database, campaign_id: str, strategy: str = "evidence", budget_tokens: int = 4000,
+                 worker_id: str | None = None) -> dict:
+    campaign = store.get_campaign(db, campaign_id)
+    if campaign.get("policy") == "research_v1":
+        strategy = "evidence"
+    exps = store.experiments(db, campaign_id)
+    notes, hypotheses = [], []
+    if strategy == "evidence":
+        inc = store.incumbent(db, campaign)
+        query = (f"Choosing the next EEG experiment with at most {campaign['constraints']['max_channels']} "
+                 "channels. Useful results and failures for eligible channel sets"
+                 + (f"; current best is {inc['label']}" if inc else "") + ".")
+        notes = _search(db, campaign, query, RETRIEVE_K, NOTE_KINDS)
+    if campaign.get("policy") == "research_v1":
+        from harness.hypotheses import reconcile
+        reconcile(db, campaign)
+        hypotheses = list(db.hypotheses.find({"campaign_id": campaign_id, "protocol_id": campaign["protocol_id"]},
+                          {"rationale": 0, "evidence_ids": 0}).sort("created_at", -1).limit(3))
+    packet = assemble_packet(campaign, exps, strategy, budget_tokens, notes, hypotheses)
     db.packets.insert_one({"_id": packet["packet_id"], "ts": now_iso(), "context_epoch": campaign["context_epoch"],
                            "planner_result": None, **packet})
     log_event(db, campaign_id, "packet_built", {

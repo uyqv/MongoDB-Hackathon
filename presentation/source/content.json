@@ -17,8 +17,8 @@
       "id": "opening",
       "title": "Second Shift",
       "start": 0,
-      "duration": 15,
-      "notes": "We built Second Shift, an autonomous research assistant for brain signals. It runs EEG experiments and keeps the research moving, even when its agent crashes, loses context, or receives a new constraint.",
+      "duration": 12,
+      "notes": "We built Second Shift, a neuroscience harness that keeps EEG research moving when an agent crashes or loses its working context.",
       "sources": [
         "README.md: What it does",
         "Conceptual artwork generated with built-in image_gen. Electrode placement is illustrative, not a measured montage."
@@ -140,7 +140,7 @@
         },
         {
           "type": "text",
-          "text": "An autonomous research assistant\nfor brain signals.",
+          "text": "A neuroscience harness\nfor recorded brain signals.",
           "x": 98,
           "y": 710,
           "w": 770,
@@ -168,9 +168,9 @@
     {
       "id": "signals",
       "title": "Finding patterns in brain signals",
-      "start": 15,
-      "duration": 20,
-      "notes": "EEG records electrical activity from the scalp. Our task is concrete: distinguish imagined fists from imagined feet. Second Shift searches 225 configurations of electrodes, frequency bands, time windows, and classifiers. Every experiment produces a measured result that the next decision can use.",
+      "start": 12,
+      "duration": 15,
+      "notes": "EEG records electrical activity from the scalp. Our task is to distinguish imagined fists from imagined feet. The agent searches 225 configurations, and each measured result helps guide its next experiment.",
       "sources": [
         "harness/contracts.py: 225 effective configurations",
         "harness/eeg.py: within-subject run 6 training, run 10 validation, run 14 sealed test",
@@ -1007,9 +1007,9 @@
     {
       "id": "mechanism",
       "title": "How Second Shift researches",
-      "start": 35,
-      "duration": 25,
-      "notes": "The planner chooses the next configuration using recorded evidence. Numerical code trains and evaluates it. MongoDB Atlas stores the goal, experiments, and results. Each decision starts with a fresh evidence packet. Exact database reads supply measured results. Vector search retrieves research notes. A replacement worker can continue the same campaign.",
+      "start": 27,
+      "duration": 18,
+      "notes": "Each decision starts with evidence from Atlas. Exact reads retrieve measured results. Vector search retrieves notes. Claude chooses the next experiment, and numerical code evaluates it. The result returns to Atlas for the next decision.",
       "sources": [
         "harness/worker.py",
         "harness/context.py: exact reads of best, leaders, laggards, recent results; semantic retrieval over notes",
@@ -1098,7 +1098,7 @@
         },
         {
           "type": "text",
-          "text": "A fresh decision. A persistent research record.",
+          "text": "Fresh context for every experiment",
           "x": 98,
           "y": 419,
           "w": 1560,
@@ -1147,7 +1147,7 @@
         },
         {
           "type": "text",
-          "text": "AI chooses",
+          "text": "Remember",
           "x": 100,
           "y": 657,
           "w": 522,
@@ -1160,7 +1160,7 @@
         },
         {
           "type": "text",
-          "text": "Code measures",
+          "text": "Decide",
           "x": 702,
           "y": 657,
           "w": 540,
@@ -1172,7 +1172,7 @@
         },
         {
           "type": "text",
-          "text": "Atlas remembers",
+          "text": "Experiment",
           "x": 1304,
           "y": 657,
           "w": 540,
@@ -1184,7 +1184,7 @@
         },
         {
           "type": "text",
-          "text": "The next EEG experiment",
+          "text": "Exact results and relevant notes",
           "x": 100,
           "y": 754,
           "w": 516,
@@ -1197,7 +1197,7 @@
         },
         {
           "type": "text",
-          "text": "A reproducible numerical result",
+          "text": "Claude plans via OpenRouter",
           "x": 702,
           "y": 754,
           "w": 542,
@@ -1209,7 +1209,7 @@
         },
         {
           "type": "text",
-          "text": "Evidence for the next decision",
+          "text": "Code measures EEG accuracy",
           "x": 1304,
           "y": 754,
           "w": 522,
@@ -1237,16 +1237,15 @@
         },
         {
           "type": "text",
-          "text": "Worker resets → context rebuilt",
+          "text": "Each decision rebuilds context within a 4,000 token budget",
           "x": 100,
           "y": 820,
-          "w": 900,
+          "w": 1500,
           "h": 36,
           "size": 26,
           "color": "#006D46",
           "font": "Source Sans 3",
-          "weight": 400,
-          "motion": "worker-reset-label"
+          "weight": 400
         },
         {
           "type": "memory",
@@ -1257,7 +1256,7 @@
         },
         {
           "type": "text",
-          "text": "Completed research persists across worker restarts",
+          "text": "Atlas stores results. Jev routes notes. Voyage embeds them.",
           "x": 120,
           "y": 880,
           "w": 1630,
@@ -1273,12 +1272,15 @@
     {
       "id": "demo",
       "title": "The working system",
-      "start": 60,
-      "duration": 60,
-      "notes": "Play the new, narrated 60-second dashboard demo. Do not speak over the recorded voiceover. At the end, advance to the measured-results slide. This slot intentionally contains no previous recording. The final demo must show the actual newly recorded actions.",
+      "start": 45,
+      "duration": 95,
+      "playAt": 50,
+      "cue": "At 0:50, press Enter. Let the 90-second narration play without speaking over it. Advance when the video ends at 2:20.",
+      "notes": "Watch the saved results survive a restart and a tighter electrode limit.",
       "sources": [
-        "New recording required. Previous recordings and raw frames are excluded at the user’s request.",
-        "Use the voiceover embedded in the user’s new finished demo. The separately generated Eric narration is an optional alternate and must not be layered over that soundtrack."
+        "presentation/second-shift-neuroai-90s.mp4: 90 seconds, campaign camp_639cfbea, original narration preserved",
+        "run/video-v6/export/edit-decisions.json and transcript-review.json",
+        "run/video-v6/take-1/recovery-proof.json: interrupted experiment resumes as attempt 2"
       ],
       "elements": [
         {
@@ -1304,7 +1306,7 @@
         },
         {
           "type": "text",
-          "text": "60-second dashboard demo",
+          "text": "90-second narrated demo",
           "x": 1300,
           "y": 64,
           "w": 524,
@@ -1362,7 +1364,7 @@
         },
         {
           "type": "text",
-          "text": "A research campaign survives\na restart and a new electrode limit.",
+          "text": "Saved results survive a restart.\nThe electrode limit drops from 64 to 9.",
           "x": 100,
           "y": 530,
           "w": 1340,
@@ -1379,7 +1381,7 @@
           "y": 0,
           "w": 1920,
           "h": 1080,
-          "src": "media/second-shift-demo.mp4"
+          "src": "media/second-shift-neuroai-90s.mp4"
         },
         {
           "type": "text",
@@ -1397,14 +1399,16 @@
     },
     {
       "id": "evidence",
-      "title": "Measured on real EEG",
-      "start": 120,
-      "duration": 30,
-      "notes": "Our reference campaign reached seventy-three point two percent balanced accuracy on a held-out test scored once. That used twenty-one electrodes across five participants and seventy-five test trials. Separately, all eight recovery checks and all five constraint-change checks passed. These are small, offline experiments. They demonstrate the research loop, not clinical performance or a real-time decoder.",
+      "title": "Results and reliability",
+      "start": 140,
+      "duration": 22,
+      "notes": "The demo reaches seventy five point nine percent validation balanced accuracy using nine electrodes. Separately, our reference campaign scored seventy three point two percent on its sealed test using twenty one electrodes. These are small offline experiments, supported by separate reliability checks.",
       "sources": [
+        "presentation/second-shift-neuroai-90s.mp4 at 1:26–1:29: 0.759 best eligible validation score with 9 electrodes",
+        "run/video-v6/take-1/experiments.json: camp_639cfbea, central9, val_balanced_accuracy 0.7592, n_val 75",
         "README.md: camp_0f8981ee, 0.774 validation, 0.732 sealed test, 21 electrodes, 75 test trials, subjects 1–5",
         "eval/checks.json: camp_51b0f538 recovery 8/8; camp_66e4900c constraint 5/5",
-        "Reference campaign and reliability checks are separate from the new demo campaign."
+        "Validation guides model selection. The 73.2% sealed test result and reliability checks come from separate campaigns, not the demo."
       ],
       "elements": [
         {
@@ -1430,7 +1434,7 @@
         },
         {
           "type": "text",
-          "text": "Evidence from completed runs",
+          "text": "Demo and separate evaluations",
           "x": 1300,
           "y": 64,
           "w": 524,
@@ -1476,7 +1480,7 @@
         },
         {
           "type": "text",
-          "text": "Measured on real EEG",
+          "text": "Results and reliability",
           "x": 96,
           "y": 154,
           "w": 1730,
@@ -1488,7 +1492,7 @@
         },
         {
           "type": "text",
-          "text": "REFERENCE CAMPAIGN · 21 ELECTRODES",
+          "text": "DEMO CAMPAIGN: 9 ELECTRODES",
           "x": 100,
           "y": 370,
           "w": 1000,
@@ -1500,7 +1504,7 @@
         },
         {
           "type": "text",
-          "text": "73.2%",
+          "text": "75.9%",
           "x": 87,
           "y": 434,
           "w": 1060,
@@ -1512,10 +1516,10 @@
         },
         {
           "type": "text",
-          "text": "held-out balanced accuracy",
+          "text": "validation balanced accuracy",
           "x": 100,
           "y": 739,
-          "w": 1030,
+          "w": 1060,
           "h": 73,
           "size": 48,
           "color": "#1A2924",
@@ -1524,7 +1528,7 @@
         },
         {
           "type": "text",
-          "text": "5 participants · 75 test trials · test scored once",
+          "text": "After restart and the new electrode limit",
           "x": 100,
           "y": 842,
           "w": 1080,
@@ -1544,7 +1548,7 @@
         },
         {
           "type": "text",
-          "text": "SEPARATE RELIABILITY CHECKS",
+          "text": "SEPARATE REFERENCE CAMPAIGN",
           "x": 1270,
           "y": 400,
           "w": 555,
@@ -1556,10 +1560,10 @@
         },
         {
           "type": "text",
-          "text": "8 / 8",
+          "text": "73.2%",
           "x": 1264,
-          "y": 480,
-          "w": 520,
+          "y": 466,
+          "w": 540,
           "h": 125,
           "size": 102,
           "color": "#1A2924",
@@ -1568,43 +1572,55 @@
         },
         {
           "type": "text",
-          "text": "Recovery checks passed",
+          "text": "sealed test balanced accuracy",
           "x": 1270,
-          "y": 621,
+          "y": 603,
           "w": 552,
-          "h": 54,
-          "size": 33,
+          "h": 49,
+          "size": 32,
           "color": "#1A2924",
           "font": "Source Sans 3",
           "weight": 400
         },
         {
           "type": "text",
-          "text": "5 / 5",
-          "x": 1264,
-          "y": 728,
-          "w": 520,
-          "h": 125,
-          "size": 102,
-          "color": "#1A2924",
-          "font": "Space Grotesk",
-          "weight": 500
-        },
-        {
-          "type": "text",
-          "text": "Goal-change checks passed",
+          "text": "21 electrodes, 5 participants\n75 test trials, scored once",
           "x": 1270,
-          "y": 861,
+          "y": 672,
           "w": 550,
-          "h": 54,
-          "size": 33,
+          "h": 86,
+          "size": 28,
+          "color": "#5B6861",
+          "font": "Source Sans 3",
+          "weight": 400
+        },
+        {
+          "type": "text",
+          "text": "SEPARATE RELIABILITY CHECKS",
+          "x": 1270,
+          "y": 791,
+          "w": 555,
+          "h": 40,
+          "size": 25,
+          "color": "#5B6861",
+          "font": "Source Sans 3",
+          "weight": 600
+        },
+        {
+          "type": "text",
+          "text": "8/8 recovery checks passed\n5/5 constraint checks passed",
+          "x": 1270,
+          "y": 844,
+          "w": 552,
+          "h": 86,
+          "size": 31,
           "color": "#1A2924",
           "font": "Source Sans 3",
           "weight": 400
         },
         {
           "type": "text",
-          "text": "Offline demonstration, not a clinical or real-time decoder",
+          "text": "Offline research prototype. Clinical use and live decoding remain outside scope.",
           "x": 100,
           "y": 937,
           "w": 1430,
@@ -1619,10 +1635,13 @@
     {
       "id": "closing",
       "title": "Research that keeps its progress",
-      "start": 150,
-      "duration": 25,
-      "notes": "The Neuro AI value is a research assistant that can test ideas on real brain signals and preserve what it learns. Researchers can inspect the evidence, change an electrode budget, and continue from completed work. We built Second Shift to give the next experiment a reliable starting point. Thank you.",
+      "start": 162,
+      "duration": 13,
+      "notes": "We tested memory with ten thousand distractor notes. Billions of tokens remains the goal. Second Shift keeps research moving, even when the agent starts over. Thank you.",
       "sources": [
+        "eval/stress.json: 10,000 synthetic distractor notes in a copied real campaign",
+        "eval/stress_current_packet.json: 10,009 total memories, estimated 1,204 tokens within a 4,000 token budget",
+        "README.md: billions of tokens is a target, not an achieved scale",
         "README.md: project scope and team",
         "Repository: https://github.com/uyqv/MongoDB-Hackathon",
         "Conceptual brain and evidence-layer artwork generated with built-in image_gen."
@@ -1720,12 +1739,12 @@
         },
         {
           "type": "text",
-          "text": "Autonomous EEG experiments.\nEvidence that survives the restart.",
+          "text": "Tested with 10,000 distractor notes.\nBillions of tokens is the long term target.",
           "x": 100,
           "y": 631,
-          "w": 900,
+          "w": 910,
           "h": 133,
-          "size": 42,
+          "size": 38,
           "color": "#5B6861",
           "font": "Source Sans 3",
           "weight": 400,
@@ -1759,5 +1778,9 @@
       ]
     }
   ],
-  "demoReady": false
+  "targetSeconds": 175,
+  "reserveSeconds": 5,
+  "demoSeconds": 90,
+  "demoFile": "media/second-shift-neuroai-90s.mp4",
+  "demoReady": true
 }
