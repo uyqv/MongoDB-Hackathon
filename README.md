@@ -12,7 +12,7 @@ The reference workload is a real one: classifying imagined movement (both fists 
 
 - **One campaign survives everything.** Goal, constraints, protocol, every experiment and its measured result live in Atlas. Kill the worker with `SIGKILL`, start a new one, and it picks up where the last one died.
 - **The model picks, code measures.** Claude Sonnet 5 (through OpenRouter) chooses the next configuration from a fixed menu of 225 and cites evidence IDs. It never computes or reports a metric. Every number comes from the numerical runner and is stored in the experiment document.
-- **Bounded context, rebuilt every step.** Each decision gets a fresh evidence packet: the latest goal (exact read), the best eligible result (exact read), pending jobs, a short recent window, and a few older notes ranked by Atlas Vector Search over Voyage embeddings. The packet has a token budget, and it is saved so you can see exactly what the model saw.
+- **Bounded context, rebuilt every step.** Each decision gets a fresh evidence packet: the latest goal, the best and worst results under the current constraints, every configuration already tried, pending jobs and a short recent window, all by exact MongoDB reads, plus a few notes ranked by Atlas Vector Search over Voyage embeddings. The packet has a token budget, and it is saved so you can see exactly what the model saw.
 - **Goals can change mid campaign.** Drop the electrode budget from 64 to 9 and eligibility is recomputed from results already measured. Nothing is rerun and nothing comparable is thrown away.
 - **A small decision model triages notes.** After each experiment, the planner's free text hypothesis plus a code computed outcome goes to Jev (`typesafe/jev-1.13` through OpenRouter's Decisions API). Jev labels it `research_note`, `failure_memory`, `ignore` or `review`. Useful notes become unverified memories that Vector Search can surface later. Jev never computes or compares numbers, and a Jev label never makes a note verified.
 - **Work is never paid for twice.** Experiments are keyed by a hash of the effective configuration plus the protocol (data file hashes, exact splits, evaluator version, seed). A finished experiment is reused. A changed dataset or evaluator can never silently reuse old numbers.
@@ -60,6 +60,8 @@ flowchart LR
     P -- evidence packet --> LLM[Claude Sonnet 5<br/>via OpenRouter]
     LLM -- config + rationale + evidence IDs --> V
     E --> EEG[EEG runner<br/>MNE + scikit-learn]
+    C -- hypothesis + outcome --> JEV[Jev 1.13<br/>note routing]
+    JEV -- label --> memories
     subgraph Atlas["MongoDB Atlas"]
         campaigns[(campaigns)]
         experiments[(experiments)]
