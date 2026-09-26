@@ -17,6 +17,8 @@ The reference workload is a real one: classifying imagined movement (both fists 
 - **A small decision model triages notes.** After each experiment, the planner's free text hypothesis plus a code computed outcome goes to Jev (`typesafe/jev-1.13` through OpenRouter's Decisions API). Jev labels it `research_note`, `failure_memory`, `ignore` or `review`. Useful notes become unverified memories that Vector Search can surface later. Jev never computes or compares numbers, and a Jev label never makes a note verified.
 - **Work is never paid for twice.** Experiments are keyed by a hash of the effective configuration plus the protocol (data file hashes, exact splits, evaluator version, seed). A finished experiment is reused. A changed dataset or evaluator can never silently reuse old numbers.
 
+![Dashboard after a real campaign: fault injection and restart, context reset, channel budget cut from 64 to 9, sealed test scored once](docs/dashboard.png)
+
 ## Measured today
 
 All numbers below come from real runs against real PhysioNet data and our Atlas Sandbox cluster. Nothing is simulated except where labeled.
