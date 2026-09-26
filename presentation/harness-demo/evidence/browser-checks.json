@@ -1,0 +1,26 @@
+{
+  "passed": [
+    "Empty campaign, initial history is quiet, early-opened history populates, controls reflect worker ownership, 1080p fits",
+    "New packet animates once; repeated event IDs do not animate again",
+    "Overview toggle, evidence inspector, campaign-scoped historical packet request",
+    "Waiting and failed states render without claiming active execution",
+    "Connection loss stops motion and controls; reconnection does not replay history",
+    "800 ms responses do not overlap a subsequent 500 ms polling cycle",
+    "Campaign switch discards stale requests and cannot stop another campaign worker",
+    "Reduced motion, cleared context, nine-electrode count, honest empty eligibility",
+    "No browser JavaScript errors"
+  ],
+  "max_concurrent_per_endpoint": {
+    "/campaigns": 1,
+    "/campaigns/qa-a": 1,
+    "/campaigns/qa-a/experiments": 1,
+    "/campaigns/qa-a/events": 1,
+    "/campaigns/qa-a/packets/latest": 1,
+    "/worker/status": 2,
+    "/campaigns/qa-a/packets/p-old": 1,
+    "/campaigns/qa-b": 1,
+    "/campaigns/qa-b/experiments": 1,
+    "/campaigns/qa-b/events": 1,
+    "/campaigns/qa-b/packets/latest": 1
+  }
+}

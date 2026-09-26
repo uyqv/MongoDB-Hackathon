@@ -1,6 +1,6 @@
 # Second Shift product demonstration
 
-The current delivery is `presentation/neuroscience-demo/second-shift-neuroscience.mp4`. It is a 59.6 second, 1920 × 1080 recording of the working interface with neuroscience-focused narration only. The script, evidence, and scored review are in the same directory. The previous edition remains in `presentation/product-demo/`.
+The current delivery is the single file `presentation/second-shift-neuroai-90s.mp4`. It is exactly 90 seconds at 1920 × 1080, narrated with the requested ElevenLabs voice `ypfAZhVeE0hhj0A5eGdR`. It covers NeuroAI and EEG, coherent memory as the billion-token design target, long-term goals, hard metric feedback, and the MongoDB Atlas/OpenRouter/Voyage AI integrations. The raw footage, voice, edit decisions, and verification remain in `run/video-v6/`. Previous shorter editions are preserved.
 
 Use the monochrome dashboard at http://localhost:8000. The working context, decision, experiment, and durable memory form one live diagram. Click a node or **Inspect** for evidence, **Activity** for historical decisions, or **Under the hood** for actual repository code. **Follow activity** switches to a fixed overview when disabled.
 
@@ -21,15 +21,16 @@ Select that campaign and press **Start worker**. Press **Stop worker** while an 
 ## Record a new take
 
 ```bash
-DEMO_API=http://localhost:8000 VIDEO_CAPTURE_DIR=run/video-v3/new-take DB_NAME=second_shift .venv/bin/python -m scripts.video.record_demo_v3
+DEMO_API=http://localhost:8000 VIDEO_CAPTURE_DIR=run/video-v6/new-take DB_NAME=second_shift .venv/bin/python -m scripts.video.record_demo_v6
 ```
 
-The recorder creates a fresh real campaign. It drives the dashboard controls, captures a continuous 1080p browser video, and preserves timestamps, events, packets, and experiment documents. It asserts that the interrupted experiment retries as attempt two and that earlier results are unchanged. It will fail rather than claim a missed stop as recovery. Do not run another worker concurrently.
+The recorder creates a fresh real campaign with a 14-experiment budget and allows the EEG search to run for at least 65 seconds before the interruption. It drives the dashboard controls, captures a continuous 1080p browser video, and preserves timestamps, events, packets, and experiment documents. It asserts that the interrupted experiment retries as attempt two and that earlier results are unchanged. It will fail rather than claim a missed stop as recovery. Do not run another worker concurrently.
 
-Narration comes from the revised 120-word neuroscience script in `scripts/video/narration.json`. The previous 130-word script is preserved in `scripts/video/narration_v3.json`:
+Narration comes from the revised 148-word NeuroAI script in `scripts/video/narration.json`. Prior scripts are preserved as `narration_v3.json`, `narration_v4.json`, and `narration_v5.json`:
 
 ```bash
-VIDEO_VOICE_DIR=run/video-v4/voice .venv/bin/python scripts/video/tts_elevenlabs.py
+VIDEO_VOICE_DIR=run/video-v6/voice-final .venv/bin/python scripts/video/tts_elevenlabs.py ypfAZhVeE0hhj0A5eGdR
+.venv/bin/python scripts/video/transcribe_audio.py run/video-v6/voice-final/narration.mp3 run/video-v6/voice-final/transcript-review.json
 ```
 
 Listen to the voice before choosing cuts. Do not mechanically accelerate the voice. The delivered edit preserves its original speed and inserts silence between complete sentences.
@@ -37,11 +38,11 @@ Listen to the voice before choosing cuts. Do not mechanically accelerate the voi
 ## Reproduce the reviewed edit
 
 ```bash
-.venv/bin/python scripts/video/edit_demo_v4.py
-VIDEO_REVIEW_ROOT=run/video-v4 VIDEO_EVIDENCE_DIR=run/video-v3/take-2 .venv/bin/python scripts/video/review_demo_v3.py
+.venv/bin/python scripts/video/edit_demo_v6.py
+VIDEO_REVIEW_ROOT=run/video-v6 VIDEO_EVIDENCE_DIR=run/video-v6/take-1 VIDEO_MAX_SECONDS=90 VIDEO_TARGET_SECONDS=90 .venv/bin/python scripts/video/review_demo_v3.py
 ```
 
-The neuroscience revision uses new narration and new cuts of the approved continuous take. The editor's shot list is deliberately tied to `run/video-v3/take-2`, campaign `camp_614645d1`. A new campaign has different timings, so build a new edit decision list from its marks and events. Do not reuse these cut times blindly.
+The 90-second revision uses a fresh continuous take with the corrected connector arrow and harness label. Its shot list is tied to `run/video-v6/take-1`, campaign `camp_639cfbea`. A new campaign has different timings, so build a new edit decision list from its marks and events. Do not reuse these cut times blindly. The generated narration lasts 84.32 seconds. Sentence boundaries are located from independent transcription so inserted pauses do not split words. Speech and footage retain their original speed.
 
 All included footage plays at normal speed. Clean cuts omit waiting periods; list those omissions in delivery notes. The video contains no captions, subtitles, lower thirds, speed badges, marketing overlays, music, or sound effects. The cursor and labels are part of the recorded interface. No historical events are replayed as a live campaign.
 

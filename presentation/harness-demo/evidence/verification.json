@@ -1,0 +1,19 @@
+{
+  "dimensions": "1920 \u00d7 1080",
+  "duration_seconds": 59.6,
+  "frames_per_second": "25/1",
+  "streams": [
+    "video",
+    "audio"
+  ],
+  "native_speed_all_shots": true,
+  "interrupted_experiment": "camp_b502457a:x_630f7073b4bccb50",
+  "verified_attempts": [
+    1,
+    2
+  ],
+  "previous_results_unchanged": 2,
+  "new_goal_packet_count": 6,
+  "first_new_goal_incumbent": null,
+  "all_new_goal_proposals_use_nine_electrodes": true
+}

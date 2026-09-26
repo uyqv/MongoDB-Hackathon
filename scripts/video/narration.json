@@ -1,34 +1,46 @@
 [
   {
     "id": "intro",
-    "text": "Your agent can crash. Your neuroscience research shouldn't have to start over."
+    "text": "NeuroAI needs research that survives a crash."
   },
   {
     "id": "position",
-    "text": "We built Second Shift, a neuroscience harness."
+    "text": "We built Second Shift, a neuroscience harness for recorded EEG brain data, distinguishing imagined hand and foot movements."
   },
   {
-    "id": "run",
-    "text": "Claude proposes experiments to classify imagined hand and foot movements from EEG. Our pipeline measures the results. MongoDB Atlas preserves the evidence."
+    "id": "planning",
+    "text": "OpenRouter connects Claude for experiment planning and Jev for classifying research notes."
+  },
+  {
+    "id": "metrics",
+    "text": "Our EEG pipeline measures accuracy. Hard metrics guide the next experiment."
+  },
+  {
+    "id": "memory",
+    "text": "MongoDB Atlas stores experiments, results, and research memories. Voyage AI creates note embeddings; Atlas Vector Search retrieves relevant notes."
+  },
+  {
+    "id": "scale",
+    "text": "Our target is coherent memory across billions of tokens in one session. Each decision rebuilds compact context from durable history, tested against ten thousand distractor notes."
   },
   {
     "id": "kill",
-    "text": "Now let's pull the plug. The worker disappears, but its completed results stay."
+    "text": "Now let's pull the plug. The research survives."
   },
   {
     "id": "recover",
-    "text": "Restart it, and the harness rebuilds context. Completed results are reused; the interrupted experiment runs again."
+    "text": "Restart it. Saved results are reused; the interrupted experiment runs again."
   },
   {
     "id": "goal",
-    "text": "Now we erase the context and cut the electrode limit from sixty four to nine."
+    "text": "Now erase context and cut the electrode limit from sixty four to nine."
   },
   {
     "id": "adapt",
-    "text": "The harness rechecks the evidence, then continues the search with fewer sensors."
+    "text": "The long term goal holds: improve EEG classification. It rechecks evidence and keeps optimizing."
   },
   {
     "id": "close",
-    "text": "With Second Shift, your agent starts fresh, and your neuroscience research moves forward."
+    "text": "The agent starts over. Your NeuroAI research moves forward."
   }
 ]

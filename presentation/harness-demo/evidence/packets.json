@@ -1,0 +1,2124 @@
+[
+  {
+    "_id": "pk_703ece67a917",
+    "ts": "2026-09-26T20:26:48.360+00:00",
+    "context_epoch": 1,
+    "planner_result": {
+      "action": "propose",
+      "config": {
+        "method": "bandpower_lr",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "C": 1.0
+      },
+      "rationale": "With only one experiment left and CSP variants on central9 plateauing near 0.73, testing an untried method (bandpower_lr) on the same best band/window/channel setup explores a different hypothesis space before budget exhausts.",
+      "evidence_ids": [
+        "camp_b502457a:x_82815d2c340ea4b2",
+        "camp_b502457a:x_d042267980f0d2af",
+        "camp_b502457a:x_310fc5724c1a7578"
+      ],
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454408-tjndGc2h4Bj37gufbBE3",
+      "usage": {
+        "input_tokens": 4703,
+        "output_tokens": 278,
+        "cost_usd": 0.012186,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    },
+    "packet_id": "pk_703ece67a917",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "strategy": "evidence",
+    "goal": {
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit.",
+      "goal_version": 2,
+      "constraints": {
+        "max_channels": 9
+      },
+      "budget": {
+        "max_experiments": 10,
+        "used": 9,
+        "remaining": 1
+      }
+    },
+    "incumbent": {
+      "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 2
+      },
+      "val_balanced_accuracy": 0.7315
+    },
+    "pending": [],
+    "recent": [
+      {
+        "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+        "status": "done",
+        "val_balanced_accuracy": 0.7315,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_9ff45d527cd86889",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.5_3.5 \u00b7 central9 \u00b7 n=2",
+        "status": "done",
+        "val_balanced_accuracy": 0.6515,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_310fc5724c1a7578",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=2",
+        "status": "done",
+        "val_balanced_accuracy": 0.6924,
+        "eligible": true
+      }
+    ],
+    "retrieved": [
+      {
+        "memory_id": "m_a8823bb19235",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6: All prior top results used motor21 (21 channels), which exceeds the current max_channels=9 constraint, making them ineligible; test the best-known band/window/n_components combo on the eligible central9 channel set to establish a valid incumbent. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_57c6273a72d0b921"
+        ],
+        "score": 0.830289363861084,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_01b215da5d73",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=2: n=2 is the best-performing component count on central9 so far; testing an earlier window may better capture beta-band ERD onset before movement-related artifacts. Outcome, computed by code: it did not beat the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_310fc5724c1a7578"
+        ],
+        "score": 0.8049499988555908,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_7f2cf612c679",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4: With central9 the only eligible channel set, test n_components=4 to see if fewer components reduce overfitting versus n=6, since motor21 comparisons showed n=6 helped but central9 has fewer channels to span. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_d042267980f0d2af"
+        ],
+        "score": 0.8040702939033508,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_4cdbad3bc470",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2: Since n=6 underperformed n=4 on central9, testing n=2 explores whether even fewer components further reduce overfitting on the limited 9-channel set. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_82815d2c340ea4b2"
+        ],
+        "score": 0.8007938861846924,
+        "verified": false,
+        "retrieval": "vector"
+      }
+    ],
+    "tried_keys": [
+      "x_c895457f2bf3a3ea",
+      "x_179f0e198f2ab069",
+      "x_630f7073b4bccb50",
+      "x_ef4ac199c19d5c65",
+      "x_57c6273a72d0b921",
+      "x_d042267980f0d2af",
+      "x_82815d2c340ea4b2",
+      "x_9ff45d527cd86889",
+      "x_310fc5724c1a7578"
+    ],
+    "tried": [
+      "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.5_3.5 \u00b7 central9 \u00b7 n=2",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=2"
+    ],
+    "leaders": [
+      {
+        "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+        "status": "done",
+        "val_balanced_accuracy": 0.7315,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.7055,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_310fc5724c1a7578",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=2",
+        "status": "done",
+        "val_balanced_accuracy": 0.6924,
+        "eligible": true
+      }
+    ],
+    "laggards": [
+      {
+        "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+        "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.5843,
+        "eligible": false
+      },
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": false
+      }
+    ],
+    "surface": {
+      "methods": {
+        "bandpower_lr": {
+          "C": [
+            0.1,
+            1.0
+          ]
+        },
+        "csp_lda": {
+          "n_components": [
+            2,
+            4,
+            6
+          ]
+        }
+      },
+      "bands": {
+        "mu_8_12": [
+          8.0,
+          12.0
+        ],
+        "lowbeta_13_20": [
+          13.0,
+          20.0
+        ],
+        "highbeta_20_30": [
+          20.0,
+          30.0
+        ],
+        "beta_13_30": [
+          13.0,
+          30.0
+        ],
+        "broad_8_30": [
+          8.0,
+          30.0
+        ]
+      },
+      "windows": {
+        "w0.5_2.5": [
+          0.5,
+          2.5
+        ],
+        "w1.0_3.0": [
+          1.0,
+          3.0
+        ],
+        "w1.5_3.5": [
+          1.5,
+          3.5
+        ]
+      },
+      "channels": {
+        "central9": 9,
+        "motor21": 21,
+        "all64": 64
+      },
+      "total_configs": 225
+    },
+    "token_estimate": 1546,
+    "budget_tokens": 4000
+  },
+  {
+    "_id": "pk_227f97eefbba",
+    "ts": "2026-09-26T20:26:39.758+00:00",
+    "context_epoch": 1,
+    "planner_result": {
+      "action": "propose",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w0.5_2.5",
+        "channels": "central9",
+        "n_components": 2
+      },
+      "rationale": "n=2 is the best-performing component count on central9 so far; testing an earlier window may better capture beta-band ERD onset before movement-related artifacts.",
+      "evidence_ids": [
+        "camp_b502457a:x_82815d2c340ea4b2",
+        "camp_b502457a:x_9ff45d527cd86889"
+      ],
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454399-l9QuElMSAcgbxpO7owuU",
+      "usage": {
+        "input_tokens": 4652,
+        "output_tokens": 232,
+        "cost_usd": 0.011624,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    },
+    "packet_id": "pk_227f97eefbba",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "strategy": "evidence",
+    "goal": {
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit.",
+      "goal_version": 2,
+      "constraints": {
+        "max_channels": 9
+      },
+      "budget": {
+        "max_experiments": 10,
+        "used": 8,
+        "remaining": 2
+      }
+    },
+    "incumbent": {
+      "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 2
+      },
+      "val_balanced_accuracy": 0.7315
+    },
+    "pending": [],
+    "recent": [
+      {
+        "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.7055,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+        "status": "done",
+        "val_balanced_accuracy": 0.7315,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_9ff45d527cd86889",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.5_3.5 \u00b7 central9 \u00b7 n=2",
+        "status": "done",
+        "val_balanced_accuracy": 0.6515,
+        "eligible": true
+      }
+    ],
+    "retrieved": [
+      {
+        "memory_id": "m_a8823bb19235",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6: All prior top results used motor21 (21 channels), which exceeds the current max_channels=9 constraint, making them ineligible; test the best-known band/window/n_components combo on the eligible central9 channel set to establish a valid incumbent. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_57c6273a72d0b921"
+        ],
+        "score": 0.830289363861084,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_7f2cf612c679",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4: With central9 the only eligible channel set, test n_components=4 to see if fewer components reduce overfitting versus n=6, since motor21 comparisons showed n=6 helped but central9 has fewer channels to span. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_d042267980f0d2af"
+        ],
+        "score": 0.8040702939033508,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_4cdbad3bc470",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2: Since n=6 underperformed n=4 on central9, testing n=2 explores whether even fewer components further reduce overfitting on the limited 9-channel set. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_82815d2c340ea4b2"
+        ],
+        "score": 0.8007938861846924,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_22948c114541",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6: Beta band is the best performing so far; increasing CSP components from 4 to 6 may capture more discriminative spatial patterns within the same winning band/window/channels. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_ef4ac199c19d5c65"
+        ],
+        "score": 0.7957069873809814,
+        "verified": false,
+        "retrieval": "vector"
+      }
+    ],
+    "tried_keys": [
+      "x_c895457f2bf3a3ea",
+      "x_179f0e198f2ab069",
+      "x_630f7073b4bccb50",
+      "x_ef4ac199c19d5c65",
+      "x_57c6273a72d0b921",
+      "x_d042267980f0d2af",
+      "x_82815d2c340ea4b2",
+      "x_9ff45d527cd86889"
+    ],
+    "tried": [
+      "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.5_3.5 \u00b7 central9 \u00b7 n=2"
+    ],
+    "leaders": [
+      {
+        "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+        "status": "done",
+        "val_balanced_accuracy": 0.7315,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.7055,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+        "status": "done",
+        "val_balanced_accuracy": 0.6529,
+        "eligible": true
+      }
+    ],
+    "laggards": [
+      {
+        "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+        "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.5843,
+        "eligible": false
+      },
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": false
+      }
+    ],
+    "surface": {
+      "methods": {
+        "bandpower_lr": {
+          "C": [
+            0.1,
+            1.0
+          ]
+        },
+        "csp_lda": {
+          "n_components": [
+            2,
+            4,
+            6
+          ]
+        }
+      },
+      "bands": {
+        "mu_8_12": [
+          8.0,
+          12.0
+        ],
+        "lowbeta_13_20": [
+          13.0,
+          20.0
+        ],
+        "highbeta_20_30": [
+          20.0,
+          30.0
+        ],
+        "beta_13_30": [
+          13.0,
+          30.0
+        ],
+        "broad_8_30": [
+          8.0,
+          30.0
+        ]
+      },
+      "windows": {
+        "w0.5_2.5": [
+          0.5,
+          2.5
+        ],
+        "w1.0_3.0": [
+          1.0,
+          3.0
+        ],
+        "w1.5_3.5": [
+          1.5,
+          3.5
+        ]
+      },
+      "channels": {
+        "central9": 9,
+        "motor21": 21,
+        "all64": 64
+      },
+      "total_configs": 225
+    },
+    "token_estimate": 1523,
+    "budget_tokens": 4000
+  },
+  {
+    "_id": "pk_7119037615fe",
+    "ts": "2026-09-26T20:26:31.290+00:00",
+    "context_epoch": 1,
+    "planner_result": {
+      "action": "propose",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.5_3.5",
+        "channels": "central9",
+        "n_components": 2
+      },
+      "rationale": "n_components=2 is the best so far on central9 (0.7315); testing a shifted window may capture more discriminative beta activity within the same eligible channel/method configuration.",
+      "evidence_ids": [
+        "camp_b502457a:x_82815d2c340ea4b2",
+        "m_4cdbad3bc470"
+      ],
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454391-8dXJeuXXUKxJNXm8F2Fh",
+      "usage": {
+        "input_tokens": 4599,
+        "output_tokens": 228,
+        "cost_usd": 0.011478,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    },
+    "packet_id": "pk_7119037615fe",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "strategy": "evidence",
+    "goal": {
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit.",
+      "goal_version": 2,
+      "constraints": {
+        "max_channels": 9
+      },
+      "budget": {
+        "max_experiments": 10,
+        "used": 7,
+        "remaining": 3
+      }
+    },
+    "incumbent": {
+      "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 2
+      },
+      "val_balanced_accuracy": 0.7315
+    },
+    "pending": [],
+    "recent": [
+      {
+        "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+        "status": "done",
+        "val_balanced_accuracy": 0.6529,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.7055,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+        "status": "done",
+        "val_balanced_accuracy": 0.7315,
+        "eligible": true
+      }
+    ],
+    "retrieved": [
+      {
+        "memory_id": "m_a8823bb19235",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6: All prior top results used motor21 (21 channels), which exceeds the current max_channels=9 constraint, making them ineligible; test the best-known band/window/n_components combo on the eligible central9 channel set to establish a valid incumbent. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_57c6273a72d0b921"
+        ],
+        "score": 0.830289363861084,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_7f2cf612c679",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4: With central9 the only eligible channel set, test n_components=4 to see if fewer components reduce overfitting versus n=6, since motor21 comparisons showed n=6 helped but central9 has fewer channels to span. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_d042267980f0d2af"
+        ],
+        "score": 0.8040702939033508,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_4cdbad3bc470",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2: Since n=6 underperformed n=4 on central9, testing n=2 explores whether even fewer components further reduce overfitting on the limited 9-channel set. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_82815d2c340ea4b2"
+        ],
+        "score": 0.8007938861846924,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_22948c114541",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6: Beta band is the best performing so far; increasing CSP components from 4 to 6 may capture more discriminative spatial patterns within the same winning band/window/channels. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_ef4ac199c19d5c65"
+        ],
+        "score": 0.7957069873809814,
+        "verified": false,
+        "retrieval": "vector"
+      }
+    ],
+    "tried_keys": [
+      "x_c895457f2bf3a3ea",
+      "x_179f0e198f2ab069",
+      "x_630f7073b4bccb50",
+      "x_ef4ac199c19d5c65",
+      "x_57c6273a72d0b921",
+      "x_d042267980f0d2af",
+      "x_82815d2c340ea4b2"
+    ],
+    "tried": [
+      "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2"
+    ],
+    "leaders": [
+      {
+        "experiment_id": "camp_b502457a:x_82815d2c340ea4b2",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=2",
+        "status": "done",
+        "val_balanced_accuracy": 0.7315,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.7055,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+        "status": "done",
+        "val_balanced_accuracy": 0.6529,
+        "eligible": true
+      }
+    ],
+    "laggards": [
+      {
+        "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+        "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.5843,
+        "eligible": false
+      },
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": false
+      }
+    ],
+    "surface": {
+      "methods": {
+        "bandpower_lr": {
+          "C": [
+            0.1,
+            1.0
+          ]
+        },
+        "csp_lda": {
+          "n_components": [
+            2,
+            4,
+            6
+          ]
+        }
+      },
+      "bands": {
+        "mu_8_12": [
+          8.0,
+          12.0
+        ],
+        "lowbeta_13_20": [
+          13.0,
+          20.0
+        ],
+        "highbeta_20_30": [
+          20.0,
+          30.0
+        ],
+        "beta_13_30": [
+          13.0,
+          30.0
+        ],
+        "broad_8_30": [
+          8.0,
+          30.0
+        ]
+      },
+      "windows": {
+        "w0.5_2.5": [
+          0.5,
+          2.5
+        ],
+        "w1.0_3.0": [
+          1.0,
+          3.0
+        ],
+        "w1.5_3.5": [
+          1.5,
+          3.5
+        ]
+      },
+      "channels": {
+        "central9": 9,
+        "motor21": 21,
+        "all64": 64
+      },
+      "total_configs": 225
+    },
+    "token_estimate": 1500,
+    "budget_tokens": 4000
+  },
+  {
+    "_id": "pk_21c41a9d6876",
+    "ts": "2026-09-26T20:26:22.589+00:00",
+    "context_epoch": 1,
+    "planner_result": {
+      "action": "propose",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 2
+      },
+      "rationale": "Since n=6 underperformed n=4 on central9, testing n=2 explores whether even fewer components further reduce overfitting on the limited 9-channel set.",
+      "evidence_ids": [
+        "camp_b502457a:x_d042267980f0d2af",
+        "camp_b502457a:x_57c6273a72d0b921"
+      ],
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454382-bKjefL2U5ftYC69HxkVU",
+      "usage": {
+        "input_tokens": 4419,
+        "output_tokens": 233,
+        "cost_usd": 0.011168,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    },
+    "packet_id": "pk_21c41a9d6876",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "strategy": "evidence",
+    "goal": {
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit.",
+      "goal_version": 2,
+      "constraints": {
+        "max_channels": 9
+      },
+      "budget": {
+        "max_experiments": 10,
+        "used": 6,
+        "remaining": 4
+      }
+    },
+    "incumbent": {
+      "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 4
+      },
+      "val_balanced_accuracy": 0.7055
+    },
+    "pending": [],
+    "recent": [
+      {
+        "experiment_id": "camp_b502457a:x_ef4ac199c19d5c65",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6",
+        "status": "done",
+        "val_balanced_accuracy": 0.7454,
+        "eligible": false
+      },
+      {
+        "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+        "status": "done",
+        "val_balanced_accuracy": 0.6529,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.7055,
+        "eligible": true
+      }
+    ],
+    "retrieved": [
+      {
+        "memory_id": "m_a8823bb19235",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6: All prior top results used motor21 (21 channels), which exceeds the current max_channels=9 constraint, making them ineligible; test the best-known band/window/n_components combo on the eligible central9 channel set to establish a valid incumbent. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_57c6273a72d0b921"
+        ],
+        "score": 0.8296137452125549,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_7f2cf612c679",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4: With central9 the only eligible channel set, test n_components=4 to see if fewer components reduce overfitting versus n=6, since motor21 comparisons showed n=6 helped but central9 has fewer channels to span. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_d042267980f0d2af"
+        ],
+        "score": 0.8100550770759583,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_22948c114541",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6: Beta band is the best performing so far; increasing CSP components from 4 to 6 may capture more discriminative spatial patterns within the same winning band/window/channels. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_ef4ac199c19d5c65"
+        ],
+        "score": 0.7970585823059082,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_958578146974",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: CSP+LDA on mu band with motor-relevant channels is a strong standard baseline for motor imagery discrimination between fists and feet. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_c895457f2bf3a3ea"
+        ],
+        "score": 0.7944239974021912,
+        "verified": false,
+        "retrieval": "vector"
+      }
+    ],
+    "tried_keys": [
+      "x_c895457f2bf3a3ea",
+      "x_179f0e198f2ab069",
+      "x_630f7073b4bccb50",
+      "x_ef4ac199c19d5c65",
+      "x_57c6273a72d0b921",
+      "x_d042267980f0d2af"
+    ],
+    "tried": [
+      "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4"
+    ],
+    "leaders": [
+      {
+        "experiment_id": "camp_b502457a:x_d042267980f0d2af",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.7055,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+        "status": "done",
+        "val_balanced_accuracy": 0.6529,
+        "eligible": true
+      }
+    ],
+    "laggards": [
+      {
+        "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+        "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.5843,
+        "eligible": false
+      },
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": false
+      }
+    ],
+    "surface": {
+      "methods": {
+        "bandpower_lr": {
+          "C": [
+            0.1,
+            1.0
+          ]
+        },
+        "csp_lda": {
+          "n_components": [
+            2,
+            4,
+            6
+          ]
+        }
+      },
+      "bands": {
+        "mu_8_12": [
+          8.0,
+          12.0
+        ],
+        "lowbeta_13_20": [
+          13.0,
+          20.0
+        ],
+        "highbeta_20_30": [
+          20.0,
+          30.0
+        ],
+        "beta_13_30": [
+          13.0,
+          30.0
+        ],
+        "broad_8_30": [
+          8.0,
+          30.0
+        ]
+      },
+      "windows": {
+        "w0.5_2.5": [
+          0.5,
+          2.5
+        ],
+        "w1.0_3.0": [
+          1.0,
+          3.0
+        ],
+        "w1.5_3.5": [
+          1.5,
+          3.5
+        ]
+      },
+      "channels": {
+        "central9": 9,
+        "motor21": 21,
+        "all64": 64
+      },
+      "total_configs": 225
+    },
+    "token_estimate": 1421,
+    "budget_tokens": 4000
+  },
+  {
+    "_id": "pk_110e8233e08b",
+    "ts": "2026-09-26T20:26:13.648+00:00",
+    "context_epoch": 1,
+    "planner_result": {
+      "action": "propose",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 4
+      },
+      "rationale": "With central9 the only eligible channel set, test n_components=4 to see if fewer components reduce overfitting versus n=6, since motor21 comparisons showed n=6 helped but central9 has fewer channels to span.",
+      "evidence_ids": [
+        "camp_b502457a:x_57c6273a72d0b921",
+        "camp_b502457a:x_ef4ac199c19d5c65"
+      ],
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454373-08D22b9BXsboFipEstGD",
+      "usage": {
+        "input_tokens": 4229,
+        "output_tokens": 254,
+        "cost_usd": 0.010998,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    },
+    "packet_id": "pk_110e8233e08b",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "strategy": "evidence",
+    "goal": {
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit.",
+      "goal_version": 2,
+      "constraints": {
+        "max_channels": 9
+      },
+      "budget": {
+        "max_experiments": 10,
+        "used": 5,
+        "remaining": 5
+      }
+    },
+    "incumbent": {
+      "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 6
+      },
+      "val_balanced_accuracy": 0.6529
+    },
+    "pending": [],
+    "recent": [
+      {
+        "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+        "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.5843,
+        "eligible": false
+      },
+      {
+        "experiment_id": "camp_b502457a:x_ef4ac199c19d5c65",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6",
+        "status": "done",
+        "val_balanced_accuracy": 0.7454,
+        "eligible": false
+      },
+      {
+        "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+        "status": "done",
+        "val_balanced_accuracy": 0.6529,
+        "eligible": true
+      }
+    ],
+    "retrieved": [
+      {
+        "memory_id": "m_a8823bb19235",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6: All prior top results used motor21 (21 channels), which exceeds the current max_channels=9 constraint, making them ineligible; test the best-known band/window/n_components combo on the eligible central9 channel set to establish a valid incumbent. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_57c6273a72d0b921"
+        ],
+        "score": 0.8313968181610107,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_22948c114541",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6: Beta band is the best performing so far; increasing CSP components from 4 to 6 may capture more discriminative spatial patterns within the same winning band/window/channels. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_ef4ac199c19d5c65"
+        ],
+        "score": 0.8002023100852966,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_958578146974",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: CSP+LDA on mu band with motor-relevant channels is a strong standard baseline for motor imagery discrimination between fists and feet. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_c895457f2bf3a3ea"
+        ],
+        "score": 0.7893787026405334,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_d2ff69e33635",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: Test broader beta band with same CSP+LDA settings that produced the current best result, since beta rhythms are also implicated in motor imagery. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_179f0e198f2ab069"
+        ],
+        "score": 0.7875217199325562,
+        "verified": false,
+        "retrieval": "vector"
+      }
+    ],
+    "tried_keys": [
+      "x_c895457f2bf3a3ea",
+      "x_179f0e198f2ab069",
+      "x_630f7073b4bccb50",
+      "x_ef4ac199c19d5c65",
+      "x_57c6273a72d0b921"
+    ],
+    "tried": [
+      "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6"
+    ],
+    "leaders": [
+      {
+        "experiment_id": "camp_b502457a:x_57c6273a72d0b921",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6",
+        "status": "done",
+        "val_balanced_accuracy": 0.6529,
+        "eligible": true
+      }
+    ],
+    "laggards": [
+      {
+        "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+        "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.5843,
+        "eligible": false
+      },
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": false
+      }
+    ],
+    "surface": {
+      "methods": {
+        "bandpower_lr": {
+          "C": [
+            0.1,
+            1.0
+          ]
+        },
+        "csp_lda": {
+          "n_components": [
+            2,
+            4,
+            6
+          ]
+        }
+      },
+      "bands": {
+        "mu_8_12": [
+          8.0,
+          12.0
+        ],
+        "lowbeta_13_20": [
+          13.0,
+          20.0
+        ],
+        "highbeta_20_30": [
+          20.0,
+          30.0
+        ],
+        "beta_13_30": [
+          13.0,
+          30.0
+        ],
+        "broad_8_30": [
+          8.0,
+          30.0
+        ]
+      },
+      "windows": {
+        "w0.5_2.5": [
+          0.5,
+          2.5
+        ],
+        "w1.0_3.0": [
+          1.0,
+          3.0
+        ],
+        "w1.5_3.5": [
+          1.5,
+          3.5
+        ]
+      },
+      "channels": {
+        "central9": 9,
+        "motor21": 21,
+        "all64": 64
+      },
+      "total_configs": 225
+    },
+    "token_estimate": 1330,
+    "budget_tokens": 4000
+  },
+  {
+    "_id": "pk_fe9a25954c41",
+    "ts": "2026-09-26T20:26:04.523+00:00",
+    "context_epoch": 1,
+    "planner_result": {
+      "action": "propose",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 6
+      },
+      "rationale": "All prior top results used motor21 (21 channels), which exceeds the current max_channels=9 constraint, making them ineligible; test the best-known band/window/n_components combo on the eligible central9 channel set to establish a valid incumbent.",
+      "evidence_ids": [
+        "camp_b502457a:x_ef4ac199c19d5c65",
+        "m_22948c114541"
+      ],
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454364-I40mPfXHLTm1hWROVcvN",
+      "usage": {
+        "input_tokens": 3888,
+        "output_tokens": 248,
+        "cost_usd": 0.010256,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    },
+    "packet_id": "pk_fe9a25954c41",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "strategy": "evidence",
+    "goal": {
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit.",
+      "goal_version": 2,
+      "constraints": {
+        "max_channels": 9
+      },
+      "budget": {
+        "max_experiments": 10,
+        "used": 4,
+        "remaining": 6
+      }
+    },
+    "incumbent": null,
+    "pending": [],
+    "recent": [
+      {
+        "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6924,
+        "eligible": false
+      },
+      {
+        "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+        "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.5843,
+        "eligible": false
+      },
+      {
+        "experiment_id": "camp_b502457a:x_ef4ac199c19d5c65",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6",
+        "status": "done",
+        "val_balanced_accuracy": 0.7454,
+        "eligible": false
+      }
+    ],
+    "retrieved": [
+      {
+        "memory_id": "m_958578146974",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: CSP+LDA on mu band with motor-relevant channels is a strong standard baseline for motor imagery discrimination between fists and feet. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_c895457f2bf3a3ea"
+        ],
+        "score": 0.7328366041183472,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_50152d9e7bdd",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: Broad band combines mu and beta rhythms both implicated in motor imagery; testing if wider band improves on beta_13_30 incumbent with same CSP+LDA settings. Outcome, computed by code: it did not beat the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_630f7073b4bccb50"
+        ],
+        "score": 0.7238712906837463,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_d2ff69e33635",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: Test broader beta band with same CSP+LDA settings that produced the current best result, since beta rhythms are also implicated in motor imagery. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_179f0e198f2ab069"
+        ],
+        "score": 0.7211660146713257,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_22948c114541",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6: Beta band is the best performing so far; increasing CSP components from 4 to 6 may capture more discriminative spatial patterns within the same winning band/window/channels. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_ef4ac199c19d5c65"
+        ],
+        "score": 0.7199885249137878,
+        "verified": false,
+        "retrieval": "vector"
+      }
+    ],
+    "tried_keys": [
+      "x_c895457f2bf3a3ea",
+      "x_179f0e198f2ab069",
+      "x_630f7073b4bccb50",
+      "x_ef4ac199c19d5c65"
+    ],
+    "tried": [
+      "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6"
+    ],
+    "leaders": [],
+    "laggards": [
+      {
+        "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+        "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.5843,
+        "eligible": false
+      },
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": false
+      }
+    ],
+    "surface": {
+      "methods": {
+        "bandpower_lr": {
+          "C": [
+            0.1,
+            1.0
+          ]
+        },
+        "csp_lda": {
+          "n_components": [
+            2,
+            4,
+            6
+          ]
+        }
+      },
+      "bands": {
+        "mu_8_12": [
+          8.0,
+          12.0
+        ],
+        "lowbeta_13_20": [
+          13.0,
+          20.0
+        ],
+        "highbeta_20_30": [
+          20.0,
+          30.0
+        ],
+        "beta_13_30": [
+          13.0,
+          30.0
+        ],
+        "broad_8_30": [
+          8.0,
+          30.0
+        ]
+      },
+      "windows": {
+        "w0.5_2.5": [
+          0.5,
+          2.5
+        ],
+        "w1.0_3.0": [
+          1.0,
+          3.0
+        ],
+        "w1.5_3.5": [
+          1.5,
+          3.5
+        ]
+      },
+      "channels": {
+        "central9": 9,
+        "motor21": 21,
+        "all64": 64
+      },
+      "total_configs": 225
+    },
+    "token_estimate": 1164,
+    "budget_tokens": 4000
+  },
+  {
+    "_id": "pk_69d4381690c1",
+    "ts": "2026-09-26T20:25:55.598+00:00",
+    "context_epoch": 0,
+    "planner_result": {
+      "action": "propose",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 6
+      },
+      "rationale": "Beta band is the best performing so far; increasing CSP components from 4 to 6 may capture more discriminative spatial patterns within the same winning band/window/channels.",
+      "evidence_ids": [
+        "camp_b502457a:x_179f0e198f2ab069",
+        "m_d2ff69e33635"
+      ],
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454356-cTWtbo3ZYsX96SwVjemS",
+      "usage": {
+        "input_tokens": 4103,
+        "output_tokens": 226,
+        "cost_usd": 0.010466,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    },
+    "packet_id": "pk_69d4381690c1",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "strategy": "evidence",
+    "goal": {
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit.",
+      "goal_version": 1,
+      "constraints": {
+        "max_channels": 64
+      },
+      "budget": {
+        "max_experiments": 10,
+        "used": 3,
+        "remaining": 7
+      }
+    },
+    "incumbent": {
+      "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 4
+      },
+      "val_balanced_accuracy": 0.6924
+    },
+    "pending": [],
+    "recent": [
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6924,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+        "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.5843,
+        "eligible": true
+      }
+    ],
+    "retrieved": [
+      {
+        "memory_id": "m_958578146974",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: CSP+LDA on mu band with motor-relevant channels is a strong standard baseline for motor imagery discrimination between fists and feet. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_c895457f2bf3a3ea"
+        ],
+        "score": 0.79661625623703,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_d2ff69e33635",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: Test broader beta band with same CSP+LDA settings that produced the current best result, since beta rhythms are also implicated in motor imagery. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_179f0e198f2ab069"
+        ],
+        "score": 0.7956273555755615,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_50152d9e7bdd",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: Broad band combines mu and beta rhythms both implicated in motor imagery; testing if wider band improves on beta_13_30 incumbent with same CSP+LDA settings. Outcome, computed by code: it did not beat the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_630f7073b4bccb50"
+        ],
+        "score": 0.7890735864639282,
+        "verified": false,
+        "retrieval": "vector"
+      }
+    ],
+    "tried_keys": [
+      "x_c895457f2bf3a3ea",
+      "x_179f0e198f2ab069",
+      "x_630f7073b4bccb50"
+    ],
+    "tried": [
+      "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4"
+    ],
+    "leaders": [
+      {
+        "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6924,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+        "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.5843,
+        "eligible": true
+      }
+    ],
+    "laggards": [
+      {
+        "experiment_id": "camp_b502457a:x_630f7073b4bccb50",
+        "label": "csp_lda \u00b7 broad_8_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.5843,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": true
+      }
+    ],
+    "surface": {
+      "methods": {
+        "bandpower_lr": {
+          "C": [
+            0.1,
+            1.0
+          ]
+        },
+        "csp_lda": {
+          "n_components": [
+            2,
+            4,
+            6
+          ]
+        }
+      },
+      "bands": {
+        "mu_8_12": [
+          8.0,
+          12.0
+        ],
+        "lowbeta_13_20": [
+          13.0,
+          20.0
+        ],
+        "highbeta_20_30": [
+          20.0,
+          30.0
+        ],
+        "beta_13_30": [
+          13.0,
+          30.0
+        ],
+        "broad_8_30": [
+          8.0,
+          30.0
+        ]
+      },
+      "windows": {
+        "w0.5_2.5": [
+          0.5,
+          2.5
+        ],
+        "w1.0_3.0": [
+          1.0,
+          3.0
+        ],
+        "w1.5_3.5": [
+          1.5,
+          3.5
+        ]
+      },
+      "channels": {
+        "central9": 9,
+        "motor21": 21,
+        "all64": 64
+      },
+      "total_configs": 225
+    },
+    "token_estimate": 1216,
+    "budget_tokens": 4000
+  },
+  {
+    "_id": "pk_a1fc9efbd17c",
+    "ts": "2026-09-26T20:25:29.451+00:00",
+    "context_epoch": 0,
+    "planner_result": {
+      "action": "propose",
+      "config": {
+        "method": "csp_lda",
+        "band": "broad_8_30",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 4
+      },
+      "rationale": "Broad band combines mu and beta rhythms both implicated in motor imagery; testing if wider band improves on beta_13_30 incumbent with same CSP+LDA settings.",
+      "evidence_ids": [
+        "camp_b502457a:x_179f0e198f2ab069",
+        "camp_b502457a:x_c895457f2bf3a3ea"
+      ],
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454329-5XCcVspJfkpDOSlrJTWh",
+      "usage": {
+        "input_tokens": 3553,
+        "output_tokens": 243,
+        "cost_usd": 0.009536,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    },
+    "packet_id": "pk_a1fc9efbd17c",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "strategy": "evidence",
+    "goal": {
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit.",
+      "goal_version": 1,
+      "constraints": {
+        "max_channels": 64
+      },
+      "budget": {
+        "max_experiments": 10,
+        "used": 2,
+        "remaining": 8
+      }
+    },
+    "incumbent": {
+      "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 4
+      },
+      "val_balanced_accuracy": 0.6924
+    },
+    "pending": [],
+    "recent": [
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6924,
+        "eligible": true
+      }
+    ],
+    "retrieved": [
+      {
+        "memory_id": "m_958578146974",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: CSP+LDA on mu band with motor-relevant channels is a strong standard baseline for motor imagery discrimination between fists and feet. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_c895457f2bf3a3ea"
+        ],
+        "score": 0.79661625623703,
+        "verified": false,
+        "retrieval": "vector"
+      },
+      {
+        "memory_id": "m_d2ff69e33635",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: Test broader beta band with same CSP+LDA settings that produced the current best result, since beta rhythms are also implicated in motor imagery. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_179f0e198f2ab069"
+        ],
+        "score": 0.7956273555755615,
+        "verified": false,
+        "retrieval": "vector"
+      }
+    ],
+    "tried_keys": [
+      "x_c895457f2bf3a3ea",
+      "x_179f0e198f2ab069"
+    ],
+    "tried": [
+      "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4"
+    ],
+    "leaders": [
+      {
+        "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6924,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": true
+      }
+    ],
+    "laggards": [
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": true
+      },
+      {
+        "experiment_id": "camp_b502457a:x_179f0e198f2ab069",
+        "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6924,
+        "eligible": true
+      }
+    ],
+    "surface": {
+      "methods": {
+        "bandpower_lr": {
+          "C": [
+            0.1,
+            1.0
+          ]
+        },
+        "csp_lda": {
+          "n_components": [
+            2,
+            4,
+            6
+          ]
+        }
+      },
+      "bands": {
+        "mu_8_12": [
+          8.0,
+          12.0
+        ],
+        "lowbeta_13_20": [
+          13.0,
+          20.0
+        ],
+        "highbeta_20_30": [
+          20.0,
+          30.0
+        ],
+        "beta_13_30": [
+          13.0,
+          30.0
+        ],
+        "broad_8_30": [
+          8.0,
+          30.0
+        ]
+      },
+      "windows": {
+        "w0.5_2.5": [
+          0.5,
+          2.5
+        ],
+        "w1.0_3.0": [
+          1.0,
+          3.0
+        ],
+        "w1.5_3.5": [
+          1.5,
+          3.5
+        ]
+      },
+      "channels": {
+        "central9": 9,
+        "motor21": 21,
+        "all64": 64
+      },
+      "total_configs": 225
+    },
+    "token_estimate": 948,
+    "budget_tokens": 4000
+  },
+  {
+    "_id": "pk_b56fdf95a18a",
+    "ts": "2026-09-26T20:25:20.980+00:00",
+    "context_epoch": 0,
+    "planner_result": {
+      "action": "propose",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 4
+      },
+      "rationale": "Test broader beta band with same CSP+LDA settings that produced the current best result, since beta rhythms are also implicated in motor imagery.",
+      "evidence_ids": [
+        "camp_b502457a:x_c895457f2bf3a3ea",
+        "m_958578146974"
+      ],
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454321-mjFI9oFOS5PgJGzcaA7f",
+      "usage": {
+        "input_tokens": 2904,
+        "output_tokens": 216,
+        "cost_usd": 0.007968,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    },
+    "packet_id": "pk_b56fdf95a18a",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "strategy": "evidence",
+    "goal": {
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit.",
+      "goal_version": 1,
+      "constraints": {
+        "max_channels": 64
+      },
+      "budget": {
+        "max_experiments": 10,
+        "used": 1,
+        "remaining": 9
+      }
+    },
+    "incumbent": {
+      "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+      "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+      "config": {
+        "method": "csp_lda",
+        "band": "mu_8_12",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 4
+      },
+      "val_balanced_accuracy": 0.6259
+    },
+    "pending": [],
+    "recent": [
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": true
+      }
+    ],
+    "retrieved": [
+      {
+        "memory_id": "m_958578146974",
+        "kind": "hypothesis",
+        "text": "Unverified note (routed by Jev as research_note): Planner hypothesis before running csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: CSP+LDA on mu band with motor-relevant channels is a strong standard baseline for motor imagery discrimination between fists and feet. Outcome, computed by code: it is now the best eligible result.",
+        "source_ids": [
+          "camp_b502457a:x_c895457f2bf3a3ea"
+        ],
+        "score": 0.8077094554901123,
+        "verified": false,
+        "retrieval": "vector"
+      }
+    ],
+    "tried_keys": [
+      "x_c895457f2bf3a3ea"
+    ],
+    "tried": [
+      "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4"
+    ],
+    "leaders": [
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": true
+      }
+    ],
+    "laggards": [
+      {
+        "experiment_id": "camp_b502457a:x_c895457f2bf3a3ea",
+        "label": "csp_lda \u00b7 mu_8_12 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4",
+        "status": "done",
+        "val_balanced_accuracy": 0.6259,
+        "eligible": true
+      }
+    ],
+    "surface": {
+      "methods": {
+        "bandpower_lr": {
+          "C": [
+            0.1,
+            1.0
+          ]
+        },
+        "csp_lda": {
+          "n_components": [
+            2,
+            4,
+            6
+          ]
+        }
+      },
+      "bands": {
+        "mu_8_12": [
+          8.0,
+          12.0
+        ],
+        "lowbeta_13_20": [
+          13.0,
+          20.0
+        ],
+        "highbeta_20_30": [
+          20.0,
+          30.0
+        ],
+        "beta_13_30": [
+          13.0,
+          30.0
+        ],
+        "broad_8_30": [
+          8.0,
+          30.0
+        ]
+      },
+      "windows": {
+        "w0.5_2.5": [
+          0.5,
+          2.5
+        ],
+        "w1.0_3.0": [
+          1.0,
+          3.0
+        ],
+        "w1.5_3.5": [
+          1.5,
+          3.5
+        ]
+      },
+      "channels": {
+        "central9": 9,
+        "motor21": 21,
+        "all64": 64
+      },
+      "total_configs": 225
+    },
+    "token_estimate": 633,
+    "budget_tokens": 4000
+  },
+  {
+    "_id": "pk_298c74b2f5b5",
+    "ts": "2026-09-26T20:25:13.078+00:00",
+    "context_epoch": 0,
+    "planner_result": {
+      "action": "propose",
+      "config": {
+        "method": "csp_lda",
+        "band": "mu_8_12",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 4
+      },
+      "rationale": "CSP+LDA on mu band with motor-relevant channels is a strong standard baseline for motor imagery discrimination between fists and feet.",
+      "evidence_ids": [],
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790454313-4eYgCUOVX1R3VYamo6k6",
+      "usage": {
+        "input_tokens": 2089,
+        "output_tokens": 186,
+        "cost_usd": 0.006038,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    },
+    "packet_id": "pk_298c74b2f5b5",
+    "campaign_id": "camp_b502457a",
+    "protocol_id": "p_8b1175a416b1",
+    "strategy": "evidence",
+    "goal": {
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit.",
+      "goal_version": 1,
+      "constraints": {
+        "max_channels": 64
+      },
+      "budget": {
+        "max_experiments": 10,
+        "used": 0,
+        "remaining": 10
+      }
+    },
+    "incumbent": null,
+    "pending": [],
+    "recent": [],
+    "retrieved": [],
+    "tried_keys": [],
+    "tried": [],
+    "leaders": [],
+    "laggards": [],
+    "surface": {
+      "methods": {
+        "bandpower_lr": {
+          "C": [
+            0.1,
+            1.0
+          ]
+        },
+        "csp_lda": {
+          "n_components": [
+            2,
+            4,
+            6
+          ]
+        }
+      },
+      "bands": {
+        "mu_8_12": [
+          8.0,
+          12.0
+        ],
+        "lowbeta_13_20": [
+          13.0,
+          20.0
+        ],
+        "highbeta_20_30": [
+          20.0,
+          30.0
+        ],
+        "beta_13_30": [
+          13.0,
+          30.0
+        ],
+        "broad_8_30": [
+          8.0,
+          30.0
+        ]
+      },
+      "windows": {
+        "w0.5_2.5": [
+          0.5,
+          2.5
+        ],
+        "w1.0_3.0": [
+          1.0,
+          3.0
+        ],
+        "w1.5_3.5": [
+          1.5,
+          3.5
+        ]
+      },
+      "channels": {
+        "central9": 9,
+        "motor21": 21,
+        "all64": 64
+      },
+      "total_configs": 225
+    },
+    "token_estimate": 260,
+    "budget_tokens": 4000
+  }
+]
