@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Second Shift brag</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/reactive/audio.js"></script>
+    <style>
+      :root {
+        --bg: #07090d;
+        --panel: #0e1117;
+        --panel-2: #121620;
+        --line: #1e2430;
+        --line-2: #2a3140;
+        --text: #eef1f6;
+        --muted: #8c95a8;
+        --faint: #80899c;
+        --green: #00ed64;
+        --green-soft: rgba(0, 237, 100, 0.12);
+        --indigo: #8b9bff;
+        --red: #ff5d5d;
+        --red-soft: rgba(255, 93, 93, 0.12);
+        --amber: #ffb547;
+        --amber-soft: rgba(255, 181, 71, 0.12);
+        --violet: #b692ff;
+        --violet-soft: rgba(182, 146, 255, 0.12);
+        --blue: #5cc8ff;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1920px; height: 1080px; overflow: hidden;
+        background: var(--bg); color: var(--text);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+
+      /* ---------- persistent background ---------- */
+      #bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+      #glow {
+        position: absolute; width: 1700px; height: 1100px; left: 780px; top: -520px;
+        background: radial-gradient(closest-side, rgba(0, 237, 100, 0.2), rgba(0, 237, 100, 0.06) 55%, rgba(0, 237, 100, 0) 100%);
+        will-change: transform, opacity;
+      }
+      #glow2 {
+        position: absolute; width: 1400px; height: 900px; left: -520px; top: 620px;
+        background: radial-gradient(closest-side, rgba(139, 155, 255, 0.1), rgba(139, 155, 255, 0) 100%);
+      }
+
+      /* ---------- scene 1: hook ---------- */
+      #s1 { z-index: 5; }
+      .s1-wrap { position: absolute; inset: 0; }
+      .kicker {
+        position: absolute; left: 120px; top: 118px;
+        font-family: var(--mono); font-weight: 700; font-size: 24px; letter-spacing: 0.14em;
+        color: var(--muted); display: flex; align-items: center; gap: 16px;
+      }
+      .kicker .kdot { width: 14px; height: 14px; border-radius: 50%; background: var(--green); box-shadow: 0 0 18px rgba(0, 237, 100, 0.7); }
+      .s1-rule { position: absolute; left: 120px; top: 176px; width: 1680px; height: 2px; background: var(--line-2); transform-origin: 0 50%; }
+      .headline {
+        position: absolute; left: 120px; top: 300px; width: 1640px;
+        font-weight: 900; font-size: 116px; line-height: 1.04; letter-spacing: -0.04em; color: var(--text);
+      }
+      .headline .w { display: inline-block; margin-right: 0.24em; }
+      .headline .forget { color: var(--text); }
+      .headline .forget .ch { display: inline-block; }
+      .s1-meta {
+        position: absolute; right: 120px; top: 121px; text-align: right; white-space: nowrap;
+        font-family: var(--mono); font-size: 22px; line-height: 1.4; color: var(--muted);
+      }
+      .s1-meta b { color: var(--text); font-weight: 700; }
+      .eeg-big { position: absolute; left: 0; top: 740px; width: 1920px; height: 220px; overflow: hidden; }
+      .eeg-big .reveal { position: absolute; inset: 0; }
+      .eeg-big svg { position: absolute; left: 0; top: 0; width: 3840px; height: 220px; }
+      .eeg-label {
+        position: absolute; left: 120px; top: 972px;
+        font-family: var(--mono); font-size: 22px; letter-spacing: 0.08em; color: var(--muted);
+      }
+
+      /* ---------- dashboard clip ---------- */
+      #dash { z-index: 10; }
+      .dim { position: absolute; inset: 0; }
+      .tilt { position: absolute; inset: 0; transform-origin: 50% 50%; }
+      .shake { position: absolute; inset: 0; }
+      .cam { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; transform-origin: 0 0; }
+      .dashboard {
+        position: absolute; left: 0; top: 0; width: 1600px; height: 900px; overflow: hidden;
+        background: radial-gradient(1200px 600px at 70% -10%, rgba(0, 237, 100, 0.06), rgba(0, 237, 100, 0) 60%), var(--bg);
+        color: var(--text); font-size: 15px; line-height: 1.4;
+      }
+      .top { position: absolute; left: 0; top: 0; width: 1600px; height: 74px; border-bottom: 1px solid var(--line); background: rgba(7, 9, 13, 0.8); }
+      .brand { position: absolute; left: 24px; top: 19px; display: flex; align-items: center; gap: 12px; }
+      .brand svg { width: 36px; height: 36px; display: block; }
+      .brand .name { font-weight: 900; font-size: 20px; letter-spacing: -0.02em; line-height: 1.2; }
+      .brand .tag { color: var(--muted); font-size: 13px; white-space: nowrap; line-height: 1.3; }
+      .tabs { position: absolute; left: 458px; top: 17px; display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+      .tabs span { padding: 6px 14px; border-radius: 7px; color: var(--muted); font-weight: 700; font-size: 15px; line-height: 1.4; }
+      .tabs span.on { background: var(--panel-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--line-2); }
+      .act { position: absolute; top: 18px; height: 38px; display: flex; align-items: center; }
+      .btn {
+        justify-content: center; gap: 7px; background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 10px;
+        font-weight: 700; font-size: 14px; white-space: nowrap; color: var(--text);
+      }
+      .btn .ico { font-size: 11px; }
+      #b-start { left: 710px; width: 128px; opacity: 0.4; }
+      #b-start .ico { color: var(--green); }
+      #b-kill { left: 846px; width: 116px; }
+      #b-kill .ico { color: var(--red); }
+      #b-reset { left: 970px; width: 138px; }
+      .btn .ring { position: absolute; inset: -5px; border-radius: 14px; border: 3px solid var(--green); opacity: 0; }
+      #b-kill .ring { border-color: var(--red); }
+      .seg { left: 1116px; width: 220px; background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 10px; padding: 3px; }
+      .seg .seg-label { width: 92px; color: var(--muted); font-size: 12px; font-weight: 700; padding: 0 8px 0 6px; letter-spacing: 0.06em; }
+      .seg .sb { width: 40px; height: 30px; display: grid; place-items: center; border-radius: 7px; font-weight: 700; font-family: var(--mono); font-size: 15px; color: var(--muted); }
+      .seg .sb.on { background: var(--amber); color: #1d1405; }
+      .sel { left: 1344px; width: 140px; background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 10px; padding: 0 10px; font-size: 13px; color: var(--muted); justify-content: space-between; }
+      .livebox { left: 1492px; width: 84px; gap: 7px; color: var(--muted); font-size: 13px; font-weight: 700; }
+      .livebox .pwrap { position: relative; width: 8px; height: 8px; }
+      .livebox .pulse { position: absolute; inset: 0; border-radius: 50%; background: var(--green); }
+      .livebox .pring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--green); }
+
+      .kpi {
+        position: absolute; top: 92px; height: 132px;
+        background: linear-gradient(180deg, var(--panel-2), var(--panel));
+        border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 13px; overflow: hidden;
+      }
+      #k-status { left: 24px; width: 268.5px; }
+      #k-best { left: 306.5px; width: 257.7px; }
+      #k-exp { left: 578.2px; width: 214.8px; }
+      #k-limit { left: 807px; width: 214.8px; }
+      #k-ctx { left: 1035.8px; width: 257.7px; }
+      #k-eeg { left: 1307.5px; width: 268.5px; }
+      .k-label { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.4; }
+      .k-value { font-size: 26px; font-weight: 900; letter-spacing: -0.02em; margin-top: 8px; display: flex; align-items: center; gap: 10px; white-space: nowrap; line-height: 1.2; }
+      .k-value.big { font-size: 38px; line-height: 1.05; font-variant-numeric: tabular-nums; margin-top: 6px; }
+      .k-value .of { font-size: 18px; color: var(--muted); font-weight: 700; margin-left: 2px; }
+      .k-sub { color: var(--muted); font-size: 12.5px; margin-top: 7px; white-space: nowrap; line-height: 1.3; }
+      .k-sub.violet { color: var(--violet); }
+      .vbox { display: inline-block; transform-origin: 0 50%; }
+      .state-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--faint); flex: none; }
+      .bar { height: 6px; border-radius: 3px; background: var(--line); margin-top: 10px; overflow: hidden; position: relative; }
+      .bar i { position: absolute; left: 0; top: 0; display: block; height: 100%; width: 100%; background: var(--green); border-radius: 3px; transform-origin: 0 50%; transform: scaleX(0); }
+      #k-ctx .bar i { background: var(--blue); }
+      #k-best .k-value { color: var(--green); }
+      #k-limit.changed { border-color: rgba(255, 181, 71, 0.55); box-shadow: 0 0 0 1px rgba(255, 181, 71, 0.2) inset; }
+      #k-limit.changed .k-value { color: var(--amber); }
+      #k-eeg .eeg-win { position: relative; width: 236px; height: 44px; margin-top: 8px; overflow: hidden; }
+      #k-eeg svg { position: absolute; left: 0; top: 0; width: 472px; height: 44px; }
+      .tone-ok .state-dot { background: var(--green); box-shadow: 0 0 12px rgba(0, 237, 100, 0.7); }
+      .tone-info .state-dot { background: var(--blue); box-shadow: 0 0 12px rgba(92, 200, 255, 0.6); }
+      .tone-bad .state-dot { background: var(--red); box-shadow: 0 0 14px rgba(255, 93, 93, 0.8); }
+      .tone-done .state-dot { background: var(--green); }
+      #k-status.tone-bad { border-color: rgba(255, 93, 93, 0.6); background: linear-gradient(180deg, #2a1418, var(--panel)); }
+      #k-status.tone-bad #kv-status { color: var(--red); }
+      #k-status.tone-done { border-color: rgba(0, 237, 100, 0.45); }
+
+      .card { position: absolute; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+      .card-h { position: absolute; left: 16px; right: 16px; top: 14px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+      .card-h h2 { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; }
+      .hint { color: var(--faint); font-size: 12px; }
+      #c-chart { left: 24px; top: 240px; width: 967px; height: 289px; }
+      #c-feed { left: 1007px; top: 240px; width: 569px; height: 289px; }
+      #c-table { left: 24px; top: 545px; width: 967px; height: 333px; }
+      #c-packet { left: 1007px; top: 545px; width: 569px; height: 333px; }
+      .legend { display: flex; gap: 14px; color: var(--muted); font-size: 12px; }
+      .legend span { display: inline-flex; align-items: center; gap: 6px; }
+      .lg-in { width: 9px; height: 9px; border-radius: 50%; background: var(--indigo); }
+      .lg-out { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--faint); }
+      .lg-best { width: 16px; height: 3px; background: var(--green); border-radius: 2px; }
+      #chart-svg { position: absolute; left: 0; top: 0; width: 967px; height: 289px; }
+      .axis-t { fill: var(--faint); font-family: var(--sans); font-size: 12px; }
+      .mark { position: absolute; top: 64px; width: 0; height: 181px; border-left: 2px dashed var(--red); transform-origin: 50% 0; }
+      .mark.amber { border-left-color: var(--amber); }
+      .pill-pos { position: absolute; top: 60px; transform: translateX(-50%); }
+      .mpill { display: block; white-space: nowrap; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 6px; background: #2a1418; color: var(--red); border: 1px solid rgba(255, 93, 93, 0.45); }
+      .mpill.amber { background: #2a2010; color: var(--amber); border-color: rgba(255, 181, 71, 0.45); }
+
+      .feed { position: absolute; left: 16px; top: 44px; width: 537px; height: 231px; overflow: hidden; }
+      .frow {
+        position: absolute; left: 0; top: 0; width: 537px; height: 54px;
+        display: grid; grid-template-columns: 26px 1fr auto; gap: 10px; align-items: start;
+        padding: 8px 10px; border-radius: 10px; background: var(--panel-2); border: 1px solid transparent;
+      }
+      .frow .ic { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-size: 13px; font-weight: 900; background: var(--line); color: var(--muted); }
+      .frow .t1 { font-weight: 700; font-size: 14px; line-height: 1.3; white-space: nowrap; }
+      .frow .t2 { color: var(--muted); font-size: 12.5px; margin-top: 2px; white-space: nowrap; line-height: 1.3; }
+      .frow .ts { color: var(--faint); font-size: 12px; font-family: var(--mono); padding-top: 2px; white-space: nowrap; }
+      .frow.bad { border-color: rgba(255, 93, 93, 0.45); background: linear-gradient(90deg, #2a1418, var(--panel-2) 70%); }
+      .frow.bad .ic { background: var(--red); color: #2b0606; }
+      .frow.ok { border-color: rgba(0, 237, 100, 0.35); background: linear-gradient(90deg, #0d2a1c, var(--panel-2) 70%); }
+      .frow.ok .ic { background: var(--green); color: #032314; }
+      .frow.warn { border-color: rgba(255, 181, 71, 0.4); background: linear-gradient(90deg, #2a2010, var(--panel-2) 70%); }
+      .frow.warn .ic { background: var(--amber); color: #2a1a02; }
+      .frow.ctx { border-color: rgba(182, 146, 255, 0.4); background: linear-gradient(90deg, #1f1a33, var(--panel-2) 70%); }
+      .frow.ctx .ic { background: var(--violet); color: #1b0c33; }
+      .frow.ai .ic { background: #1d2a44; color: var(--indigo); }
+      .frow.res .ic { background: #102a1e; color: var(--green); }
+      .frow.jev .ic { background: #2a1f3f; color: var(--violet); }
+
+      .exp-list { position: absolute; left: 16px; top: 44px; width: 935px; }
+      .erow { position: absolute; left: 0; width: 935px; height: 25px; display: grid; grid-template-columns: 30px 413px 92px 170px 150px; gap: 12px; align-items: center; padding: 0 10px; border-radius: 8px; font-size: 14px; }
+      .erow.head { top: 0; color: var(--faint); font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; height: 24px; }
+      .erow .n { color: var(--faint); font-family: var(--mono); font-size: 13px; }
+      .erow .cfg { white-space: nowrap; }
+      .erow .cfg b { font-weight: 700; }
+      .erow .cfg span { color: var(--muted); }
+      .chip { font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--line); color: var(--text); justify-self: start; }
+      .chip.c9 { background: rgba(255, 181, 71, 0.16); color: var(--amber); }
+      .acc { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-weight: 700; font-size: 14px; }
+      .acc .track { position: relative; width: 104px; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+      .acc .track i { position: absolute; left: 0; top: 0; height: 100%; background: var(--indigo); border-radius: 3px; }
+      .erow.best { background: linear-gradient(90deg, var(--green-soft), rgba(0, 237, 100, 0) 80%); box-shadow: inset 3px 0 0 var(--green); }
+      .erow.best .acc { color: var(--green); }
+      .erow.best .acc .track i { background: var(--green); }
+      .pill { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: rgba(0, 237, 100, 0.1); color: var(--green); white-space: nowrap; }
+      .pill.bst { background: var(--green); color: #032314; margin-left: 4px; opacity: 0; }
+      .status-cell { display: flex; align-items: center; }
+
+      .packet { position: absolute; left: 16px; top: 44px; width: 537px; display: flex; flex-direction: column; gap: 10px; }
+      .p-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .p-chip { background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 8px; padding: 5px 9px; font-size: 13px; white-space: nowrap; }
+      .p-chip b { font-weight: 700; }
+      .p-chip.amber { border-color: rgba(255, 181, 71, 0.45); color: var(--amber); }
+      .p-tokens { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+      .p-tokens .bar { flex: 1; margin: 0; }
+      .p-tokens .bar i { background: var(--blue); }
+      .p-sec { color: var(--faint); font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
+      .note { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 13px; }
+      .note .nh { display: flex; gap: 6px; align-items: center; margin-bottom: 3px; }
+      .tagx { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 5px; background: var(--violet-soft); color: var(--violet); }
+      .tagx.v { background: rgba(92, 200, 255, 0.12); color: var(--blue); }
+      .note .nt { color: var(--muted); line-height: 1.35; }
+
+      #cursor { position: absolute; left: 0; top: 0; width: 24px; height: 30px; opacity: 0; z-index: 50; transform-origin: 1px 1px; }
+      #cursor svg { width: 24px; height: 30px; display: block; overflow: visible; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6)); }
+
+      /* ---------- chapter panel ---------- */
+      #chapter { z-index: 20; }
+      .cpanel {
+        position: absolute; left: 64px; top: 788px; width: 700px; height: 236px;
+        background: var(--panel); border: 2px solid var(--line-2); border-radius: 22px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+      }
+      .cap { position: absolute; left: 34px; top: 50%; transform: translateY(-50%); width: 632px; opacity: 0; }
+      .cap .cl { font-family: var(--mono); font-weight: 700; font-size: 22px; letter-spacing: 0.12em; display: flex; align-items: center; gap: 12px; }
+      .cap .cl i { width: 13px; height: 13px; border-radius: 50%; display: block; }
+      .cap .ch1 { margin-top: 12px; font-weight: 900; font-size: 62px; line-height: 1.05; letter-spacing: -0.035em; color: var(--text); }
+      .cap .cres { margin-top: 12px; font-weight: 700; font-size: 30px; letter-spacing: -0.01em; color: var(--green); opacity: 0; }
+      .c-green .cl { color: var(--green); } .c-green .cl i { background: var(--green); box-shadow: 0 0 14px rgba(0, 237, 100, 0.8); }
+      .c-red .cl { color: var(--red); } .c-red .cl i { background: var(--red); box-shadow: 0 0 14px rgba(255, 93, 93, 0.8); }
+      .c-violet .cl { color: var(--violet); } .c-violet .cl i { background: var(--violet); box-shadow: 0 0 14px rgba(182, 146, 255, 0.8); }
+      .c-amber .cl { color: var(--amber); } .c-amber .cl i { background: var(--amber); box-shadow: 0 0 14px rgba(255, 181, 71, 0.8); }
+
+      /* ---------- kill flash ---------- */
+      #flash { z-index: 30; }
+      .flash-fill { position: absolute; inset: 0; opacity: 0; background: radial-gradient(ellipse at 50% 50%, rgba(255, 93, 93, 0.12) 30%, rgba(255, 93, 93, 0.6) 100%); }
+
+      /* ---------- outro ---------- */
+      #outro { z-index: 40; }
+      .didnt {
+        position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; display: flex; align-items: center; justify-content: center;
+      }
+      .didnt span { display: block; font-weight: 900; font-size: 210px; letter-spacing: -0.05em; color: var(--text); line-height: 1; }
+      .lockup { position: absolute; left: 0; top: 350px; width: 1920px; display: flex; flex-direction: column; align-items: center; }
+      .lk-row { display: flex; align-items: center; gap: 44px; }
+      .lk-mark { position: relative; width: 150px; height: 150px; }
+      .lk-mark .glowbox { position: absolute; inset: 0; border-radius: 42px; }
+      .lk-mark svg { position: absolute; inset: 0; width: 150px; height: 150px; }
+      .lk-name { font-weight: 900; font-size: 150px; letter-spacing: -0.045em; line-height: 1; color: var(--text); }
+      .lk-tag { margin-top: 44px; font-weight: 700; font-size: 60px; letter-spacing: -0.02em; color: var(--text); }
+      .lk-tag em { font-style: normal; color: var(--green); }
+      .lk-foot { margin-top: 34px; font-family: var(--mono); font-weight: 700; font-size: 26px; letter-spacing: 0.1em; color: var(--muted); }
+      .eeg-out { position: absolute; left: 0; top: 880px; width: 1920px; height: 160px; overflow: hidden; }
+      .eeg-out .reveal { position: absolute; inset: 0; }
+      .eeg-out svg { position: absolute; left: 0; top: 0; width: 3840px; height: 160px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="23.5" data-width="1920" data-height="1080">
+      <!-- persistent background: audio-reactive glow -->
+      <div id="bg" data-layout-ignore>
+        <div id="glow"></div>
+        <div id="glow2"></div>
+      </div>
+
+      <!-- ===== Scene 1: hook ===== -->
+      <section id="s1" class="clip" data-start="0" data-duration="3.35" data-track-index="1">
+        <div class="s1-wrap" id="s1-wrap">
+          <div class="kicker" id="s1-kicker"><span class="kdot"></span>SECOND SHIFT · CRASH TEST</div>
+          <div class="s1-rule" id="s1-rule"></div>
+          <div class="s1-meta" id="s1-meta">
+            <b>camp_ff5f69ff</b> · budget 10 experiments
+          </div>
+          <div class="headline" id="s1-head">
+            <span class="w">We</span><span class="w">tried</span><span class="w">to</span><span class="w">make</span><span class="w">our</span><span class="w">agent</span><span class="w forget" id="w-forget"></span>
+          </div>
+          <div class="eeg-big" data-layout-allow-overflow>
+            <div class="reveal" id="s1-eeg-reveal"><svg id="s1-eeg" viewBox="0 0 3840 220" preserveAspectRatio="none"></svg></div>
+          </div>
+          <div class="eeg-label" id="s1-eeg-label">INPUT · REAL EEG · IMAGINED FISTS VS FEET</div>
+        </div>
+      </section>
+
+      <!-- ===== Scenes 2-4: the dashboard ===== -->
+      <section id="dash" class="clip" data-start="3.2" data-duration="16.2" data-track-index="2" data-layout-allow-overflow>
+        <div class="dim" id="d-dim">
+          <div class="tilt" id="d-tilt">
+            <div class="shake" id="d-shake">
+              <div class="cam" id="d-cam">
+                <div class="dashboard" id="dashboard">
+                  <header class="top">
+                    <div class="brand">
+                      <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#00ED64" /><path d="M8 20c3 0 4.5-8 8-8s5 8 8 8" stroke="#052e1a" stroke-width="3" fill="none" stroke-linecap="round" /></svg>
+                      <div><div class="name">Second Shift</div><div class="tag">Agents that never lose the plot · memory in MongoDB Atlas</div></div>
+                    </div>
+                    <div class="tabs"><span class="on">Live</span><span>Results</span><span>Code</span></div>
+                    <div class="act btn" id="b-start"><span class="ico">▶︎</span>Start worker</div>
+                    <div class="act btn" id="b-kill"><span class="ico">✕</span>Kill worker<span class="ring" id="ring-kill"></span></div>
+                    <div class="act btn" id="b-reset"><span class="ico">↻</span>Reset context<span class="ring" id="ring-reset"></span></div>
+                    <div class="act seg"><span class="seg-label">ELECTRODES</span><span class="sb on" id="sb64">64</span><span class="sb">21</span><span class="sb" id="sb9">9</span></div>
+                    <div class="act sel"><span>camp_ff5f69ff</span><span>⌄</span></div>
+                    <div class="act livebox"><span class="pwrap"><span class="pulse"></span><span class="pring" id="pring"></span></span><span id="live-text">Live</span></div>
+                  </header>
+
+                  <div class="kpi" id="k-status">
+                    <div class="k-label">Status</div>
+                    <div class="k-value"><span class="state-dot"></span><span class="vbox" id="kv-status">Running</span></div>
+                    <div class="k-sub" id="ks-status">measuring on real EEG</div>
+                  </div>
+                  <div class="kpi" id="k-best">
+                    <div class="k-label">Best result</div>
+                    <div class="k-value big"><span class="vbox" id="kv-best">0.692</span></div>
+                    <div class="k-sub" id="ks-best">balanced accuracy</div>
+                  </div>
+                  <div class="kpi" id="k-exp">
+                    <div class="k-label">Experiments</div>
+                    <div class="k-value big"><span id="kv-used">0</span><span class="of">/ 10</span></div>
+                    <div class="bar"><i id="kb-exp"></i></div>
+                  </div>
+                  <div class="kpi" id="k-limit">
+                    <div class="k-label">Electrode limit</div>
+                    <div class="k-value big"><span class="vbox" id="kv-limit">64</span></div>
+                    <div class="k-sub" id="ks-limit">goal version 1</div>
+                  </div>
+                  <div class="kpi" id="k-ctx">
+                    <div class="k-label">Model context</div>
+                    <div class="k-value big"><span id="kv-tokens">1,441</span><span class="of">tokens</span></div>
+                    <div class="bar"><i id="kb-tokens"></i></div>
+                    <div class="k-sub" id="ks-tokens">rebuilt from Atlas every decision</div>
+                  </div>
+                  <div class="kpi" id="k-eeg">
+                    <div class="k-label">Input · real EEG</div>
+                    <div class="eeg-win"><svg id="kpi-eeg" viewBox="0 0 472 44" preserveAspectRatio="none"></svg></div>
+                    <div class="k-sub">PhysioNet · imagined fists vs feet</div>
+                  </div>
+
+                  <div class="card" id="c-chart">
+                    <svg id="chart-svg" viewBox="0 0 967 289"></svg>
+                    <div class="card-h">
+                      <h2>Accuracy by experiment</h2>
+                      <div class="legend"><span><i class="lg-in"></i>within limit</span><span><i class="lg-out"></i>over limit</span><span><i class="lg-best"></i>best so far</span></div>
+                    </div>
+                    <div class="mark" id="mark-kill" style="left: 419px"></div>
+                    <div class="pill-pos" style="left: 419px"><span class="mpill" id="pill-kill"><span id="pill-kill-t">Killed</span></span></div>
+                    <div class="mark amber" id="mark-limit" style="left: 678px"></div>
+                    <div class="pill-pos" style="left: 678px"><span class="mpill amber" id="pill-limit">Limit 64 → 9</span></div>
+                  </div>
+
+                  <div class="card" id="c-feed">
+                    <div class="card-h"><h2>Live activity</h2><span class="hint">newest first</span></div>
+                    <div class="feed" id="feed"></div>
+                  </div>
+
+                  <div class="card" id="c-table">
+                    <div class="card-h"><h2>Experiments</h2><span class="hint">Claude proposes · code measures</span></div>
+                    <div class="exp-list" id="exp-list">
+                      <div class="erow head"><span>#</span><span>Configuration</span><span>Electrodes</span><span>Accuracy</span><span>Status</span></div>
+                    </div>
+                  </div>
+
+                  <div class="card" id="c-packet">
+                    <div class="card-h"><h2>What the model saw</h2><span class="hint">built 2:41:19 PM</span></div>
+                    <div class="packet">
+                      <div class="p-chips">
+                        <span class="p-chip" id="pc-goal"><b>Goal v1</b></span>
+                        <span class="p-chip" id="pc-limit">Limit <b id="pc-limit-v">64</b> electrodes</span>
+                        <span class="p-chip">Best so far <b id="pc-best">0.745</b></span>
+                        <span class="p-chip"><b id="pc-tried">4</b> tried</span>
+                        <span class="p-chip"><b id="pc-left">6</b> left</span>
+                      </div>
+                      <div class="p-tokens"><span id="pt-tokens">1,441 tokens</span><div class="bar"><i id="pb-tokens"></i></div><span>4,000</span></div>
+                      <div class="p-sec">Recalled from memory</div>
+                      <div class="note"><div class="nh"><span class="tagx">Jev · hypothesis</span><span class="tagx v">Vector Search</span></div><div class="nt">Test a smaller, more focal motor channel set (central9) with the current best band and window.</div></div>
+                      <div class="note"><div class="nh"><span class="tagx">Jev · hypothesis</span><span class="tagx v">Vector Search</span></div><div class="nt">21 motor channels beat all 64 so far. Narrow the window before adding channels.</div></div>
+                    </div>
+                  </div>
+
+                  <div id="cursor"><svg viewBox="0 0 24 30"><path d="M1 1 L1 23 L6.6 17.6 L10.4 26.4 L14.2 24.8 L10.5 16.2 L18 16.2 Z" fill="#ffffff" stroke="#0a0c10" stroke-width="1.6" stroke-linejoin="round" /></svg></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== chapter panel (screen space) ===== -->
+      <section id="chapter" class="clip" data-start="4.4" data-duration="13.6" data-track-index="3" data-layout-allow-occlusion>
+        <div class="cpanel" id="cpanel" data-layout-allow-occlusion>
+          <div class="cap c-green" id="cap0"><div class="cl" data-layout-allow-overlap><i></i>LIVE CAMPAIGN · REAL EEG</div><div class="ch1" data-layout-allow-overlap>Claude proposes. Code measures.</div></div>
+          <div class="cap c-red" id="cap1"><div class="cl" data-layout-allow-overlap><i></i>ATTEMPT 1 OF 3</div><div class="ch1" data-layout-allow-overlap>Kill it mid experiment.</div></div>
+          <div class="cap c-violet" id="cap2"><div class="cl" data-layout-allow-overlap><i></i>ATTEMPT 2 OF 3</div><div class="ch1" data-layout-allow-overlap>Wipe its context.</div></div>
+          <div class="cap c-amber" id="cap3"><div class="cl" data-layout-allow-overlap><i></i>ATTEMPT 3 OF 3</div><div class="ch1" data-layout-allow-overlap>Change the goal.</div><div class="cres" id="cap3-res" data-layout-allow-overlap>Past results re-ranked. Nothing rerun.</div></div>
+        </div>
+      </section>
+
+      <!-- ===== kill flash ===== -->
+      <section id="flash" class="clip" data-start="8.7" data-duration="0.7" data-track-index="4" data-layout-ignore>
+        <div class="flash-fill" id="flash-fill"></div>
+      </section>
+
+      <!-- ===== outro ===== -->
+      <section id="outro" class="clip" data-start="19" data-duration="4.5" data-track-index="5">
+        <div class="didnt" id="didnt"><span id="didnt-t">It didn’t.</span></div>
+        <div class="lockup" id="lockup">
+          <div class="lk-row">
+            <div class="lk-mark" id="lk-mark">
+              <div class="glowbox" id="lk-glow"></div>
+              <svg viewBox="0 0 32 32"><rect id="lk-rect" width="32" height="32" rx="9" fill="#00ED64" /><path id="lk-wave" d="M8 20c3 0 4.5-8 8-8s5 8 8 8" pathLength="1" stroke="#052e1a" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="1" stroke-dashoffset="1" /></svg>
+            </div>
+            <div class="lk-name" id="lk-name">Second Shift</div>
+          </div>
+          <div class="lk-tag" id="lk-tag">Agents that never <em>lose the plot.</em></div>
+          <div class="lk-foot" id="lk-foot">BUILT IN ONE DAY · MONGODB × CEREBRAL VALLEY HACKATHON</div>
+        </div>
+        <div class="eeg-out" data-layout-allow-overflow>
+          <div class="reveal" id="out-eeg-reveal"><svg id="out-eeg" viewBox="0 0 3840 160" preserveAspectRatio="none"></svg></div>
+        </div>
+      </section>
+
+      <!-- ===== audio ===== -->
+      <audio id="music" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3" data-start="0" data-duration="23.5" data-track-index="10" data-volume="1"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.4,"v":0.34},{"t":22.0,"v":0.34},{"t":23.5,"v":0}]}]}'></audio>
+      <audio id="sfx-reveal" src="assets/sfx/impact/impactSoft_medium_001.ogg" data-start="3.25" data-duration="0.2" data-track-index="11" data-volume="0.7"></audio>
+      <audio id="sfx-dot1" src="assets/sfx/interface/drop_001.ogg" data-start="4.38" data-duration="0.12" data-track-index="12" data-volume="0.45"></audio>
+      <audio id="sfx-dot4" src="assets/sfx/interface/drop_002.ogg" data-start="5.99" data-duration="0.2" data-track-index="13" data-volume="0.45"></audio>
+      <audio id="sfx-click-kill" src="assets/sfx/ui/mouseclick1.ogg" data-start="8.70" data-duration="0.07" data-track-index="14" data-volume="0.8"></audio>
+      <audio id="sfx-glitch" src="assets/sfx/interface/glitch_004.ogg" data-start="8.74" data-duration="0.03" data-track-index="15" data-volume="0.55"></audio>
+      <audio id="sfx-kill" src="assets/sfx/impact/impactSoft_heavy_003.ogg" data-start="8.75" data-duration="0.55" data-track-index="16" data-volume="0.85"></audio>
+      <audio id="sfx-rebuilt" src="assets/sfx/interface/bong_001.ogg" data-start="10.92" data-duration="0.13" data-track-index="17" data-volume="0.7"></audio>
+      <audio id="sfx-click-reset" src="assets/sfx/ui/mouseclick1.ogg" data-start="13.60" data-duration="0.07" data-track-index="18" data-volume="0.8"></audio>
+      <audio id="sfx-refill" src="assets/sfx/interface/switch_007.ogg" data-start="14.19" data-duration="0.62" data-track-index="19" data-volume="0.45"></audio>
+      <audio id="sfx-click-nine" src="assets/sfx/ui/mouseclick1.ogg" data-start="15.25" data-duration="0.07" data-track-index="20" data-volume="0.8"></audio>
+      <audio id="sfx-limit" src="assets/sfx/impact/impactSoft_medium_004.ogg" data-start="16.37" data-duration="0.15" data-track-index="21" data-volume="0.65"></audio>
+      <audio id="sfx-didnt" src="assets/sfx/impact/impactSoft_medium_002.ogg" data-start="19.09" data-duration="0.14" data-track-index="22" data-volume="0.85"></audio>
+      <audio id="sfx-logo" src="assets/sfx/impact/impactBell_heavy_000.ogg" data-start="20.18" data-duration="1.49" data-track-index="23" data-volume="0.7"></audio>
+    </div>
+
+    <script>
+      (function () {
+        const DUR = 23.5;
+        const $ = (id) => document.getElementById(id);
+
+        // ---------- deterministic helpers ----------
+        function mulberry32(a) {
+          return function () {
+            a |= 0; a = (a + 0x6d2b79f5) | 0;
+            let t = Math.imul(a ^ (a >>> 15), 1 | a);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+        const clamp01 = (x) => Math.max(0, Math.min(1, x));
+        const easeOut3 = (x) => 1 - Math.pow(1 - x, 3);
+        const easeIn2 = (x) => x * x;
+        const lerp = (a, b, k) => a + (b - a) * k;
+        const fmt = (n) => Math.round(n).toLocaleString("en-US");
+
+        // Pseudo EEG: mixed rhythms + seeded noise, periodic over `w` so the scroll loops seamlessly.
+        function eegPath(w, h, seed, step, amp) {
+          const rnd = mulberry32(seed);
+          const noise = [];
+          const n = Math.round(w / 2 / step);
+          for (let i = 0; i <= n; i++) noise.push(rnd() * 2 - 1);
+          let d = "";
+          for (let i = 0; i <= n * 2; i++) {
+            const x = i * step;
+            const p = (x / (w / 2)) * Math.PI * 2;
+            const v = 0.42 * Math.sin(p * 9) + 0.22 * Math.sin(p * 23 + 1.3) + 0.12 * Math.sin(p * 41 + 0.4) + 0.34 * noise[i % n];
+            const y = h / 2 - v * amp;
+            d += (i ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1);
+          }
+          return d;
+        }
+        const svgNS = "http://www.w3.org/2000/svg";
+        function addPath(svg, d, attrs) {
+          const p = document.createElementNS(svgNS, "path");
+          p.setAttribute("d", d);
+          for (const k in attrs) p.setAttribute(k, attrs[k]);
+          svg.appendChild(p);
+          return p;
+        }
+        addPath($("s1-eeg"), eegPath(3840, 220, 7, 6, 70), { stroke: "#00ed64", "stroke-width": "3", fill: "none", opacity: "0.55", "stroke-linejoin": "round" });
+        addPath($("out-eeg"), eegPath(3840, 160, 11, 6, 44), { stroke: "#00ed64", "stroke-width": "2.5", fill: "none", opacity: "0.35", "stroke-linejoin": "round" });
+        addPath($("kpi-eeg"), eegPath(472, 44, 3, 2, 17), { stroke: "#8b9bff", "stroke-width": "1.6", fill: "none", "stroke-linejoin": "round" });
+
+        // "forget." as individual letters so it can fade like a memory
+        const fw = $("w-forget");
+        "forget.".split("").forEach((c) => { const s = document.createElement("span"); s.className = "ch"; s.textContent = c; fw.appendChild(s); });
+
+        // ---------- campaign data (camp_ff5f69ff, from the dashboard screenshot) ----------
+        const EXPS = [
+          { n: 1, cfg: "13–30 Hz · 1–3 s", ch: 21, v: 0.692, t: 4.39 },
+          { n: 2, cfg: "13–30 Hz · 1–3 s", ch: 21, v: 0.745, t: 4.91 },
+          { n: 3, cfg: "13–30 Hz · 1–3 s", ch: 64, v: 0.641, t: 5.34 },
+          { n: 4, cfg: "13–30 Hz · 1.5–3.5 s", ch: 21, v: 0.665, t: 6.0 },
+          { n: 5, cfg: "13–30 Hz · 0.5–2.5 s", ch: 21, v: 0.773, t: 11.46 },
+          { n: 6, cfg: "13–30 Hz · 0.5–2.5 s", ch: 9, v: 0.759, t: 12.3 },
+          { n: 7, cfg: "13–30 Hz · 0.5–2.5 s", ch: 21, v: 0.705, t: 13.1 },
+          { n: 8, cfg: "13–30 Hz · 0.5–2.5 s", ch: 9, v: 0.745, t: 17.47 },
+          { n: 9, cfg: "13–30 Hz · 1.5–3.5 s", ch: 9, v: 0.627, t: 17.65 },
+          { n: 10, cfg: "13–30 Hz · 1–3 s", ch: 9, v: 0.653, t: 17.83 },
+        ];
+        const T = { kill: 8.74, rebuild: 10.93, running2: 11.9, reset: 13.64, refill: 14.2, nine: 15.29, reRank: 15.4, complete: 18.02 };
+        const X = (i) => 115 + i * 86.67;
+        const Y = (v) => 245 - (v - 0.4) * 374;
+
+        // ---------- chart ----------
+        const cs = $("chart-svg");
+        [0.4, 0.5, 0.6, 0.7, 0.8, 0.9].forEach((v) => {
+          const l = document.createElementNS(svgNS, "line");
+          l.setAttribute("x1", 66); l.setAttribute("x2", 945); l.setAttribute("y1", Y(v)); l.setAttribute("y2", Y(v));
+          l.setAttribute("stroke", v === 0.5 ? "#3a4356" : "#1e2430"); l.setAttribute("stroke-width", v === 0.5 ? 1.5 : 1);
+          if (v === 0.5) l.setAttribute("stroke-dasharray", "5 6");
+          cs.appendChild(l);
+          const tx = document.createElementNS(svgNS, "text");
+          tx.setAttribute("x", 58); tx.setAttribute("y", Y(v) + 4); tx.setAttribute("text-anchor", "end"); tx.setAttribute("class", "axis-t");
+          tx.textContent = v.toFixed(1); cs.appendChild(tx);
+        });
+        const at = document.createElementNS(svgNS, "text");
+        at.setAttribute("class", "axis-t"); at.setAttribute("transform", "translate(24 152) rotate(-90)"); at.setAttribute("text-anchor", "middle");
+        at.textContent = "balanced accuracy (0.5 = chance)"; cs.appendChild(at);
+        const bestLine = document.createElementNS(svgNS, "line");
+        bestLine.setAttribute("stroke", "#00ed64"); bestLine.setAttribute("stroke-width", "3.5"); bestLine.setAttribute("stroke-linecap", "round");
+        bestLine.setAttribute("opacity", "0");
+        cs.appendChild(bestLine);
+        const dots = EXPS.map((e, i) => {
+          const g = document.createElementNS(svgNS, "g");
+          g.setAttribute("id", "dot" + i); g.setAttribute("opacity", "0");
+          const ring = document.createElementNS(svgNS, "circle");
+          ring.setAttribute("cx", X(i)); ring.setAttribute("cy", Y(e.v)); ring.setAttribute("r", 7);
+          ring.setAttribute("fill", "#0e1117"); ring.setAttribute("stroke", "#80899c"); ring.setAttribute("stroke-width", 2.5); ring.setAttribute("opacity", 0);
+          const fill = document.createElementNS(svgNS, "circle");
+          fill.setAttribute("cx", X(i)); fill.setAttribute("cy", Y(e.v)); fill.setAttribute("r", 8); fill.setAttribute("fill", "#8b9bff");
+          g.appendChild(ring); g.appendChild(fill); cs.appendChild(g);
+          return { g, ring, fill };
+        });
+
+        // ---------- experiments table ----------
+        const list = $("exp-list");
+        const rows = EXPS.map((e, i) => {
+          const r = document.createElement("div");
+          r.className = "erow"; r.id = "erow" + i; r.style.top = 28 + i * 25.4 + "px"; r.style.opacity = "0";
+          r.innerHTML = `<span class="n">${e.n}</span><span class="cfg"><b>CSP</b> <span>· ${e.cfg}</span></span>` +
+            `<span class="chip ${e.ch === 9 ? "c9" : ""}">${e.ch} ch</span>` +
+            `<span class="acc"><span class="track"><i style="width:${((e.v - 0.4) / 0.5) * 100}%"></i></span>${e.v.toFixed(3)}</span>` +
+            `<span class="status-cell"><span class="pill">done</span><span class="pill bst">best</span></span>`;
+          list.appendChild(r);
+          return r;
+        });
+
+        // ---------- live activity feed (newest first) ----------
+        const FEED = [
+          { t: -1, cls: "", ic: "▶︎", t1: "Worker started", t2: "fresh campaign", ts: "2:39:48 PM" },
+          { t: -1, cls: "ai", ic: "✦", t1: "Claude proposed CSP · 13–30 Hz · 21 electrodes", t2: "Start on the 21 motor channels in the beta band.", ts: "2:39:51 PM" },
+          { t: 4.39, cls: "res", ic: "✓", t1: "Experiment #1 measured 0.692", t2: "CSP · 13–30 Hz · 21 electrodes", ts: "2:40:02 PM" },
+          { t: 4.91, cls: "res", ic: "✓", t1: "Experiment #2 measured 0.745", t2: "CSP · 13–30 Hz · 21 electrodes", ts: "2:40:13 PM" },
+          { t: 5.34, cls: "res", ic: "✓", t1: "Experiment #3 measured 0.641", t2: "CSP · 13–30 Hz · 64 electrodes", ts: "2:40:25 PM" },
+          { t: 6.0, cls: "res", ic: "✓", t1: "Experiment #4 measured 0.665", t2: "CSP · 13–30 Hz · 21 electrodes", ts: "2:40:36 PM" },
+          { t: 6.56, cls: "jev", ic: "J", t1: "Jev filed Claude’s note as research note", t2: "typesafe/jev-1.13-20260917", ts: "2:40:38 PM" },
+          { t: 7.09, cls: "ai", ic: "✦", t1: "Claude proposed CSP · 13–30 Hz · 21 electrodes", t2: "21 motor channels beat all 64. Try an earlier window.", ts: "2:40:41 PM" },
+          { t: 9.83, cls: "bad", ic: "✕", t1: "Worker killed mid experiment", t2: "SIGKILL while running #5", ts: "2:40:44 PM" },
+          { t: 10.93, cls: "ok", ic: "↻", t1: "New worker rebuilt the campaign from Atlas", t2: "4 finished experiments reused, none recomputed", ts: "2:40:52 PM" },
+          { t: 13.66, cls: "ctx", ic: "⌫", t1: "Context wiped", t2: "the next decision is rebuilt from Atlas alone", ts: "2:41:40 PM" },
+          { t: 15.31, cls: "warn", ic: "⚑", t1: "Electrode limit 64 → 9", t2: "past results re-ranked, nothing rerun", ts: "2:41:47 PM" },
+          { t: 18.02, cls: "ok", ic: "★", t1: "Campaign complete · sealed test 0.719", t2: "CSP · 13–30 Hz · 9 electrodes", ts: "2:43:30 PM" },
+        ];
+        const feed = $("feed");
+        const frows = FEED.map((f, k) => {
+          const r = document.createElement("div");
+          r.className = "frow " + f.cls; r.id = "frow" + k;
+          if (f.t >= 0) r.style.opacity = "0";
+          r.innerHTML = `<div class="ic">${f.ic}</div><div><div class="t1">${f.t1}</div><div class="t2">${f.t2}</div></div><div class="ts">${f.ts}</div>`;
+          feed.appendChild(r);
+          return r;
+        });
+
+        // ---------- state as a pure function of time ----------
+        const A = window.AUDIO_DATA;
+        const el = {
+          glow: $("glow"), statusCard: $("k-status"), status: $("kv-status"), statusSub: $("ks-status"),
+          best: $("kv-best"), bestSub: $("ks-best"), used: $("kv-used"), expBar: $("kb-exp"),
+          limitCard: $("k-limit"), limit: $("kv-limit"), limitSub: $("ks-limit"),
+          tokens: $("kv-tokens"), tokBar: $("kb-tokens"), tokSub: $("ks-tokens"),
+          pcGoal: $("pc-goal"), pcLimit: $("pc-limit"), pcLimitV: $("pc-limit-v"), pcBest: $("pc-best"), pcTried: $("pc-tried"), pcLeft: $("pc-left"),
+          ptTokens: $("pt-tokens"), pbTokens: $("pb-tokens"), sb64: $("sb64"), sb9: $("sb9"), live: $("live-text"),
+          pillKillT: $("pill-kill-t"), lkGlow: $("lk-glow"),
+        };
+        let lastStatus = "";
+        function statusAt(t) {
+          if (t >= T.complete) return ["tone-done", "Complete", "sealed test set scored once"];
+          if (t >= T.refill) return ["tone-ok", "Running", "measuring on real EEG"];
+          if (t >= T.reset) return ["tone-info", "Rebuilding", "reading the campaign from Atlas"];
+          if (t >= T.running2) return ["tone-ok", "Running", "measuring on real EEG"];
+          if (t >= T.rebuild) return ["tone-info", "Rebuilding", "reading the campaign from Atlas"];
+          if (t >= T.kill) return ["tone-bad", "Worker down", "campaign state is safe in Atlas"];
+          return ["tone-ok", "Running", "measuring on real EEG"];
+        }
+        function tokensAt(t) {
+          if (t < T.running2) return 1441;
+          if (t < T.reset) return 1512;
+          if (t < T.reset + 0.4) return lerp(1512, 0, easeIn2(clamp01((t - T.reset) / 0.4)));
+          if (t < T.refill) return 0;
+          return lerp(0, 1579, easeOut3(clamp01((t - T.refill) / 0.5)));
+        }
+        function render(t) {
+          // audio-reactive glow (music RMS + bass, lightly smoothed)
+          const f = Math.max(1, Math.min(A.n - 2, Math.round(t * A.fps)));
+          const rms = (A.rms[f - 1] + A.rms[f] + A.rms[f + 1]) / 3;
+          const bass = (A.bass[f - 1] + A.bass[f] + A.bass[f + 1]) / 3;
+          el.glow.style.opacity = (0.55 + 0.45 * rms).toFixed(3);
+          el.glow.style.transform = `scale(${(1 + 0.06 * bass).toFixed(4)})`;
+          el.lkGlow.style.boxShadow = `0 0 ${(40 + 70 * bass).toFixed(1)}px ${(8 + 14 * rms).toFixed(1)}px rgba(0, 237, 100, ${(0.22 + 0.3 * rms).toFixed(3)})`;
+
+          // which experiments have landed, and which are eligible under the current limit
+          const landed = EXPS.filter((e) => t >= e.t).length;
+          const cut = t >= T.nine;
+          const eligible = (e) => !cut || e.ch <= 9;
+          let inc = -1;
+          for (let i = 0; i < landed; i++) if (eligible(EXPS[i]) && (inc < 0 || EXPS[i].v > EXPS[inc].v)) inc = i;
+
+          const [tone, stxt, ssub] = statusAt(t);
+          if (tone + stxt !== lastStatus) {
+            el.statusCard.className = "kpi " + tone; el.status.textContent = stxt; el.statusSub.textContent = ssub; lastStatus = tone + stxt;
+          }
+          el.best.textContent = inc >= 0 ? EXPS[inc].v.toFixed(3) : "—";
+          el.bestSub.textContent = t >= T.complete ? "sealed test 0.719 · 9 electrodes" : "balanced accuracy";
+          el.used.textContent = String(landed);
+          el.expBar.style.transform = `scaleX(${landed / 10})`;
+          el.limit.textContent = cut ? "9" : "64";
+          el.limitCard.className = "kpi" + (cut ? " changed" : "");
+          el.limitSub.textContent = cut ? "cut from 64 · goal v2" : "goal version 1";
+          el.sb64.className = "sb" + (cut ? "" : " on");
+          el.sb9.className = "sb" + (cut ? " on" : "");
+          const tok = tokensAt(t);
+          el.tokens.textContent = fmt(tok);
+          el.tokBar.style.transform = `scaleX(${(tok / 4000).toFixed(4)})`;
+          const wiped = t >= T.reset && t < T.refill;
+          el.tokSub.textContent = wiped ? "Context wiped" : "rebuilt from Atlas every decision";
+          el.tokSub.className = "k-sub" + (wiped ? " violet" : "");
+          el.pcGoal.innerHTML = cut ? "<b>Goal v2</b>" : "<b>Goal v1</b>";
+          el.pcGoal.className = "p-chip" + (cut ? " amber" : "");
+          el.pcLimit.className = "p-chip" + (cut ? " amber" : "");
+          el.pcLimitV.textContent = cut ? "9" : "64";
+          el.pcBest.textContent = inc >= 0 ? EXPS[inc].v.toFixed(3) : "—";
+          el.pcTried.textContent = String(landed);
+          el.pcLeft.textContent = String(10 - landed);
+          el.ptTokens.textContent = fmt(tok) + " tokens";
+          el.pbTokens.style.transform = `scaleX(${(tok / 4000).toFixed(4)})`;
+          el.live.textContent = t >= T.complete ? "Finished" : "Live";
+          el.pillKillT.textContent = t >= T.rebuild ? "Killed · resumed" : "Killed";
+
+          // dots: filled while within the limit, hollow once the new goal makes them ineligible
+          EXPS.forEach((e, i) => {
+            const k = e.ch > 9 && i < 7 ? easeOut3(clamp01((t - T.reRank - 0.05 * i) / 0.35)) : 0;
+            dots[i].fill.setAttribute("opacity", (1 - k).toFixed(3));
+            dots[i].ring.setAttribute("opacity", k.toFixed(3));
+            rows[i].className = "erow" + (i === inc ? " best" : "");
+          });
+          rows.forEach((r, i) => { r.querySelector(".bst").style.opacity = i === inc ? "1" : "0"; });
+
+          // best-so-far line: from the incumbent to the newest result, easing when either end moves
+          if (inc >= 0 && landed > 0) {
+            const lastT = EXPS[landed - 1].t;
+            const grow = easeOut3(clamp01((t - lastT) / 0.35));
+            const x2 = landed > 1 ? lerp(X(landed - 2), X(landed - 1), grow) : X(0);
+            let x1 = X(inc), y = Y(EXPS[inc].v);
+            if (cut) {
+              const k = easeOut3(clamp01((t - T.reRank) / 0.45));
+              x1 = lerp(X(4), X(5), k); y = lerp(Y(0.773), Y(0.759), k);
+            }
+            bestLine.setAttribute("x1", x1.toFixed(1)); bestLine.setAttribute("x2", Math.max(x1, x2).toFixed(1));
+            bestLine.setAttribute("y1", y.toFixed(1)); bestLine.setAttribute("y2", y.toFixed(1));
+            bestLine.setAttribute("opacity", landed > 1 ? "1" : "0");
+          }
+        }
+
+        // ---------- timeline ----------
+        const tl = gsap.timeline({ paused: true });
+        const drv = { t: 0 };
+        tl.to(drv, { t: DUR, duration: DUR, ease: "none", onUpdate: () => render(drv.t) }, 0);
+
+        // Scene 1: hook
+        tl.fromTo("#s1-kicker", { x: -24, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: "expo.out" }, 0.12);
+        tl.fromTo("#s1-rule", { scaleX: 0 }, { scaleX: 1, duration: 1.0, ease: "power3.out" }, 0.18);
+        tl.fromTo("#s1-head .w", { y: 70, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "expo.out", stagger: 0.07 }, 0.2);
+        tl.fromTo("#s1-meta", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" }, 0.55);
+        tl.fromTo("#s1-eeg-reveal", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 2.3, ease: "power2.inOut" }, 0.1);
+        tl.fromTo("#s1-eeg", { x: 0 }, { x: -700, duration: 3.35, ease: "none" }, 0);
+        tl.fromTo("#s1-eeg-label", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "sine.out" }, 0.9);
+        // "forget." fades like a memory
+        const chs = document.querySelectorAll("#w-forget .ch");
+        chs.forEach((c, i) => {
+          tl.fromTo(c, { opacity: 1, filter: "blur(0px)", y: 0 }, { opacity: 0.3, filter: "blur(5px)", y: (i % 2 ? 9 : -8), duration: 0.8, ease: "sine.inOut", immediateRender: false }, 2.25 + i * 0.055);
+        });
+        tl.to("#s1-wrap", { opacity: 0, y: -24, duration: 0.2, ease: "power2.in" }, 3.12);
+
+        // Scene 2: dashboard tilts in, then a slow push
+        const cam = "#d-cam";
+        const FR = {
+          wide: { x: 0, y: 0, scale: 1.2 },
+          push: { x: -4.8, y: -89.8, scale: 1.34 },
+          kill: { x: -12, y: 0, scale: 1.8 },
+          feed: { x: -1118.6, y: -87, scale: 1.9 },
+          ctl: { x: -1278, y: 0, scale: 2.0 },
+          chart: { x: -32, y: -80, scale: 1.55 },
+        };
+        tl.set(cam, FR.wide, 0);
+        tl.fromTo("#d-tilt", { opacity: 0, rotationX: 16, rotationY: -18, scale: 0.84, transformPerspective: 2200 },
+          { opacity: 1, rotationX: 0, rotationY: 0, scale: 1, duration: 1.15, ease: "expo.out" }, 3.2);
+        tl.fromTo(cam, FR.wide, { ...FR.push, duration: 2.7, ease: "sine.inOut", immediateRender: false }, 4.35);
+
+        // beat-grid: dots 1-4 at 4.39, 4.91, 5.34, 6.00 (non-text accents, one per beat); later dots follow the story
+        EXPS.forEach((e, i) => {
+          tl.fromTo(dots[i].g, { opacity: 0, scale: 0, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.6)" }, e.t);
+          tl.fromTo(rows[i], { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, e.t);
+        });
+        [4.39, 4.91, 11.46, 15.29].forEach((tt) => {
+          tl.fromTo("#kv-best", { scale: 1.12 }, { scale: 1, duration: 0.45, ease: "power3.out", immediateRender: false }, tt);
+        });
+
+        // feed rows slide in at the top and push older rows down
+        FEED.forEach((f, j) => {
+          if (f.t < 0) return;
+          tl.fromTo(frows[j], { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out", immediateRender: false }, f.t);
+        });
+        tl.set(frows[0], { y: 60 }, 0);
+        FEED.forEach((f, j) => {
+          if (f.t < 0) return;
+          for (let k = 0; k < j; k++) {
+            tl.fromTo(frows[k], { y: 60 * (j - 1 - k) }, { y: 60 * (j - k), duration: 0.35, ease: "power3.out", immediateRender: false }, f.t);
+            // rows pushed below the fourth slot leave the card; fade them so nothing sits under the next card
+            if (j - k === 4) tl.fromTo(frows[k], { opacity: 1 }, { opacity: 0, duration: 0.2, ease: "none", immediateRender: false }, f.t);
+          }
+        });
+
+        // live indicator pulse (finite)
+        tl.fromTo("#pring", { scale: 1, opacity: 0.8 }, { scale: 2.6, opacity: 0, duration: 1.6, ease: "sine.out", repeat: 9 }, 3.3);
+        // KPI EEG trace scrolls
+        tl.fromTo("#kpi-eeg", { x: 0 }, { x: -236, duration: 16.2, ease: "none" }, 3.2);
+
+        // chapter panel
+        tl.fromTo("#cpanel", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.5, ease: "expo.out" }, 4.45);
+        function capIn(id, t0) {
+          tl.fromTo(`#${id}`, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "none", immediateRender: false }, t0);
+          tl.fromTo(`#${id} .cl`, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out", immediateRender: false }, t0);
+          tl.fromTo(`#${id} .ch1`, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, ease: "expo.out", immediateRender: false }, t0 + 0.08);
+        }
+        function capOut(id, t0) {
+          tl.fromTo(`#${id}`, { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "power1.in", immediateRender: false }, t0);
+        }
+        capIn("cap0", 4.5); capOut("cap0", 6.95);
+        capIn("cap1", 7.2); capOut("cap1", 12.6);
+        capIn("cap2", 12.95); capOut("cap2", 14.5);
+        capIn("cap3", 14.73);
+        tl.fromTo("#cap3-res", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 16.45);
+        tl.fromTo("#cpanel", { opacity: 1 }, { opacity: 0, x: -30, duration: 0.2, ease: "power2.in", immediateRender: false }, 17.75);
+
+        // Scene 3: attempt 1, SIGKILL mid experiment
+        tl.fromTo(cam, FR.push, { ...FR.kill, duration: 0.66, ease: "power3.inOut", immediateRender: false }, 7.09);
+        tl.fromTo("#cursor", { opacity: 0, x: 700, y: 330 }, { opacity: 1, duration: 0.2, ease: "none", immediateRender: false }, 7.7);
+        tl.fromTo("#cursor", { x: 700, y: 330 }, { x: 906, y: 49, duration: 0.86, ease: "power2.inOut", immediateRender: false }, 7.82);
+        tl.fromTo("#cursor", { scale: 1 }, { scale: 0.82, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 8.68); // click
+        tl.fromTo("#b-kill", { scale: 1 }, { scale: 0.93, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 8.68);
+        tl.fromTo("#ring-kill", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1.08, duration: 0.12, ease: "power2.out", immediateRender: false }, 8.72);
+        tl.fromTo("#ring-kill", { opacity: 1 }, { opacity: 0, duration: 0.5, ease: "power1.in", immediateRender: false }, 9.0);
+        // beat-locked: 8.74s strong cue — the kill
+        tl.fromTo("#flash-fill", { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "none", immediateRender: false }, 8.74);
+        tl.fromTo("#flash-fill", { opacity: 1 }, { opacity: 0, duration: 0.5, ease: "power2.out", immediateRender: false }, 8.8);
+        tl.fromTo("#d-shake", { x: 0, y: 0 }, { keyframes: [
+          { x: -16, y: 6, duration: 0.04 }, { x: 13, y: -5, duration: 0.05 }, { x: -9, y: 4, duration: 0.05 },
+          { x: 6, y: -2, duration: 0.05 }, { x: -3, y: 1, duration: 0.05 }, { x: 0, y: 0, duration: 0.06 } ], ease: "none", immediateRender: false }, 8.74);
+        tl.fromTo("#kv-status", { scale: 1.18 }, { scale: 1, duration: 0.4, ease: "power3.out", immediateRender: false }, 8.74);
+        tl.fromTo("#mark-kill", { scaleY: 0, opacity: 0 }, { scaleY: 1, opacity: 1, duration: 0.45, ease: "power3.out" }, 8.8);
+        tl.fromTo("#pill-kill", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2)" }, 9.0);
+        tl.fromTo("#cursor", { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "none", immediateRender: false }, 9.4);
+        // whip to the feed
+        tl.fromTo(cam, FR.kill, { ...FR.feed, duration: 0.42, ease: "power4.inOut", immediateRender: false }, 9.42);
+        // beat-locked: 10.93s strong cue — "New worker rebuilt the campaign from Atlas" (feed row tween above)
+        tl.fromTo("#kv-status", { scale: 1.12 }, { scale: 1, duration: 0.4, ease: "power3.out", immediateRender: false }, 10.93);
+
+        // Scene 4: attempts 2 and 3
+        tl.fromTo(cam, FR.feed, { ...FR.ctl, duration: 0.5, ease: "power3.inOut", immediateRender: false }, 12.85);
+        tl.fromTo("#cursor", { opacity: 0, x: 1180, y: 250 }, { opacity: 1, duration: 0.15, ease: "none", immediateRender: false }, 13.05);
+        tl.fromTo("#cursor", { x: 1180, y: 250 }, { x: 1042, y: 49, duration: 0.5, ease: "power2.inOut", immediateRender: false }, 13.1);
+        tl.fromTo("#cursor", { scale: 1 }, { scale: 0.82, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 13.6);
+        tl.fromTo("#b-reset", { scale: 1 }, { scale: 0.93, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 13.6);
+        tl.fromTo("#ring-reset", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1.08, duration: 0.12, ease: "power2.out", immediateRender: false }, 13.64);
+        tl.fromTo("#ring-reset", { opacity: 1 }, { opacity: 0, duration: 0.5, ease: "power1.in", immediateRender: false }, 13.95);
+        tl.fromTo("#cursor", { x: 1042, y: 49 }, { x: 1318, y: 50, duration: 0.5, ease: "power2.inOut", immediateRender: false }, 14.72);
+        tl.fromTo("#cursor", { scale: 1 }, { scale: 0.82, duration: 0.06, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 15.25);
+        tl.fromTo("#kv-limit", { scale: 1.3 }, { scale: 1, duration: 0.5, ease: "power3.out", immediateRender: false }, 15.29);
+        tl.fromTo("#cursor", { opacity: 1 }, { opacity: 0, duration: 0.15, ease: "none", immediateRender: false }, 15.75);
+        tl.fromTo(cam, FR.ctl, { ...FR.chart, duration: 0.51, ease: "power3.inOut", immediateRender: false }, 15.84);
+        tl.fromTo("#mark-limit", { scaleY: 0, opacity: 0 }, { scaleY: 1, opacity: 1, duration: 0.4, ease: "power3.out" }, 16.34);
+        tl.fromTo("#pill-limit", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2)" }, 16.38);
+
+        // Scene 5: the campaign finishes under the new goal, then the dashboard exits
+        tl.fromTo(cam, FR.chart, { ...FR.kill, duration: 0.45, ease: "power2.inOut", immediateRender: false }, 17.1);
+        tl.fromTo("#kv-status", { scale: 1.15 }, { scale: 1, duration: 0.45, ease: "power3.out", immediateRender: false }, 18.02);
+        tl.fromTo("#d-tilt", { opacity: 1, scale: 1, filter: "blur(0px)" }, { opacity: 0, scale: 0.9, filter: "blur(12px)", duration: 0.3, ease: "power2.in", immediateRender: false }, 18.98);
+
+        // Outro: "It didn't." then the lockup
+        tl.fromTo("#didnt-t", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.22, ease: "expo.out" }, 19.1);
+        tl.fromTo("#didnt-t", { opacity: 1, scale: 1 }, { opacity: 0, scale: 0.96, duration: 0.14, ease: "power2.in", immediateRender: false }, 20.08);
+        // beat-locked: 20.19s — logo lockup
+        tl.fromTo("#lk-mark", { opacity: 0, scale: 0.6, rotation: -8 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.8)" }, 20.19);
+        tl.fromTo("#lk-wave", { attr: { "stroke-dashoffset": 1 } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.55, ease: "power2.inOut" }, 20.35);
+        tl.fromTo("#lk-name", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.55, ease: "expo.out" }, 20.26);
+        tl.fromTo("#lk-tag", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 20.75);
+        tl.fromTo("#lk-foot", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 21.28);
+        tl.fromTo("#out-eeg-reveal", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, ease: "power2.inOut" }, 20.3);
+        tl.fromTo("#out-eeg", { x: 0 }, { x: -520, duration: 4.5, ease: "none" }, 19.0);
+        tl.fromTo("#lockup", { scale: 1 }, { scale: 1.03, duration: 3.2, ease: "sine.inOut", immediateRender: false }, 20.3);
+
+        // The chapter panel deliberately sits over the Experiments table and the chart's lower axis.
+        document.querySelectorAll("#c-table *, #chart-svg text, #c-chart .legend *").forEach((n) => n.setAttribute("data-layout-allow-occlusion", ""));
+
+        render(0);
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>

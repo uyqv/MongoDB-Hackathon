@@ -1,0 +1,5 @@
+# The bundled music track's redistribution license is unverified; keep the raw file out of the repo.
+# The rendered brag.mp4 already contains the mix. To re-render, copy the track back from the brag skill's assets/music/.
+composition/assets/music/*.mp3
+composition/snapshots/
+composition/.hyperframes/

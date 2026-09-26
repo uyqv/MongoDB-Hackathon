@@ -1,0 +1,1 @@
+We tried to make our research agent forget. We killed it mid experiment, wiped its context, and changed its goal, and it rebuilt itself from MongoDB Atlas every time. Second Shift, built in one day at the MongoDB x Cerebral Valley hackathon.
