@@ -166,6 +166,29 @@ def test_budget_spent_stops_without_call(fake):
     assert r["action"] == "stop" and client.calls == []
 
 
+def test_user_message_sends_every_field_but_tried_keys_and_packet_id(fake):
+    p = make_packet()
+    lead = {"experiment_id": "camp_test0001:x_lead", "label": "lead", "status": "done",
+            "val_balanced_accuracy": 0.7, "eligible": True}
+    lag = {"experiment_id": "camp_test0001:x_lag", "label": "lag", "status": "failed",
+           "val_balanced_accuracy": None, "eligible": True}
+    p.update(packet_id="pk_000000000001", tried=[C.config_label(INC_CFG)], leaders=[lead], laggards=[lag])
+    client = fake(tool_resp("propose_experiment", propose(NEW_CFG, ["camp_test0001:x_lead", "camp_test0001:x_lag"])))
+    r = planner.plan(p)
+    user = client.calls[0]["messages"][1]["content"]
+    sent = json.loads(user.split("\n", 1)[1])
+    assert set(sent) == set(p) - {"tried_keys", "packet_id"}
+    assert sent["tried"] == [C.config_label(INC_CFG)] and sent["leaders"] == [lead] and sent["laggards"] == [lag]
+    assert "tried_keys" not in user and "pk_000000000001" not in user
+    # leaders and laggards are citable evidence
+    assert r["action"] == "propose" and not r["fallback_used"]
+
+
+def test_system_prompt_points_at_tried():
+    assert "Every tried config is listed in tried; never propose one of those." in planner.SYSTEM_PROMPT
+    assert "Tried configs appear in incumbent, pending and recent" not in planner.SYSTEM_PROMPT
+
+
 def test_system_prompt_forbids_early_stop():
     assert "ONLY valid when goal.budget.remaining is 0" in planner.SYSTEM_PROMPT
 
