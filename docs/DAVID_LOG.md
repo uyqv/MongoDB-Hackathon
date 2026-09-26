@@ -33,6 +33,9 @@ Branch `david`. Dev DB `second_shift_david`.
 - **D7** `/api/eeg/preview` + panel 6 (13:08 ET). Real `S001R06.edf` via `eegbci.load_data(1, [6])` + `standardize`: C3/Cz/C4, 1-40 Hz zero-phase FIR, 6 s from the first task cue, shown at 80 Hz; Welch PSD 4-40 Hz on 1-3 s epochs, T1 fists (n=7) vs T2 feet (n=8). Cached to `data/eeg_preview.json` (gitignored). Returns 503 with the reason if the download fails. Caption names the PhysioNet source and says it is display only.
 - **D8** `docs/ATTRIBUTION.md` (13:08 ET): eegmmidb v1.0.0 (DOI 10.13026/C28G6P, ODC-By 1.0), Schalk et al. 2004 BCI2000 citation, Goldberger et al. 2000 PhysioNet citation, software/service table with licenses, and the statement of what is original work from today.
 - Andrew: Jev (D9) is REQUIRED now, not stretch; do it after D8 regardless of time; do not wire it into the worker.
+- **D9** `harness/jev.py` + `tests/test_jev.py` (13:10 ET). Model id checked first: the catalog's `typesafe/jev-router` is a chat-completions router (different product); the Decisions API `POST https://openrouter.ai/api/alpha/decisions` with `{model: "typesafe/jev-1.13", state, questions}` works. `questions` must be a record: one `choice` question `route` whose criteria are the 4 labels. Any HTTP error, exception, unknown label, out-of-range confidence, or confidence < 0.6 returns `label: "review", fallback_used: true` with the reason. Note text capped at 2,000 chars. No DB writes; NOT wired into the worker (Andrew does that).
+  - Authenticated call: provider `TypeSafe`, model `typesafe/jev-1.13-20260917`, request id `gen-dec-1790442586-oeMIa4WHgWSzvMgDcADH`, usage 356-ish in / ~41 out tokens, cost $0.00002 per call.
+  - **Smoke test (not accuracy):** 20 hand-labeled notes (4 per label plus 4 ambiguous/adversarial), agreement 19/20, total cost $0.000395. All 4 prompt-injection / unsupported-metric / goal-change notes went to `review` at confidence 1.0. The one miss: "mu band failed... or maybe it was beta, the log got overwritten" (hand label `review`) went to `failure_memory` at 0.82. Hand labels are ours and n=20, so this says the integration works, not how accurate Jev is.
 
 ## Tests
 
@@ -40,6 +43,7 @@ Branch `david`. Dev DB `second_shift_david`.
 - `tests/test_memory.py`: 2 passed (fallback path with embed forced to raise; verified-only rule), live vector test passed with `LIVE=1`. Tests refuse any DB other than `second_shift_david`.
 - `tests/test_api.py`: 7 passed (TestClient against the seeded dev DB).
 - Full suite 12:51 ET: 27 passed, 2 live skipped.
+- `tests/test_jev.py`: 9 passed (request shape is not chat, 5 failure paths to review, missing key, empty note, truncation, fixture shape) + live smoke with `LIVE=1`. Full suite 13:10 ET: 59 passed, 3 live skipped.
 - control.py tests live in `tests/test_api.py` (CONTRACTS §1 gives David no `test_control.py`): constraint bump + history + event, context_epoch bump, start/kill/status on a dummy sleep process, and all POST endpoints. Full suite 13:00 ET: 44 passed, 2 live skipped.
 
 ## Stubbed / skipped
@@ -70,3 +74,4 @@ Branch `david`. Dev DB `second_shift_david`.
 
 - 12:51 ET: D1-D4 done and pushed. Stopped per prompt 1.
 - 13:00 ET: prompt 2 started; D5 done.
+- 13:10 ET: prompt 2 done (D5-D9). Moving to prompt 3 after merging origin/main.
