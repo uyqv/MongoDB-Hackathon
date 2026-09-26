@@ -50,7 +50,9 @@ Rules:
 - Cite evidence by id in evidence_ids. Use only ids that appear in the packet: experiment_id values, memory_id values, or source_ids of retrieved memories.
 - Never state a metric number that is not in the packet. You do not compute results; code does.
 - Rationale: at most 2 sentences.
-- Call stop only when the budget is exhausted or no eligible untried config could plausibly help.
+- Keep optimizing until the budget is spent. The job is relentless optimization within budget, not stopping at a good-enough result.
+- stop is ONLY valid when goal.budget.remaining is 0 or no eligible untried config exists. Any other stop is rejected.
+- If nearby variants of the incumbent look exhausted, explore a different method, band, or window rather than stopping. Unexplored regions of the surface are worth a budget slot.
 
 Always answer with exactly one tool call."""
 
@@ -129,7 +131,12 @@ def validate(packet: dict, name: str, args: dict) -> tuple[dict | None, str | No
     if unknown:
         return None, f"evidence ids not in the packet: {unknown}. Cite only ids that appear in the packet."
     if name == "stop":
-        return None, None
+        remaining = (packet.get("goal", {}).get("budget") or {}).get("remaining")
+        if remaining == 0 or fallback_config(packet) is None:
+            return None, None
+        return None, (f"stop is not allowed: {remaining} experiments remain in the budget and eligible untried "
+                      "configs exist. Propose one. If nearby variants look exhausted, explore a different "
+                      "method, band, or window.")
     try:
         cfg = C.normalize_config(args.get("config"))
     except ValueError as e:
@@ -232,6 +239,8 @@ def plan(packet: dict, *, model: str | None = None) -> dict:
 
     if fallback_config(packet) is None:
         return result("stop", None, "No eligible untried config remains on the allowed surface.", [])
+    if (packet.get("goal", {}).get("budget") or {}).get("remaining") == 0:
+        return result("stop", None, "Experiment budget is spent.", [])
 
     last_error = "not called"
     try:

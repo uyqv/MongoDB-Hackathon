@@ -108,7 +108,29 @@ def campaign(cid: str):
     camp["used"] = used
     camp["remaining"] = None if max_exp is None else max(0, max_exp - used)
     camp["incumbent"] = incumbent(camp, exps)
+    camp["llm_usage"] = llm_usage(cid)
+    camp["running"] = [{"experiment_id": e["_id"], "label": e.get("label"), "attempt": e.get("attempt"),
+                        "lease": e.get("lease")}
+                       for e in db().experiments.find({"campaign_id": cid, "status": "running"},
+                                                      {"label": 1, "attempt": 1, "lease": 1})]
     return clean(camp)
+
+
+def llm_usage(cid: str) -> dict:
+    """Running totals over llm_call events. Token and cost sums count provider-reported usage only."""
+    out = {"calls": 0, "fallbacks": 0, "provider_calls": 0, "input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}
+    for ev in db().events.find({"campaign_id": cid, "type": "llm_call"}, {"payload": 1}):
+        p = ev.get("payload") or {}
+        u = p.get("usage") or {}
+        out["calls"] += 1
+        out["fallbacks"] += bool(p.get("fallback_used"))
+        if u.get("source") == "provider":
+            out["provider_calls"] += 1
+            out["input_tokens"] += u.get("input_tokens") or 0
+            out["output_tokens"] += u.get("output_tokens") or 0
+            out["cost_usd"] += u.get("cost_usd") or 0.0
+    out["cost_usd"] = round(out["cost_usd"], 6)
+    return out
 
 
 @app.get("/api/campaigns/{cid}/experiments")

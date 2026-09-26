@@ -175,3 +175,19 @@ def test_eeg_preview_is_real_and_display_only(client):
     assert len(d["trace"]["t"]) == len(d["trace"]["channels"]["C3"])
     assert d["psd"]["n_epochs"]["T1"] > 0 and d["psd"]["n_epochs"]["T2"] > 0
     assert d["psd"]["freqs"][0] >= 4 and d["psd"]["freqs"][-1] <= 40
+
+
+def test_campaign_llm_usage_and_running(client):
+    c = client.get(f"/api/campaigns/{CID}").json()
+    assert c["llm_usage"]["calls"] == 0 and c["llm_usage"]["cost_usd"] == 0
+    assert len(c["running"]) == 1 and c["running"][0]["lease"]["expires_at"]
+    d = get_db()
+    d.events.insert_one({"campaign_id": CID, "ts": "2099-01-01T00:00:00Z", "type": "llm_call", "fake": True,
+                         "payload": {"usage": {"input_tokens": 100, "output_tokens": 10, "cost_usd": 0.001,
+                                               "source": "provider"}, "fallback_used": False}})
+    d.events.insert_one({"campaign_id": CID, "ts": "2099-01-01T00:00:01Z", "type": "llm_call", "fake": True,
+                         "payload": {"usage": {"input_tokens": 999, "source": "estimate"}, "fallback_used": True}})
+    u = client.get(f"/api/campaigns/{CID}").json()["llm_usage"]
+    assert u == {"calls": 2, "fallbacks": 1, "provider_calls": 1, "input_tokens": 100, "output_tokens": 10,
+                 "cost_usd": 0.001}
+    seed_fake.main()

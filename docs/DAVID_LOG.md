@@ -37,6 +37,26 @@ Branch `david`. Dev DB `second_shift_david`.
   - Authenticated call: provider `TypeSafe`, model `typesafe/jev-1.13-20260917`, request id `gen-dec-1790442586-oeMIa4WHgWSzvMgDcADH`, usage 356-ish in / ~41 out tokens, cost $0.00002 per call.
   - **Smoke test (not accuracy):** 20 hand-labeled notes (4 per label plus 4 ambiguous/adversarial), agreement 19/20, total cost $0.000395. All 4 prompt-injection / unsupported-metric / goal-change notes went to `review` at confidence 1.0. The one miss: "mu band failed... or maybe it was beta, the log got overwritten" (hand label `review`) went to `failure_memory` at 0.82. Hand labels are ours and n=20, so this says the integration works, not how accurate Jev is.
 
+### Prompt 3
+
+- 13:11 ET: merged origin/main (prompt 3 added to DAVID_PROMPTS.md). Suite: 59 passed, 3 live skipped.
+- **P1** planner no early stop. `stop` validates only when `goal.budget.remaining == 0` or no eligible untried config exists; any other stop is a validation failure, gets one repair ("propose one; explore a different method, band, or window"), then the deterministic fallback proposes. With `remaining == 0` the planner returns `stop` without calling the model. System prompt now says optimize relentlessly within budget. New tests: premature stop, repair, proposal; double premature stop, fallback proposal; stop at remaining 0 accepted; no call when budget spent. Live call re-run after the change: valid proposal, no fallback.
+- **P2** dashboard polish for the 1440 px video (13:14 ET). Base font 15.5 px, 26 px title with subtitle, higher-contrast palette. Timeline adds `fault_injection` (red), `proposal_rejected`, and a compact `llm_call` line (model or FALLBACK, action, provider input tokens, cost). Experiments: incumbent row highlighted with a green bar and badge; click any row to expand the planner rationale, request id, and `evidence_ids`, where experiment ids scroll to and flash their row and memory ids open the memory text inline. Goal panel: state pill (WAITING pulses amber), running totals from `llm_call` events (calls, fallbacks, provider input/output tokens, cost, labeled "provider"), a lease countdown for every running job ("expires in N s", then red "expired N s ago, waiting for reclaim"), and when `campaign.final` exists a block with validation vs sealed-test balanced accuracy, test F1 and n_test. API: `/api/campaigns/{cid}` adds computed `llm_usage` and `running`. URL options `?campaign=<id>` pins a campaign and `?expand=all` opens every row (for the video).
+  - Screenshots, read only, `DB_NAME=second_shift`, `camp_0f8981ee` at 1440 px: goal panel shows DONE, 9 used / 1 remaining of 10, incumbent 0.773 val (csp_lda · beta_13_30 · w0.5_2.5 · motor21 · n=6), 10 planner calls, 0 fallback, 30,341 in / 2,439 out tokens, $0.0851 (provider), final block validation 0.773 vs sealed test 0.732, F1 0.729, n_test 75. Trajectory: 9 eligible points, best-so-far step line 0.692, 0.745, 0.773. Experiments: 9 rows, row 5 highlighted as incumbent, every expanded row shows its rationale and linked evidence (row 1 uncited, rows 2-9 cite 1-2 ids). Packet panel: evidence strategy, 940 tokens (estimate) of 4,000, last planner action `stop` (the premature stop P1 now blocks). Timeline: worker_stop, finalized (val 0.773, test 0.732, n=75), llm_call lines with provider tokens and cost. EEG panel renders. The WAITING pill and lease countdown were checked on the fake campaign ("lease expires in 35 s").
+  - The real campaign's `llm_usage` total ($0.085072, 10 calls, 0 fallbacks) matches Andrew's report.
+- **P3** `eval/stress.py` + `eval/stress.json` (13:18 ET). Copied `camp_0f8981ee` (9 experiments, 9 re-rendered verified memories) into `camp_ed8675ea` in `second_shift_eval`, then added synthetic distractors through `memory.add_memories` in 1,000-note batches. Latency = end-to-end `search_memories` (Voyage query embedding + `$vectorSearch`) from David's laptop, 20 distinct queries per level, query cache cleared.
+
+| distractors | memories | insert+embed s | index sync s | search p50 ms | search p95 ms | incumbent memory in top 4 | top-4 kinds (incumbent query) | packet tokens (estimate) / budget | packet retrieved kinds |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | 9 | 0.0 | 0.0 | 239.6 | 317.5 | NO | 4x verified_result | 940 / 4000 | 4x verified_result |
+| 1,000 | 1,009 | 7.2 | 3.5 | 261.4 | 309.7 | NO | 4x verified_result | 780 / 4000 | 4x synthetic_stress |
+| 10,000 | 10,009 | 105.1 | 4.5 | 726.5 | 4613.5 | NO | 4x verified_result | 781 / 4000 | 4x synthetic_stress |
+
+  - **Miss, reported as-is:** the real incumbent's verified_result memory (`m_ce9f5f81e5fd`, val 0.773) is NOT in the top 4 for the "best eligible configuration" query at any level, including 0 distractors. The top 4 are other verified results with near-identical scores (0.788-0.791): embeddings cannot rank by a number inside the text. The evidence packet still carries the incumbent at every level through the exact `store.incumbent` read, so the planner never loses it.
+  - Filtering held: the incumbent query's top 4 stayed all verified_result even at 10,000 distractors. The packet's generic query did not: its 4 retrieved slots flip to synthetic notes once distractors exist (same finding as D6).
+  - Packet size stays well under budget as memory grows (940 then 781 tokens estimated, of 4,000), because retrieval is capped at k=4 and the recent window is fixed.
+  - Latency: p50 grows from ~240 ms to ~727 ms and p95 reaches ~4.6 s at 10,000; much of that is the Voyage embedding round trip, measured from a laptop on venue wifi, not isolated Atlas time.
+
 ## Tests
 
 - `tests/test_planner.py`: 9 passed, 1 live skipped by default; live passed with `LIVE=1`.
@@ -75,3 +95,5 @@ Branch `david`. Dev DB `second_shift_david`.
 - 12:51 ET: D1-D4 done and pushed. Stopped per prompt 1.
 - 13:00 ET: prompt 2 started; D5 done.
 - 13:10 ET: prompt 2 done (D5-D9). Moving to prompt 3 after merging origin/main.
+- 13:14 ET: P1, P2 done. Suite 64 passed, 3 live skipped.
+- 13:18 ET: P3 done. Prompt 3 complete (P4 = D9 already done in prompt 2). Stopped.
