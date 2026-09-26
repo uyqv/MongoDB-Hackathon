@@ -1,0 +1,12 @@
+pymongo>=4.10
+python-dotenv
+numpy
+scipy
+scikit-learn
+mne>=1.8
+fastapi
+uvicorn
+httpx
+openai
+voyageai
+pytest
