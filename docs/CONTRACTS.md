@@ -8,7 +8,7 @@ One owner per file. Never edit a file you don't own. That rule is what makes the
 
 | Owner | Files |
 |---|---|
-| **Andrew** | `harness/contracts.py`, `harness/db.py`, `harness/eeg.py`, `harness/store.py`, `harness/worker.py`, `harness/context.py`, `eval/run_ablation.py`, `tests/test_contracts.py`, `tests/test_eeg.py`, `tests/test_store.py`, `tests/test_worker.py`, `requirements.txt`, `.env.example`, `.gitignore`, `README.md`, `docs/WORKPLAN.md`, `docs/CONTRACTS.md`, `docs/DAVID_PROMPTS.md` |
+| **Andrew** | `harness/contracts.py`, `harness/db.py`, `harness/eeg.py`, `harness/store.py`, `harness/worker.py`, `harness/context.py`, `eval/run_ablation.py`, `eval/demo_checks.py`, `tests/test_contracts.py`, `tests/test_eeg.py`, `tests/test_store.py`, `tests/test_worker.py`, `requirements.txt`, `.env.example`, `.gitignore`, `README.md`, `docs/WORKPLAN.md`, `docs/CONTRACTS.md`, `docs/DAVID_PROMPTS.md` |
 | **David** | `harness/planner.py`, `harness/memory.py`, `harness/control.py`, `harness/jev.py`, `api/**`, `web/**`, `eval/fixtures.py`, `eval/seed_fake.py`, `tests/test_planner.py`, `tests/test_memory.py`, `tests/test_api.py`, `tests/test_fixtures.py`, `tests/test_jev.py`, `docs/ATTRIBUTION.md`, `docs/DAVID_LOG.md` |
 
 David needs a new Python dependency: add it to `docs/DAVID_LOG.md` under "deps needed" and install it locally. Andrew adds it to `requirements.txt` at merge.
@@ -30,7 +30,7 @@ Field-level shapes are the TypedDicts in `harness/contracts.py`. Summary:
 | `experiments` | `<campaign_id>:<experiment_key>` | config, status, attempt, lease, **result metrics**, error | worker only |
 | `memories` | `m_<12 hex>` | notes and code-rendered verified results, embedding | worker via `memory.add_memory`; fixtures |
 | `events` | ObjectId | append-only audit/UI timeline | everyone via `db.log_event` |
-| `packets` | ObjectId | the exact evidence packet each planner call saw, plus the planner result and usage | `context.build_packet` (packet), worker (adds `planner_result`) |
+| `packets` | `pk_<12 hex>` (= `packet_id`) | the exact evidence packet each planner call saw, plus the planner result and usage | `context.build_packet` (packet), worker (adds `planner_result`) |
 
 Indexes (Andrew's `store.ensure_indexes`): `experiments {campaign_id:1, status:1, created_at:1}`, `events {campaign_id:1, ts:1}`, `packets {campaign_id:1, ts:-1}`, `memories {campaign_id:1, protocol_id:1, status:1}`. Vector index `memories_vec` belongs to David's `memory.ensure_vector_index`.
 

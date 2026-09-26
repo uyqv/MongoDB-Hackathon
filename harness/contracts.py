@@ -36,7 +36,7 @@ EVENT_TYPES = (
     "state_change", "packet_built", "llm_call", "proposal", "proposal_rejected",
     "job_queued", "job_reused", "job_claimed", "job_committed", "job_failed",
     "lease_expired", "stale_commit_rejected", "context_reset", "goal_changed",
-    "memory_added", "finalized",
+    "memory_added", "finalized", "fault_injection",
 )
 PACKET_STRATEGIES = ("evidence", "recent_window")
 
@@ -304,6 +304,7 @@ class RetrievedMemory(TypedDict):
 
 class EvidencePacket(TypedDict):
     """Everything the planner sees for one decision. Built fresh from Atlas every call."""
+    packet_id: str           # "pk_<hex>", also the packets._id
     campaign_id: str
     protocol_id: str         # needed to compute experiment_key() of a proposal
     strategy: str            # one of PACKET_STRATEGIES
