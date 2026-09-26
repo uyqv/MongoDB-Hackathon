@@ -18,7 +18,7 @@ Branch `david`. Dev DB `second_shift_david`.
 - `tests/test_planner.py`: 9 passed, 1 live skipped by default; live passed with `LIVE=1`.
 - `tests/test_memory.py`: 2 passed (fallback path with embed forced to raise; verified-only rule), live vector test passed with `LIVE=1`. Tests refuse any DB other than `second_shift_david`.
 - `tests/test_api.py`: 7 passed (TestClient against the seeded dev DB).
-- Full suite 12:55 ET: 27 passed, 2 live skipped.
+- Full suite 12:51 ET: 27 passed, 2 live skipped.
 
 ## Stubbed / skipped
 
@@ -41,3 +41,7 @@ Branch `david`. Dev DB `second_shift_david`.
 
 - `harness/planner.py` exposes `client_factory` (module-level) so tests inject a fake client.
 - David's Claude Code session inherited empty `VOYAGE_API_KEY` / `OPENROUTER_API_KEY` from the terminal that launched it (not from ~/.zshrc). `load_dotenv()` never overrides an existing var, even an empty one, so a worker spawned from that shell would silently lose the planner and memory. `planner.py` and `memory.py` now read keys through `_env()`, which falls back to `.env` when the exported value is empty. `harness/db.py` and the worker still use plain `load_dotenv()`; launch them from a clean shell.
+
+## Status
+
+- 12:51 ET: D1-D4 done and pushed. Stopped per prompt 1; waiting for "merge 1 done" before prompt 2.
