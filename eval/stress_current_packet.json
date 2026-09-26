@@ -1,0 +1,8 @@
+{
+ "campaign_id": "camp_ed8675ea",
+ "db": "second_shift_eval",
+ "memories": 10009,
+ "packet_token_estimate": 1204,
+ "budget_tokens": 4000,
+ "note": "current evidence packet (with exact-read leaders/laggards) built over the 10k-distractor stress campaign"
+}

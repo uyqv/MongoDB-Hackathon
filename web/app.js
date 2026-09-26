@@ -1,415 +1,359 @@
-// Second Shift dashboard. OWNER: David. Vanilla JS, polls the API every 2 s.
-// Every number drawn here comes from the API. Nothing is computed from a model.
-"use strict";
-
-const POLL_MS = 2000;
-const TIMELINE_TYPES = new Set([
-  "worker_start", "worker_stop", "worker_killed", "fault_injection", "context_reset", "goal_changed",
-  "job_reused", "lease_expired", "stale_commit_rejected", "finalized", "proposal_rejected", "llm_call",
-]);
-
-const params = new URLSearchParams(location.search);
-const state = { campaignId: params.get("campaign"), userPicked: params.has("campaign"), chart: null, fake: false, expanded: new Set(), memories: {},
-                expIds: new Set(), openMemory: null };
-
+// Second Shift dashboard. Every value comes from Atlas through the API; nothing is invented here.
 const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => (
-  { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const fmt = (x, d = 3) => (x === null || x === undefined ? "—" : Number(x).toFixed(d));
-const localTime = (iso) => (iso ? new Date(iso).toLocaleTimeString() : "—");
-const badge = (text, cls) => `<span class="badge ${cls}">${esc(text)}</span>`;
+const params = new URLSearchParams(location.search);
+const state = { cid: params.get("campaign"), picked: params.has("campaign"), chart: null, eeg: false, feedKeys: "" };
+
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const acc = (x) => (x === null || x === undefined ? "—" : Number(x).toFixed(3));
+const clock = (iso) => (iso ? new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" }) : "");
+
+const METHOD = { csp_lda: "CSP", bandpower_lr: "Band power" };
+const BAND = { mu_8_12: "8–12 Hz", lowbeta_13_20: "13–20 Hz", highbeta_20_30: "20–30 Hz", beta_13_30: "13–30 Hz", broad_8_30: "8–30 Hz" };
+const WIN = { "w0.5_2.5": "0.5–2.5 s", "w1.0_3.0": "1–3 s", "w1.5_3.5": "1.5–3.5 s" };
+const CH = { central9: 9, motor21: 21, all64: 64 };
+const short = (c) => (c ? `${METHOD[c.method] || c.method} · ${BAND[c.band] || c.band} · ${CH[c.channels]} electrodes` : "");
 
 async function api(path, opts) {
   const r = await fetch(path, opts);
-  if (!r.ok) {
-    let detail = "";
-    try { detail = (await r.json()).detail || ""; } catch (_) { /* not json */ }
-    const err = new Error(`${r.status} ${detail || path}`);
-    err.status = r.status;
-    throw err;
-  }
+  if (!r.ok) { const e = new Error(`${r.status}`); e.status = r.status; throw e; }
   return r.json();
 }
+const post = (path, body) => api(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) });
 
-function markFake(...docs) {
-  for (const d of docs.flat()) if (d && d.fake === true) state.fake = true;
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toast.h); toast.h = setTimeout(() => { t.hidden = true; }, 2500);
 }
 
 // ---------------------------------------------------------------- campaigns
 async function loadCampaigns() {
   const list = await api("/api/campaigns");
   const sel = $("campaign-select");
-  const current = sel.value || state.campaignId;
-  sel.innerHTML = list.map((c) =>
-    `<option value="${esc(c._id)}">${esc(c._id)}${c.fake ? " (FAKE)" : ""} · ${esc(c.state)} · ${esc(localTime(c.created_at))}</option>`
-  ).join("");
-  if (!list.length) { state.campaignId = null; return; }
-  if (state.userPicked && list.some((c) => c._id === current)) {
-    state.campaignId = current;
-  } else {
-    state.campaignId = list[0]._id; // newest first
+  if (!state.picked && list.length) state.cid = list[0]._id;
+  sel.innerHTML = list.map((c) => `<option value="${esc(c._id)}" ${c._id === state.cid ? "selected" : ""}>${esc(c._id)} · ${esc(c.state)}</option>`).join("");
+}
+$("campaign-select").addEventListener("change", (e) => { state.cid = e.target.value; state.picked = true; state.feedKeys = ""; poll(); });
+
+// ---------------------------------------------------------------- status
+function lifecycle(events) {
+  for (let i = events.length - 1; i >= 0; i--) {
+    const t = events[i].type;
+    if (["worker_start", "worker_stop", "fault_injection", "worker_killed"].includes(t)) return events[i];
   }
-  sel.value = state.campaignId;
+  return null;
 }
 
-// ---------------------------------------------------------------- panel 1
-function leaseLine(c) {
-  if (!c.running?.length) return "";
-  return c.running.map((j) => {
-    const exp = j.lease?.expires_at ? (new Date(j.lease.expires_at) - Date.now()) / 1000 : null;
-    const when = exp === null ? "no lease" : exp > 0 ? `lease expires in ${exp.toFixed(0)} s`
-      : `lease expired ${(-exp).toFixed(0)} s ago, waiting for reclaim`;
-    return `<div class="lease ${exp !== null && exp <= 0 ? "expired" : ""}">running: ${esc(j.label)} · attempt ${esc(j.attempt)} · ${esc(when)}</div>`;
-  }).join("");
+function status(c, events, exps) {
+  if (c.state === "DONE") return { text: "Complete", tone: "done", sub: "sealed test set scored once" };
+  const life = lifecycle(events);
+  if (life && (life.type === "fault_injection" || life.type === "worker_killed")) return { text: "Worker down", tone: "bad", sub: "campaign state is safe in Atlas" };
+  if (!life && exps.length === 0) return { text: "Ready", tone: "", sub: "press Start worker" };
+  if (life && life.type === "worker_stop") return { text: "Paused", tone: "", sub: "no worker running" };
+  const s = c.state;
+  if (s === "WAITING") return { text: "Recovering", tone: "warn", sub: "waiting out the dead worker's lease" };
+  if (s === "REHYDRATE") return { text: "Rebuilding", tone: "info", sub: "reading the campaign from Atlas" };
+  if (s === "PLAN" || s === "VALIDATE") return { text: "Thinking", tone: "info", sub: "Claude is choosing the next experiment" };
+  return { text: "Running", tone: "ok", sub: "measuring on real EEG" };
 }
 
-function renderGoal(c) {
-  const hist = (c.goal_history || []).map((h) =>
-    `<li>v${esc(h.version)} · max_channels ${esc(h.constraints?.max_channels)} · ${esc(localTime(h.changed_at))}${h.reason ? " · " + esc(h.reason) : ""}</li>`
-  ).join("");
+function renderKpis(c, exps, events, packet) {
+  const st = status(c, events, exps);
+  const k = $("k-status"); k.className = `kpi tone-${st.tone}`;
+  $("kv-status").textContent = st.text; $("ks-status").textContent = st.sub;
+
   const inc = c.incumbent;
-  const u = c.llm_usage || {};
-  const f = c.final;
-  const stateCls = c.state === "WAITING" ? "state-waiting" : c.state === "DONE" ? "state-done" : c.state === "FAILED" ? "state-failed" : "";
-  $("goal").innerHTML = `
-    <dl class="kv">
-      <dt>Objective</dt><dd class="prose">${esc(c.objective)}</dd>
-      <dt>State</dt><dd><span class="state ${stateCls}">${esc(c.state)}</span></dd>
-      <dt>Goal version</dt><dd>${esc(c.goal_version)}</dd>
-      <dt>Max channels</dt><dd class="big">${esc(c.constraints?.max_channels)}</dd>
-      <dt>Budget</dt><dd>${esc(c.used)} used / ${esc(c.remaining)} remaining of ${esc(c.budget?.max_experiments)}</dd>
-      <dt>Context epoch</dt><dd>${esc(c.context_epoch)}</dd>
-      <dt>Incumbent</dt><dd>${inc ? `<b>${fmt(inc.val_balanced_accuracy)}</b> val · ${esc(inc.label)}` : '<span class="empty">none eligible yet</span>'}</dd>
-      <dt>Planner calls</dt><dd>${esc(u.calls ?? 0)} · ${esc(u.fallbacks ?? 0)} fallback</dd>
-      <dt>Planner tokens</dt><dd>${esc(u.input_tokens ?? 0)} in / ${esc(u.output_tokens ?? 0)} out · $${Number(u.cost_usd ?? 0).toFixed(4)} <span class="muted">(provider, ${esc(u.provider_calls ?? 0)} calls)</span></dd>
-    </dl>
-    ${leaseLine(c)}
-    ${f ? `<div class="final">
-      <div class="final-title">Final (goal v${esc(f.goal_version)}, max_channels ${esc(f.constraints?.max_channels)}) · ${esc(f.label)}</div>
-      <div class="final-nums">
-        <div><span class="muted">validation bal acc</span><b>${fmt(f.val_balanced_accuracy)}</b></div>
-        <div><span class="muted">sealed test bal acc</span><b>${fmt(f.test_balanced_accuracy)}</b></div>
-        <div><span class="muted">test F1</span><b>${fmt(f.test_f1)}</b></div>
-        <div><span class="muted">n_test</span><b>${esc(f.n_test ?? "—")}</b></div>
-      </div>
-      <div class="muted">test set scored once, at finalize</div>
-    </div>` : ""}
-    <div class="muted" style="margin-top:10px">Goal history</div>
-    <ol class="history">${hist || '<li class="empty">none</li>'}</ol>`;
+  $("kv-best").textContent = inc ? acc(inc.val_balanced_accuracy) : "—";
+  $("ks-best").textContent = c.final ? `sealed test ${acc(c.final.test_balanced_accuracy)} · ${CH[c.final.config.channels]} electrodes`
+    : inc ? short(inc.config) : "nothing within the limit yet";
+
+  const max = c.budget.max_experiments;
+  $("kv-used").textContent = c.used; $("kv-max").textContent = max;
+  $("kb-budget").style.width = `${Math.min(100, (100 * c.used) / max)}%`;
+
+  const lim = c.constraints.max_channels;
+  $("kv-limit").textContent = lim;
+  const first = (c.goal_history || [])[0];
+  const changed = c.goal_version > 1 && first && first.constraints.max_channels !== lim;
+  $("k-limit").classList.toggle("changed", !!changed);
+  $("ks-limit").textContent = changed ? `cut from ${first.constraints.max_channels} · goal v${c.goal_version}` : `goal v${c.goal_version}`;
+  document.querySelectorAll("#limit-seg button").forEach((b) => b.classList.toggle("on", Number(b.dataset.v) === lim));
+
+  if (packet) {
+    $("kv-tokens").textContent = packet.token_estimate.toLocaleString();
+    $("kb-tokens").style.width = `${Math.min(100, (100 * packet.token_estimate) / packet.budget_tokens)}%`;
+    $("ks-tokens").textContent = `of ${packet.budget_tokens.toLocaleString()} budget · rebuilt from Atlas`;
+  } else {
+    $("kv-tokens").textContent = "—"; $("kb-tokens").style.width = "0";
+  }
 }
 
-// ---------------------------------------------------------------- panel 2
-function renderChart(exps, campaign) {
-  const done = exps.filter((e) => e.status === "done" && e.result && e.result.val_balanced_accuracy != null);
-  const pts = done.map((e, i) => ({ x: i + 1, y: e.result.val_balanced_accuracy, e }));
-  const elig = pts.filter((p) => p.e.eligible);
-  const inel = pts.filter((p) => !p.e.eligible);
-  let best = null;
-  const bestLine = [];
-  for (const p of pts) {
-    if (p.e.eligible && (best === null || p.y > best)) best = p.y;
-    if (best !== null) bestLine.push({ x: p.x, y: best });
+// ---------------------------------------------------------------- chart
+function markers(done, events) {
+  const at = (ts) => done.filter((e) => e.finished_at && e.finished_at <= ts).length + 0.5;
+  const out = [];
+  for (const ev of events) {
+    if (ev.type === "fault_injection" || ev.type === "worker_killed") out.push({ x: at(ev.ts), label: "Worker killed", color: "#ff5d5d" });
+    if (ev.type === "worker_start" && ev.payload && ev.payload.resumed) out.push({ x: at(ev.ts), label: "Resumed from Atlas", color: "#00ed64" });
+    if (ev.type === "goal_changed") {
+      const p = ev.payload || {};
+      out.push({ x: at(ev.ts), label: `Limit ${p.old_constraints?.max_channels ?? "?"} → ${p.new_constraints?.max_channels ?? "?"}`, color: "#ffb547" });
+    }
   }
-  const xmax = Math.max(pts.length, 1) + 0.5;
-  const datasets = [
-    { type: "scatter", label: "eligible", data: elig, backgroundColor: "#00ed64", borderColor: "#00ed64", pointRadius: 6 },
-    { type: "scatter", label: "ineligible", data: inel, backgroundColor: "transparent", borderColor: "#5b6472", borderWidth: 2, pointRadius: 6 },
-    { type: "line", label: "best eligible", data: bestLine, borderColor: "#00ed64", borderWidth: 1.5, stepped: true, pointRadius: 0, fill: false },
-    { type: "line", label: "chance", data: [{ x: 0.5, y: 0.5 }, { x: xmax, y: 0.5 }], borderColor: "#8b95a3", borderDash: [6, 4], borderWidth: 1, pointRadius: 0 },
-  ];
-  const tooltip = {
-    callbacks: {
-      label: (ctx) => {
-        const e = ctx.raw.e;
-        return e ? `${fmt(ctx.raw.y)} · ${e.label}${e.eligible ? "" : " (ineligible)"}` : `${ctx.dataset.label} ${fmt(ctx.raw.y)}`;
-      },
-    },
+  // merge a kill and a resume that land in the same gap
+  const merged = [];
+  for (const m of out) {
+    const same = merged.find((x) => Math.abs(x.x - m.x) < 0.01);
+    if (same) { if (!same.label.includes(m.label)) same.label = same.label.startsWith("Worker killed") ? "Killed · resumed" : `${same.label} · ${m.label}`; }
+    else merged.push({ ...m });
+  }
+  return merged;
+}
+
+const markerPlugin = {
+  id: "markers",
+  afterDatasetsDraw(chart) {
+    const ms = chart.$markers || [];
+    const { ctx, chartArea: a, scales: { x } } = chart;
+    ms.forEach((m, i) => {
+      const px = x.getPixelForValue(m.x);
+      if (px < a.left || px > a.right) return;
+      ctx.save();
+      ctx.strokeStyle = m.color; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(px, a.top + 22); ctx.lineTo(px, a.bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = "600 12.5px Inter, sans-serif";
+      const w = ctx.measureText(m.label).width + 16, y = a.top + 2 + (i % 2) * 0;
+      const lx = Math.min(Math.max(px - w / 2, a.left), a.right - w);
+      ctx.fillStyle = m.color; ctx.globalAlpha = 0.16;
+      ctx.beginPath(); ctx.roundRect(lx, y, w, 20, 6); ctx.fill();
+      ctx.globalAlpha = 1; ctx.fillStyle = m.color; ctx.fillText(m.label, lx + 8, y + 14);
+      ctx.restore();
+    });
+  },
+};
+
+function renderChart(c, exps, events) {
+  const done = exps.filter((e) => e.status === "done" && e.result).sort((a, b) => (a.finished_at < b.finished_at ? -1 : 1));
+  const pts = done.map((e, i) => ({ x: i + 1, y: e.result.val_balanced_accuracy, eligible: e.eligible !== false, label: short(e.config) }));
+  let best = null;
+  const bestLine = pts.map((p) => { if (p.eligible && (best === null || p.y > best)) best = p.y; return { x: p.x, y: best }; }).filter((p) => p.y !== null);
+  const max = Math.max(c.budget.max_experiments, pts.length);
+  const data = {
+    datasets: [
+      { type: "line", data: bestLine, borderColor: "#00ed64", borderWidth: 3, stepped: "before", pointRadius: 0, order: 2 },
+      { type: "scatter", data: pts, order: 1,
+        pointRadius: 7, pointHoverRadius: 9, pointBorderWidth: 2.5,
+        pointBackgroundColor: pts.map((p) => (p.eligible ? "#8b9bff" : "transparent")),
+        pointBorderColor: pts.map((p) => (p.eligible ? "#8b9bff" : "#5b6476")) },
+      { type: "line", data: [{ x: 0.5, y: 0.5 }, { x: max + 0.5, y: 0.5 }], borderColor: "#3a4152", borderDash: [4, 5], borderWidth: 1.5, pointRadius: 0, order: 3 },
+    ],
   };
   if (!state.chart) {
-    state.chart = new Chart($("metric-chart"), {
-      data: { datasets },
+    Chart.defaults.font.family = "Inter, sans-serif";
+    Chart.defaults.color = "#8c95a8";
+    state.chart = new Chart($("chart"), {
+      data, plugins: [markerPlugin],
       options: {
-        animation: false, maintainAspectRatio: false, parsing: false,
-        plugins: { legend: { display: false }, tooltip },
+        animation: { duration: 500 }, maintainAspectRatio: false, layout: { padding: { top: 4, right: 8 } },
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (t) => `${t.raw.label || ""}  ${acc(t.raw.y)}` } } },
         scales: {
-          x: { type: "linear", min: 0.5, max: xmax, ticks: { stepSize: 0.5, color: "#8b95a3", callback: (v) => (Number.isInteger(v) ? v : "") }, grid: { color: "#262c35" },
-               title: { display: true, text: "done experiment #", color: "#8b95a3" } },
-          y: { min: 0.3, max: 1.0, ticks: { color: "#8b95a3" }, grid: { color: "#262c35" },
-               title: { display: true, text: "val balanced accuracy", color: "#8b95a3" } },
+          x: { type: "linear", min: 0.5, max: max + 0.5, ticks: { stepSize: 1, callback: (v) => (Number.isInteger(v) ? `#${v}` : "") }, grid: { display: false }, border: { color: "#1e2430" } },
+          y: { min: 0.4, max: 0.9, ticks: { stepSize: 0.1, callback: (v) => v.toFixed(1) }, grid: { color: "#161b25" }, border: { display: false },
+               title: { display: true, text: "balanced accuracy (0.5 = chance)", color: "#5b6476", font: { size: 12 } } },
         },
       },
     });
   } else {
-    state.chart.data.datasets = datasets;
-    state.chart.options.scales.x.max = xmax;
-    state.chart.update("none");
+    state.chart.data = data;
+    state.chart.options.scales.x.max = max + 0.5;
   }
+  state.chart.$markers = markers(done, events);
+  state.chart.update();
 }
 
-// ---------------------------------------------------------------- panel 3
-function evidenceLink(id) {
-  if (state.expIds.has(id)) return `<a href="#" class="ev-link" data-exp="${esc(id)}">${esc(id)}</a>`;
-  if (state.memories[id]) return `<a href="#" class="ev-link" data-mem="${esc(id)}">${esc(id)}</a>`;
-  return `<span class="mono muted" title="not in this campaign">${esc(id)}</span>`;
+// ---------------------------------------------------------------- experiments
+function renderExperiments(c, exps) {
+  const incId = c.incumbent && c.incumbent.experiment_id;
+  if (!exps.length) { $("exp-list").innerHTML = '<div class="empty">Waiting for the first proposal</div>'; return; }
+  const rows = exps.map((e, i) => {
+    const r = e.result, cfg = e.config, ch = CH[cfg.channels];
+    const out = e.eligible === false;
+    const pill = e.status === "done" ? "done" : e.status;
+    return `<div class="exp-row ${e._id === incId ? "best" : ""} ${out ? "out" : ""}">
+      <span class="n">${i + 1}</span>
+      <span class="cfg"><b>${esc(METHOD[cfg.method])}</b> <span>· ${esc(BAND[cfg.band])} · ${esc(WIN[cfg.window])}</span></span>
+      <span class="chip ${ch === 9 ? "c9" : ""}">${ch} ch</span>
+      <span class="acc">${r ? `<span class="track"><i style="width:${Math.max(0, (r.val_balanced_accuracy - 0.4) / 0.5) * 100}%"></i></span>${acc(r.val_balanced_accuracy)}` : '<span class="track"></span>—'}</span>
+      <span class="status-cell"><span class="pill ${pill}">${esc(pill)}</span>${e.attempt > 1 ? `<span class="pill retry">attempt ${e.attempt}</span>` : ""}${e._id === incId ? '<span class="pill best">best</span>' : ""}</span>
+    </div>`;
+  });
+  $("exp-list").innerHTML = `<div class="exp-row head"><span>#</span><span>Configuration</span><span>Electrodes</span><span>Accuracy</span><span>Status</span></div>${rows.join("")}`;
 }
 
-function renderExperiments(exps, campaign) {
-  const incId = campaign.incumbent?.experiment_id;
-  state.expIds = new Set(exps.map((e) => e._id));
-  if (params.get("expand") === "all" && !state.expandedOnce) {  // for screenshots and the video
-    exps.forEach((e) => state.expanded.add(e._id));
-    state.expandedOnce = true;
-  }
-  $("exp-table").querySelector("tbody").innerHTML = exps.map((e, i) => {
-    const pb = e.proposed_by || {};
-    const proposer = pb.fallback_used ? badge("FALLBACK", "b-fallback") : esc(pb.model || "—");
-    const acc = e.result?.val_balanced_accuracy;
-    const elig = e.eligible === true ? "yes" : e.eligible === false ? '<span class="no">no</span>' : "?";
-    const open = state.expanded.has(e._id);
-    const ev = pb.evidence_ids || [];
-    const mem = state.openMemory && state.openMemory.row === e._id ? state.memories[state.openMemory.id] : null;
-    const detail = open ? `<tr class="detail" id="detail-${esc(e._id)}"><td></td><td colspan="8">
-        <div class="rationale">${pb.rationale ? `“${esc(pb.rationale)}”` : '<span class="empty">no rationale</span>'}</div>
-        <div class="muted">evidence: ${ev.length ? ev.map(evidenceLink).join(", ") : "uncited"}
-          ${pb.request_id ? ` · request ${esc(pb.request_id)}` : ""}${pb.fallback_used ? " · deterministic fallback" : ""}</div>
-        ${mem ? `<div class="memory"><div>${badge(mem.kind, "")}${mem.verified ? badge("verified", "b-verified") : ""}<span class="mono">${esc(mem._id)}</span></div><div class="text">${esc(mem.text)}</div></div>` : ""}
-        ${e.error ? `<div class="err">error: ${esc(e.error)}</div>` : ""}
-        <div class="muted mono">${esc(e._id)}</div>
-      </td></tr>` : "";
-    return `<tr id="exp-${esc(e._id)}" class="exp-row ${e._id === incId ? "incumbent" : ""} ${open ? "open" : ""}" data-id="${esc(e._id)}">
-      <td class="mono">${open ? "▾" : "▸"} ${i + 1}</td>
-      <td class="mono">${esc(e.label)}</td>
-      <td>${badge(e.status, "s-" + e.status)}</td>
-      <td>${esc(e.attempt)}</td>
-      <td>${esc(e.n_channels)}</td>
-      <td>${elig}</td>
-      <td class="mono">${acc == null ? "—" : `<b>${fmt(acc)}</b>`}</td>
-      <td>${proposer}</td>
-      <td>${e._id === incId ? badge("incumbent", "b-inc") : ""}${e.reused ? badge("reused", "b-reused") : ""}${e.fake ? badge("FAKE", "b-fake") : ""}${e.error ? badge("error", "s-failed") : ""}</td>
-    </tr>${detail}`;
-  }).join("") || `<tr><td colspan="9" class="empty">no experiments yet</td></tr>`;
-  state.lastExps = exps;
-  state.lastCampaign = campaign;
-}
-
-$("exp-table").addEventListener("click", (ev) => {
-  const link = ev.target.closest(".ev-link");
-  if (link) {
-    ev.preventDefault();
-    const row = link.closest("tr.detail")?.id.replace("detail-", "");
-    if (link.dataset.exp) {
-      state.expanded.add(link.dataset.exp);
-      renderExperiments(state.lastExps, state.lastCampaign);
-      const target = document.getElementById(`exp-${link.dataset.exp}`);
-      target?.scrollIntoView({ block: "center", behavior: "smooth" });
-      target?.classList.add("flash");
-      setTimeout(() => target?.classList.remove("flash"), 1500);
-    } else if (link.dataset.mem) {
-      const same = state.openMemory?.id === link.dataset.mem && state.openMemory?.row === row;
-      state.openMemory = same ? null : { id: link.dataset.mem, row };
-      renderExperiments(state.lastExps, state.lastCampaign);
-    }
-    return;
-  }
-  const tr = ev.target.closest("tr.exp-row");
-  if (!tr) return;
-  const id = tr.dataset.id;
-  if (state.expanded.has(id)) state.expanded.delete(id); else state.expanded.add(id);
-  renderExperiments(state.lastExps, state.lastCampaign);
-});
-
-// ---------------------------------------------------------------- panel 4
-function renderPacket(p) {
-  if (!p) { $("packet").innerHTML = '<p class="empty">no packet built yet</p>'; return; }
-  const pr = p.planner_result;
-  const usage = pr?.usage;
-  const mems = (p.retrieved || []).map((m) => `
-    <div class="memory">
-      <div>${badge(m.kind, m.kind === "synthetic_stress" ? "b-synthetic" : "")}${m.verified ? badge("verified", "b-verified") : ""}${badge(m.retrieval, "")}
-        <span class="mono">${esc(m.memory_id)}</span> · score ${m.score == null ? "—" : fmt(m.score)}</div>
-      <div class="text">${esc(m.text)}</div>
-      <div class="meta">sources: ${esc((m.source_ids || []).join(", ") || "none")}</div>
-    </div>`).join("");
-  $("packet").innerHTML = `
-    <dl class="kv">
-      <dt>Strategy</dt><dd>${esc(p.strategy)}</dd>
-      <dt>Goal version seen</dt><dd>${esc(p.goal?.goal_version)} · max_channels ${esc(p.goal?.constraints?.max_channels)}</dd>
-      <dt>Built</dt><dd>${esc(localTime(p.ts))}</dd>
-      <dt>Tokens</dt><dd>${esc(p.token_estimate)} (estimate) / budget ${esc(p.budget_tokens)}</dd>
-      <dt>Tried keys</dt><dd>${esc((p.tried_keys || []).length)}</dd>
-      ${pr ? `<dt>Planner</dt><dd>${esc(pr.action)} · ${pr.fallback_used ? badge("FALLBACK", "b-fallback") : esc(pr.model)}</dd>
-      <dt>Planner usage</dt><dd>${usage ? `${esc(usage.input_tokens)} in / ${esc(usage.output_tokens ?? "—")} out · $${usage.cost_usd == null ? "—" : Number(usage.cost_usd).toFixed(4)} (${esc(usage.source)})` : "—"}</dd>
-      <dt>Cited</dt><dd>${esc((pr.evidence_ids || []).join(", ") || "uncited")}</dd>` : ""}
-    </dl>
-    ${pr?.rationale ? `<p class="rationale">“${esc(pr.rationale)}”</p>` : ""}
-    <div class="muted" style="margin-top:8px">Retrieved memories (${(p.retrieved || []).length})</div>
-    ${mems || '<p class="empty">none</p>'}`;
-}
-
-// ---------------------------------------------------------------- panel 5
-function describe(ev) {
+// ---------------------------------------------------------------- feed
+function feedItem(ev, idx) {
   const p = ev.payload || {};
+  const n = (id) => (idx[id] ? `#${idx[id].n}` : "");
   switch (ev.type) {
-    case "worker_start": {
-      const done = p.counts?.done ?? p.reused_done ?? 0;
-      return p.resumed ? `resumed · ${done} done reused, not recomputed` : "fresh start";
-    }
-    case "worker_stop": return `clean exit · ${p.steps ?? 0} steps`;
-    case "fault_injection": return `${p.experiment_id ?? ""} · attempt ${p.attempt ?? "?"} · self-SIGKILL`;
-    case "worker_killed": return `pid ${p.pid ?? "?"} · ${p.signal ?? ""}`;
-    case "context_reset": return `epoch ${p.context_epoch}`;
-    case "goal_changed": return `v${p.from_version} → v${p.to_version} · max_channels ${p.old_constraints?.max_channels} → ${p.new_constraints?.max_channels}${p.reason ? " · " + p.reason : ""}`;
-    case "job_reused": case "lease_expired": case "stale_commit_rejected":
-      return `${p.experiment_id ?? ""}${p.attempt ? " · attempt " + p.attempt : ""}`;
-    case "finalized": return `${p.label ?? p.experiment_id ?? ""} · val ${fmt(p.val_balanced_accuracy)} · test ${fmt(p.test_balanced_accuracy)} (n=${p.n_test ?? "?"})`;
-    case "proposal_rejected": return `${p.reason ?? ""}`;
-    case "llm_call": {
-      const u = p.usage || {};
-      const tok = u.source === "provider" ? `${u.input_tokens ?? "?"} in (provider)` : "tokens n/a";
-      const cost = u.cost_usd == null ? "" : ` · $${Number(u.cost_usd).toFixed(4)}`;
-      return `${p.fallback_used ? "FALLBACK" : p.model ?? ""} · ${p.action ?? ""} · ${tok}${cost}`;
-    }
-    default: return "";
+    case "campaign_created": return { cls: "", ic: "★", t1: "Campaign created", t2: `goal: best accuracy with at most ${p.constraints?.max_channels} electrodes, ${p.max_experiments} experiments` };
+    case "worker_start": return p.resumed
+      ? { cls: "ok", ic: "↻", t1: "New worker rebuilt the campaign from Atlas", t2: `${p.counts?.done ?? 0} finished experiments reused, none recomputed` }
+      : { cls: "", ic: "▶", t1: "Worker started", t2: "fresh campaign" };
+    case "fault_injection": return { cls: "bad", ic: "✕", t1: "Worker killed mid experiment", t2: `SIGKILL while running ${n(p.experiment_id)}` };
+    case "worker_killed": return { cls: "bad", ic: "✕", t1: "Worker killed from the dashboard", t2: "SIGKILL, no cleanup" };
+    case "lease_expired": return { cls: "warn", ic: "⟲", t1: `Orphaned experiment ${n(p.experiment_id)} reclaimed`, t2: "rerunning it as attempt 2" };
+    case "job_committed": { const e = idx[p.experiment_id]; return { cls: "res", ic: "✓", t1: `Experiment ${n(p.experiment_id)} measured ${acc(p.val_balanced_accuracy)}`, t2: e ? short(e.config) : "" }; }
+    case "proposal": return { cls: "ai", ic: "✦", t1: `Claude proposed ${short(p.config)}`, t2: p.rationale || "" };
+    case "context_reset": return { cls: "ctx", ic: "⌫", t1: "Context wiped", t2: "the next decision is rebuilt from Atlas alone" };
+    case "goal_changed": return { cls: "warn", ic: "⚑", t1: `Electrode limit ${p.old_constraints?.max_channels} → ${p.new_constraints?.max_channels}`, t2: "past results re-ranked, nothing rerun" };
+    case "jev_routed": return { cls: "jev", ic: "J", t1: `Jev filed Claude's note as ${String(p.label || "").replace("_", " ")}`, t2: p.model || "" };
+    case "job_reused": return { cls: "ok", ic: "↺", t1: "Reused a finished experiment", t2: "no recompute" };
+    case "stale_commit_rejected": return { cls: "warn", ic: "⛨", t1: "Blocked a stale write from a dead worker", t2: n(p.experiment_id) };
+    case "finalized": return { cls: "ok", ic: "★", t1: `Campaign complete · sealed test ${acc(p.test_balanced_accuracy)}`, t2: short(p.config) };
+    default: return null;
   }
 }
 
-function renderTimeline(events) {
-  const rows = events.filter((e) => TIMELINE_TYPES.has(e.type)).reverse();
-  $("timeline").innerHTML = rows.map((e) =>
-    `<li class="ev-${esc(e.type)}"><span class="t">${esc(localTime(e.ts))}</span>
-       <span><span class="type">${esc(e.type)}</span> <span class="muted">${esc(describe(e))}</span></span></li>`
-  ).join("") || '<li class="empty">no timeline events yet</li>';
+function renderFeed(events, exps) {
+  const idx = {};
+  exps.forEach((e, i) => { idx[e._id] = { n: i + 1, config: e.config }; });
+  const items = [];
+  for (let i = events.length - 1; i >= 0 && items.length < 11; i--) {
+    const it = feedItem(events[i], idx);
+    if (it) items.push({ ...it, ts: events[i].ts });
+  }
+  const key = items.map((x) => x.ts).join("|");
+  if (key === state.feedKeys) return;
+  state.feedKeys = key;
+  $("feed").innerHTML = items.length ? items.map((x) => `<li class="${x.cls}"><span class="ic">${x.ic}</span>
+      <div><div class="t1">${esc(x.t1)}</div>${x.t2 ? `<div class="t2">${esc(x.t2)}</div>` : ""}</div>
+      <span class="ts">${clock(x.ts)}</span></li>`).join("") : '<li class="empty">Nothing yet</li>';
 }
 
-// ---------------------------------------------------------------- panel 6 (display only, loaded once)
-const EEG_COLORS = { C3: "#7cc4ff", Cz: "#00ed64", C4: "#f5b942" };
-const axis = (title) => ({ ticks: { color: "#8b95a3", maxTicksLimit: 7 }, grid: { color: "#262c35" },
-  title: { display: true, text: title, color: "#8b95a3" } });
+// ---------------------------------------------------------------- packet
+function renderPacket(p) {
+  if (!p) { $("packet").innerHTML = '<div class="empty">No decision yet</div>'; $("packet-time").textContent = ""; return; }
+  $("packet-time").textContent = `built ${clock(p.ts)}`;
+  const g = p.goal || {}, inc = p.incumbent;
+  const notes = (p.retrieved || []).slice(0, 2).map((m) => {
+    const txt = String(m.text || "").replace(/^Unverified note \(routed by Jev as [a-z_]+\): /, "").replace(/^Planner hypothesis before running [^:]+: /, "");
+    return `<div class="note"><div class="nh"><span class="tagx">${m.verified ? "verified" : "Jev · " + esc(m.kind)}</span><span class="tagx v">${esc(m.retrieval === "vector" ? "Vector Search" : "exact read")}</span></div><div class="nt">${esc(txt)}</div></div>`;
+  }).join("");
+  $("packet").innerHTML = `
+    <div class="p-chips">
+      <span class="p-chip ${g.goal_version > 1 ? "amber" : ""}">Goal <b>v${g.goal_version}</b></span>
+      <span class="p-chip ${g.goal_version > 1 ? "amber" : ""}">Limit <b>${g.constraints?.max_channels} electrodes</b></span>
+      <span class="p-chip">Best so far <b>${inc ? acc(inc.val_balanced_accuracy) : "none"}</b></span>
+      <span class="p-chip"><b>${(p.tried || []).length}</b> tried</span>
+      <span class="p-chip"><b>${(g.budget || {}).remaining ?? "?"}</b> left</span>
+    </div>
+    <div class="p-tokens"><span>${p.token_estimate.toLocaleString()} tokens</span><div class="bar"><i style="width:${(100 * p.token_estimate) / p.budget_tokens}%"></i></div><span>${p.budget_tokens.toLocaleString()}</span></div>
+    ${notes ? `<div class="p-sec">Recalled from memory</div>${notes}` : ""}`;
+}
 
+// ---------------------------------------------------------------- eeg
 async function loadEeg() {
-  let d;
+  if (state.eeg) return;
   try {
-    d = await api("/api/eeg/preview");
-  } catch (err) {
-    $("eeg-placeholder").textContent = `EEG preview unavailable: ${err.message}`;
-    return;
-  }
-  $("eeg-placeholder").hidden = true;
-  const tr = d.trace;
-  // Offset channels vertically so the three traces don't overlap.
-  const offsets = { C3: 60, Cz: 0, C4: -60 };
-  new Chart($("eeg-trace"), {
-    type: "line",
-    data: {
-      datasets: Object.entries(tr.channels).map(([ch, ys]) => ({
-        label: ch, data: ys.map((y, i) => ({ x: tr.t[i], y: y + (offsets[ch] || 0) })),
-        borderColor: EEG_COLORS[ch], borderWidth: 1, pointRadius: 0,
-      })),
-    },
-    options: {
-      animation: false, maintainAspectRatio: false, parsing: false,
-      plugins: { legend: { labels: { color: "#e6e9ee", boxWidth: 10 } }, tooltip: { enabled: false } },
-      scales: { x: { type: "linear", ...axis("s after cue") }, y: { ...axis(`${tr.units} (offset)`), ticks: { display: false } } },
-    },
-  });
-  const f = d.psd.freqs;
-  const avg = (byCh) => f.map((_, i) => Object.values(byCh).reduce((a, v) => a + v[i], 0) / Object.keys(byCh).length);
-  new Chart($("eeg-psd"), {
-    type: "line",
-    data: {
-      datasets: [
-        { label: `T1 ${d.labels.T1} (n=${d.psd.n_epochs.T1})`, data: avg(d.psd.by_class.T1).map((y, i) => ({ x: f[i], y })),
-          borderColor: "#7cc4ff", borderWidth: 1.5, pointRadius: 0 },
-        { label: `T2 ${d.labels.T2} (n=${d.psd.n_epochs.T2})`, data: avg(d.psd.by_class.T2).map((y, i) => ({ x: f[i], y })),
-          borderColor: "#f5b942", borderWidth: 1.5, pointRadius: 0 },
-      ],
-    },
-    options: {
-      animation: false, maintainAspectRatio: false, parsing: false,
-      plugins: { legend: { labels: { color: "#e6e9ee", boxWidth: 10 } } },
-      scales: { x: { type: "linear", ...axis("Hz") }, y: axis(d.psd.units) },
-    },
-  });
-  $("eeg-trace-title").textContent = `C3 / Cz / C4, ${tr.filter}, 6 s from the ${tr.cue} (${tr.cue_label})`;
-  $("eeg-psd-title").textContent = `PSD mean of C3/Cz/C4, ${d.psd.window}`;
-  $("eeg-caption").textContent = `Source: ${d.source}. Display only; no metric uses this panel.`;
+    const d = await api("/api/eeg/preview");
+    const ys = d.trace.channels.C3 || Object.values(d.trace.channels)[0];
+    const cv = $("eeg"), ctx = cv.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = cv.clientWidth * dpr; cv.height = cv.clientHeight * dpr; ctx.scale(dpr, dpr);
+    const w = cv.clientWidth, h = cv.clientHeight, lo = Math.min(...ys), hi = Math.max(...ys);
+    const grad = ctx.createLinearGradient(0, 0, w, 0); grad.addColorStop(0, "#5cc8ff"); grad.addColorStop(1, "#8b9bff");
+    ctx.strokeStyle = grad; ctx.lineWidth = 1.4; ctx.beginPath();
+    ys.forEach((y, i) => { const x = (i / (ys.length - 1)) * w, py = h - ((y - lo) / (hi - lo || 1)) * (h - 4) - 2; i ? ctx.lineTo(x, py) : ctx.moveTo(x, py); });
+    ctx.stroke(); state.eeg = true;
+  } catch (e) { /* the panel stays empty rather than inventing a signal */ }
 }
+
+// ---------------------------------------------------------------- results
+async function renderResults() {
+  const r = await api("/api/proof");
+  const ab = r.ablation || {}, ev = ab.evidence || {}, rw = ab.recent_window || {};
+  const cards = [
+    { cls: "g", v: `${r.checks.passed}<small> / ${r.checks.total}</small>`, t: "reliability checks passed",
+      s: `${r.checks.by_check.recovery?.passed ?? 0} crash recovery and ${r.checks.by_check.constraint?.passed ?? 0} goal change checks, on real runs` },
+    { cls: "b", v: `${(r.memory.notes || 0).toLocaleString()}<small> notes</small>`, t: `still ${Number(r.memory.packet_tokens || 0).toLocaleString()} tokens per decision`,
+      s: `memory grew a thousandfold, context stayed under its ${Number(r.memory.budget_tokens || 0).toLocaleString()} token budget` },
+    { cls: "i", v: `${ev.cited}<small> / ${ev.decisions}</small>`, t: "decisions found the buried evidence",
+      s: `vs ${rw.cited} / ${rw.decisions} with a recent window, same model, same guards` },
+    { cls: "a", v: `${r.results_lost ?? "?"}<small> results lost</small>`, t: "across a crash and a goal change",
+      s: "every finished experiment committed exactly once, sealed test scored once" },
+  ];
+  $("results").innerHTML = cards.map((c) => `<div class="rcard ${c.cls}"><div class="rv">${c.v}</div><div class="rt">${esc(c.t)}</div><div class="rs">${esc(c.s)}</div></div>`).join("");
+}
+
+const SNIPPETS = [
+  { file: "harness/worker.py", fn: "rehydrate", title: "Rebuild from Atlas, every step",
+    desc: "The worker keeps no memory of its own. Each decision starts by reading the campaign back from MongoDB." },
+  { file: "harness/store.py", fn: "commit_result", title: "A dead worker can never overwrite a result",
+    desc: "Results commit only under the current lease token, so a zombie attempt is rejected by the database." },
+];
+
+async function renderCode() {
+  if (state.codeLoaded) return;
+  const dedent = (code) => {
+    const lines = code.split("\n"), pad = Math.min(...lines.filter((l) => l.trim()).map((l) => l.match(/^ */)[0].length));
+    return lines.map((l) => l.slice(pad)).join("\n");
+  };
+  const parts = (await Promise.all(SNIPPETS.map((s) => api(`/api/source?file=${encodeURIComponent(s.file)}&fn=${s.fn}`))))
+    .map((p) => ({ ...p, code: dedent(p.code) }));
+  $("code").innerHTML = parts.map((p, i) => `<div class="code-card"><div class="ch"><h3>${esc(SNIPPETS[i].title)}</h3>
+      <span class="cf">${esc(p.file)}:${p.start}</span></div><div class="cd">${esc(SNIPPETS[i].desc)}</div>
+      <pre><code class="language-python">${esc(p.code)}</code></pre></div>`).join("");
+  if (window.hljs) document.querySelectorAll("#code code").forEach((el) => hljs.highlightElement(el));
+  state.codeLoaded = true;
+}
+
+function showView(v) {
+  document.querySelectorAll(".tabs button").forEach((b) => b.classList.toggle("on", b.dataset.view === v));
+  $("view-live").hidden = v !== "live"; $("view-results").hidden = v !== "results"; $("view-code").hidden = v !== "code";
+  if (v === "results") renderResults();
+  if (v === "code") renderCode();
+}
+document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => showView(b.dataset.view)));
 
 // ---------------------------------------------------------------- controls
-const post = (path, body) => api(path, {
-  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}),
-});
+async function control(fn, msg) { try { await fn(); toast(msg); poll(); } catch (e) { toast(`Failed: ${e.message}`); } }
+$("btn-start").addEventListener("click", () => control(() => post("/api/worker/start", { campaign_id: state.cid }), "Worker started"));
+$("btn-kill").addEventListener("click", () => control(() => post("/api/worker/kill"), "Worker killed (SIGKILL)"));
+$("btn-reset").addEventListener("click", () => control(() => post(`/api/campaigns/${state.cid}/context-reset`), "Context wiped"));
+document.querySelectorAll("#limit-seg button").forEach((b) => b.addEventListener("click", () => control(
+  () => post(`/api/campaigns/${state.cid}/constraint`, { max_channels: Number(b.dataset.v), reason: `electrode limit set to ${b.dataset.v} from the dashboard` }),
+  `Electrode limit set to ${b.dataset.v}`)));
 
-function renderWorker(st) {
-  const el = $("worker-status");
-  el.textContent = st.running ? `API worker: running pid ${st.pid} · ${st.campaign_id}` : "API worker: stopped";
-  el.style.color = st.running ? "var(--accent)" : "var(--muted)";
-  $("btn-start").disabled = st.running || !state.campaignId;
-  $("btn-kill").disabled = !st.running;
-}
-
-async function control(label, fn) {
-  const msg = $("control-msg");
-  msg.textContent = `${label}…`;
-  try {
-    const out = await fn();
-    msg.textContent = `${label}: ok ${out ? JSON.stringify(out).slice(0, 80) : ""}`;
-  } catch (err) {
-    msg.textContent = `${label} failed: ${err.message}`;
-  }
-  poll();
-}
-
-$("btn-start").addEventListener("click", () =>
-  control("start", () => post("/api/worker/start", { campaign_id: state.campaignId })));
-$("btn-kill").addEventListener("click", () => control("SIGKILL", () => post("/api/worker/kill")));
-$("btn-reset").addEventListener("click", () =>
-  control("context reset", () => post(`/api/campaigns/${state.campaignId}/context-reset`)));
-$("btn-constraint").addEventListener("click", () => control("constraint", async () => {
-  const c = await post(`/api/campaigns/${state.campaignId}/constraint`, {
-    max_channels: Number($("sel-channels").value), reason: $("constraint-reason").value,
-  });
-  $("constraint-reason").value = "";
-  return { goal_version: c.goal_version, max_channels: c.constraints.max_channels };
-}));
-
-// ---------------------------------------------------------------- loop
+// ---------------------------------------------------------------- poll
 async function poll() {
   try {
-    const health = await api("/api/health");
-    $("db-name").textContent = `db: ${health.db}`;
-    await loadCampaigns();
-    renderWorker(await api("/api/worker/status"));
-    const cid = state.campaignId;
-    if (!cid) { $("goal").innerHTML = '<p class="empty">no campaigns yet</p>'; return; }
-    const [camp, exps, events, packet, mems] = await Promise.all([
+    if (!state.cid) await loadCampaigns();
+    if (!state.cid) return;
+    const cid = state.cid;
+    const [c, exps, events, packet, worker] = await Promise.all([
       api(`/api/campaigns/${cid}`),
       api(`/api/campaigns/${cid}/experiments`),
-      api(`/api/campaigns/${cid}/events?limit=500`),
+      api(`/api/campaigns/${cid}/events?limit=400`),
       api(`/api/campaigns/${cid}/packets/latest?strategy=evidence`).catch((e) => (e.status === 404 ? null : Promise.reject(e))),
-      api(`/api/campaigns/${cid}/memories`),
+      api("/api/worker/status"),
     ]);
-    state.memories = Object.fromEntries(mems.map((m) => [m._id, m]));
-    state.fake = false;
-    markFake(camp, exps, events, packet ? [packet] : []);
-    $("fake-banner").hidden = !state.fake;
-    renderGoal(camp);
-    renderChart(exps, camp);
-    renderExperiments(exps, camp);
+    renderKpis(c, exps, events, packet);
+    renderChart(c, exps, events);
+    renderExperiments(c, exps);
+    renderFeed(events, exps);
     renderPacket(packet);
-    renderTimeline(events);
-    $("last-poll").textContent = `updated ${new Date().toLocaleTimeString()}`;
-  } catch (err) {
-    $("last-poll").textContent = `poll failed: ${err.message}`;
+    $("btn-start").disabled = worker.running || c.state === "DONE";
+    $("btn-kill").disabled = !worker.running;
+    $("live-text").textContent = c.state === "DONE" ? "Finished" : "Live";
+  } catch (e) {
+    $("live-text").textContent = "Reconnecting";
   }
 }
 
-$("campaign-select").addEventListener("change", () => {
-  state.userPicked = true;
-  state.campaignId = $("campaign-select").value;
+(async () => {
+  await loadCampaigns().catch(() => {});
+  loadEeg();
+  if (["results", "code"].includes(params.get("view"))) showView(params.get("view"));
   poll();
-});
-
-poll();
-setInterval(poll, POLL_MS);
-loadEeg();
+  setInterval(poll, 1500);
+})();

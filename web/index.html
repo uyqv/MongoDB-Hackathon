@@ -1,82 +1,130 @@
 <!doctype html>
-<!-- Dashboard. OWNER: David. Served by api/main.py at "/". See docs/CONTRACTS.md. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Second Shift</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300ED64'/%3E%3Cpath d='M9 20c3 0 4-8 7-8s4 8 7 8' stroke='%23061a10' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
-  <div id="fake-banner" class="fake-banner" hidden>FAKE DATA: seeded UI fixtures, not results</div>
-  <header>
+  <header class="top">
     <div class="brand">
-      <h1>Second Shift</h1>
-      <span class="sub">long-horizon EEG research agent · state lives in MongoDB Atlas</span>
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#00ED64"/><path d="M8 20c3 0 4.5-8 8-8s5 8 8 8" stroke="#052e1a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div class="name">Second Shift</div>
+        <div class="tag">Agents that never lose the plot · memory in MongoDB Atlas</div>
+      </div>
     </div>
-    <div class="header-controls">
-      <label>Campaign <select id="campaign-select"></select></label>
-      <span id="db-name" class="pill"></span>
-      <span id="last-poll" class="muted"></span>
+
+    <nav class="tabs" role="tablist">
+      <button data-view="live" class="on">Live</button>
+      <button data-view="results">Results</button>
+      <button data-view="code">Code</button>
+    </nav>
+
+    <div class="actions">
+      <button id="btn-start" class="btn go"><span class="ico">&#9654;</span>Start worker</button>
+      <button id="btn-kill" class="btn stop"><span class="ico">&#10005;</span>Kill worker</button>
+      <button id="btn-reset" class="btn"><span class="ico">&#8634;</span>Reset context</button>
+      <div class="seg" id="limit-seg" title="Electrode limit">
+        <span class="seg-label">Electrodes</span>
+        <button data-v="64">64</button><button data-v="21">21</button><button data-v="9">9</button>
+      </div>
+      <select id="campaign-select" aria-label="Campaign"></select>
+      <div class="live"><span class="pulse"></span><span id="live-text">Live</span></div>
     </div>
   </header>
 
-  <div id="controls" class="controls">
-    <span id="worker-status" class="pill">worker: ?</span>
-    <button id="btn-start">Start worker</button>
-    <button id="btn-kill" class="danger">Kill worker (SIGKILL)</button>
-    <button id="btn-reset">Reset context</button>
-    <span class="sep"></span>
-    <label>Channel budget
-      <select id="sel-channels"><option>9</option><option>21</option><option>64</option></select>
-    </label>
-    <input id="constraint-reason" placeholder="reason (shown in goal history)">
-    <button id="btn-constraint">Apply</button>
-    <span id="control-msg" class="muted"></span>
-  </div>
+  <div id="toast" class="toast" hidden></div>
 
-  <main class="grid">
-    <section class="panel" id="panel-goal">
-      <h2>1 · Goal</h2>
-      <div id="goal"></div>
-    </section>
-
-    <section class="panel wide" id="panel-metric">
-      <h2>2 · Metric trajectory <span class="muted">val balanced accuracy, done experiments</span></h2>
-      <div class="chart-box"><canvas id="metric-chart"></canvas></div>
-      <div class="legend muted">solid = eligible under current goal · hollow grey = ineligible · line = best eligible so far · dashed = chance 0.5</div>
-    </section>
-
-    <section class="panel full" id="panel-experiments">
-      <h2>3 · Experiments</h2>
-      <div class="table-wrap"><table id="exp-table">
-        <thead><tr><th>#</th><th>Config</th><th>Status</th><th>Attempt</th><th>Ch</th><th>Eligible</th><th>Val bal acc</th><th>Proposer</th><th></th></tr></thead>
-        <tbody></tbody>
-      </table></div>
-    </section>
-
-    <section class="panel" id="panel-packet">
-      <h2>4 · Latest context packet</h2>
-      <div id="packet"></div>
-    </section>
-
-    <section class="panel" id="panel-timeline">
-      <h2>5 · Timeline</h2>
-      <ol id="timeline"></ol>
-    </section>
-
-    <section class="panel" id="panel-eeg">
-      <h2>6 · EEG input</h2>
-      <div id="eeg">
-        <p class="placeholder" id="eeg-placeholder">Loading real EEG from PhysioNet…</p>
-        <div class="muted" id="eeg-trace-title"></div>
-        <div class="chart-box small"><canvas id="eeg-trace"></canvas></div>
-        <div class="muted" id="eeg-psd-title"></div>
-        <div class="chart-box small"><canvas id="eeg-psd"></canvas></div>
-        <p class="muted" id="eeg-caption"></p>
+  <main id="view-live" class="view">
+    <section class="kpis">
+      <div class="kpi" id="k-status">
+        <div class="k-label">Status</div>
+        <div class="k-value"><span class="state-dot"></span><span id="kv-status">Loading</span></div>
+        <div class="k-sub" id="ks-status">&nbsp;</div>
+      </div>
+      <div class="kpi" id="k-best">
+        <div class="k-label">Best result</div>
+        <div class="k-value big" id="kv-best">&mdash;</div>
+        <div class="k-sub" id="ks-best">balanced accuracy</div>
+      </div>
+      <div class="kpi" id="k-budget">
+        <div class="k-label">Experiments</div>
+        <div class="k-value big"><span id="kv-used">0</span><span class="of"> / <span id="kv-max">10</span></span></div>
+        <div class="bar"><i id="kb-budget"></i></div>
+      </div>
+      <div class="kpi" id="k-limit">
+        <div class="k-label">Electrode limit</div>
+        <div class="k-value big" id="kv-limit">64</div>
+        <div class="k-sub" id="ks-limit">goal version 1</div>
+      </div>
+      <div class="kpi" id="k-context">
+        <div class="k-label">Model context</div>
+        <div class="k-value big"><span id="kv-tokens">&mdash;</span><span class="of"> tokens</span></div>
+        <div class="bar"><i id="kb-tokens"></i></div>
+        <div class="k-sub" id="ks-tokens">rebuilt from Atlas every decision</div>
+      </div>
+      <div class="kpi eeg">
+        <div class="k-label">Input · real EEG</div>
+        <canvas id="eeg" width="260" height="56"></canvas>
+        <div class="k-sub">PhysioNet · imagined fists vs feet</div>
       </div>
     </section>
+
+    <section class="grid">
+      <div class="card chart-card">
+        <div class="card-h">
+          <h2>Accuracy by experiment</h2>
+          <div class="legend">
+            <span><i class="lg dot-in"></i>within limit</span>
+            <span><i class="lg dot-out"></i>over limit</span>
+            <span><i class="lg line-best"></i>best so far</span>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chart"></canvas></div>
+      </div>
+
+      <div class="card feed-card">
+        <div class="card-h"><h2>Live activity</h2><span class="hint">newest first</span></div>
+        <ol id="feed" class="feed"></ol>
+      </div>
+
+      <div class="card table-card">
+        <div class="card-h"><h2>Experiments</h2><span class="hint">Claude proposes · code measures</span></div>
+        <div id="exp-list" class="exp-list"></div>
+      </div>
+
+      <div class="card packet-card">
+        <div class="card-h"><h2>What the model saw</h2><span class="hint" id="packet-time"></span></div>
+        <div id="packet" class="packet"><div class="empty">No decision yet</div></div>
+      </div>
+    </section>
+  </main>
+
+  <main id="view-results" class="view" hidden>
+    <div class="results-head">
+      <h1>Measured today</h1>
+      <p>Real runs on real EEG data, recorded in MongoDB Atlas. Every number below is read from the evaluation files in the repository.</p>
+    </div>
+    <section class="results" id="results"></section>
+  </main>
+
+  <main id="view-code" class="view" hidden>
+    <div class="results-head">
+      <h1>How it holds together</h1>
+      <p>Two functions from the repository, loaded live from the source files.</p>
+    </div>
+    <section class="code-grid" id="code"></section>
   </main>
 
   <script src="/static/app.js"></script>

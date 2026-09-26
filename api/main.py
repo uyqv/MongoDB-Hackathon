@@ -284,3 +284,57 @@ def constraint(cid: str, body: ConstraintBody):
 def context_reset(cid: str):
     _campaign_or_404(cid)
     return {"context_epoch": control.reset_context(db(), cid)}
+
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def _read(rel: str):
+    p = ROOT / rel
+    return json.loads(p.read_text()) if p.exists() else None
+
+
+@app.get("/api/proof")
+def proof():
+    """Measured results for the Results view, read from the eval output files (never typed in by hand)."""
+    checks = _read("eval/checks.json") or []
+    latest = {}
+    for r in checks:
+        latest[r["check"]] = r
+    passed = sum(sum(r["checks"].values()) for r in latest.values())
+    total = sum(len(r["checks"]) for r in latest.values())
+    stress = _read("eval/stress.json") or {}
+    levels = [{"memories": x["memories_total"], "p50_ms": x["search_ms_p50"], "p95_ms": x["search_ms_p95"]}
+              for x in stress.get("results", [])]
+    current = _read("eval/stress_current_packet.json") or {}
+    ab = (_read("eval/results.json") or {}).get("summary", {})
+    rec = (latest.get("recovery") or {}).get("checks", {})
+    lost = 0 if rec.get("every_experiment_committed_once") and rec.get("done_experiments_not_recomputed") else None
+    return {
+        "results_lost": lost,
+        "checks": {"passed": passed, "total": total,
+                   "by_check": {k: {"passed": sum(v["checks"].values()), "total": len(v["checks"]),
+                                    "campaign_id": v["campaign_id"]} for k, v in latest.items()}},
+        "memory": {"notes": current.get("memories"), "packet_tokens": current.get("packet_token_estimate"),
+                   "budget_tokens": current.get("budget_tokens"), "levels": levels},
+        "ablation": {arm: {"cited": v.get("cited_expected_evidence"), "decisions": v.get("decisions"),
+                           "tokens": v.get("mean_input_tokens_provider")} for arm, v in ab.items()},
+    }
+
+
+SOURCE_FILES = {"harness/store.py", "harness/context.py", "harness/worker.py", "harness/eeg.py", "harness/planner.py",
+                "harness/memory.py", "harness/jev.py", "harness/contracts.py"}
+
+
+@app.get("/api/source")
+def source(file: str, fn: str):
+    """One function's source, straight from the repo, for the Code view."""
+    import ast
+    if file not in SOURCE_FILES:
+        raise HTTPException(404, "not an allowed file")
+    text = (ROOT / file).read_text()
+    for node in ast.walk(ast.parse(text)):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.name == fn:
+            lines = text.splitlines()[node.lineno - 1: node.end_lineno]
+            return {"file": file, "fn": fn, "start": node.lineno, "end": node.end_lineno, "code": "\n".join(lines)}
+    raise HTTPException(404, "function not found")
