@@ -11,7 +11,7 @@
 2. Get the `.env` file from Andrew over a private channel. Never commit it. In your copy, change two lines:
    - `DB_NAME=second_shift_david`
    - `OPENROUTER_API_KEY=<your own key, the one you redeemed the $10 on>`
-3. `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`
+3. `python3 -m venv .venv && .venv/bin/pip install -r requirements-worker.txt`
 4. Open Claude Code in that folder. Paste **Prompt 1**. When it finishes, text Andrew the summary it prints. Paste **Prompt 2** only after Andrew says merge 1 is done.
 
 If the Atlas connection times out, ask Andrew to add your IP under Atlas → Network Access.
