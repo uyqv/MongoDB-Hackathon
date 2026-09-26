@@ -11,7 +11,7 @@ Source plan: `Second_Shift_Build_Plan.md`. Contracts: `docs/CONTRACTS.md`. This 
 - **Planner:** `anthropic/claude-sonnet-5` via OpenRouter, tool calling, code validation, deterministic fallback.
 - **Dashboard:** static HTML + vanilla JS + Chart.js, served by FastAPI, polling every 2 s. No Next.js build step.
 - **Comparison test:** 2 arms (`recent_window` vs `evidence`) × 5 scenarios. The rolling-summary arm is cut for time.
-- **Cut by the plan's own rule** (under 4 build hours left): Jev moves to David's last stretch task, and the 10k stress fixture is gone.
+- **Jev is required** (Andrew's call, 1:05 PM): David builds `harness/jev.py` (D9), and Andrew wires it into the worker to route planner rationales and notes.
 
 ## Timeline
 
@@ -23,7 +23,7 @@ Source plan: `Second_Shift_Build_Plan.md`. Contracts: `docs/CONTRACTS.md`. This 
 | **2:15** | **MERGE 1** (Andrew): `david` → `main`, then `Andrew` → `main`, run tests, push | David's agent pauses and waits for prompt 2 |
 | 2:15–2:45 | **A4** `context.py` (both strategies), wire in the real planner and memory. First real LLM-driven campaign, ~10 experiments | **D5** `control.py` + control endpoints + buttons. Dashboard on the real `second_shift` DB |
 | 2:45–3:05 | **A5** Recovery proof: SIGKILL mid-queue, restart, done keys reused, running job re-leased as attempt 2. Constraint 64 → 9 re-ranks the incumbent and the campaign continues | **D6** `eval/fixtures.py` (5 scenarios off the real campaign) · **D7** EEG preview panel |
-| 3:05–3:25 | **A6** `run_ablation.py`: 2 arms × 5 scenarios, writes `eval/results.json` | **D8** `docs/ATTRIBUTION.md` · **D9** Jev stretch, only if D5–D7 are done |
+| 3:05–3:25 | **A6** `run_ablation.py`: 2 arms × 5 scenarios, writes `eval/results.json` · wire Jev into the worker | **D8** `docs/ATTRIBUTION.md` · **D9** Jev (required) |
 | **3:25** | **MERGE 2 + FEATURE FREEZE at 3:30** | David's agent stops |
 | 3:30–3:50 | Clean demo run on a fresh campaign. Both of you watch the dashboard | |
 | 3:50–4:25 | README + results table; repo public | Record the one-minute video **on site**; check audio |
@@ -32,12 +32,11 @@ Source plan: `Second_Shift_Build_Plan.md`. Contracts: `docs/CONTRACTS.md`. This 
 
 ## If you're behind at a checkpoint, cut in this order
 
-1. Jev (D9)
-2. EEG panel polish (D7): a static PNG of the real trace is fine
-3. Comparison test drops to 1 scenario per arm, or the README says "not run"
-4. Constraint change button: run it from a Python one-liner instead
+1. EEG panel polish (D7): a static PNG of the real trace is fine
+2. Comparison test drops to 1 scenario per arm, or the README says "not run"
+3. Constraint change button: run it from a Python one-liner instead
 
-**Never cut:** real-data loop, Atlas as the only state, one visible context rebuild, one kill/restart proof, the video, the Sandbox cluster, dataset attribution.
+**Never cut:** Jev, real-data loop, Atlas as the only state, one visible context rebuild, one kill/restart proof, the video, the Sandbox cluster, dataset attribution.
 
 ## Merge mechanics (Andrew only)
 

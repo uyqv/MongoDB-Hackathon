@@ -30,3 +30,19 @@ def test_fallback_is_eligible_untried_then_stops():
         tried.append(experiment_key(PID, r["config"]))
     everything = [experiment_key(PID, c) for c in all_configs()]
     assert fallback_plan(_packet(tried=everything), "test")["action"] == "stop"
+
+
+def test_rate_limited_planner_is_retried_not_silently_replaced(monkeypatch):
+    import harness.worker as w
+    calls = []
+
+    def fake_once(packet):
+        calls.append(1)
+        if len(calls) == 1:
+            return {**fallback_plan(packet, "planner failed: RateLimitError: Error code: 429"), "model": "fb"}
+        return {**fallback_plan(packet, "x"), "fallback_used": False, "fallback_reason": None, "model": "real"}
+
+    monkeypatch.setattr(w, "_call_planner_once", fake_once)
+    monkeypatch.setattr(w.time, "sleep", lambda s: None)
+    assert w.call_planner(_packet())["model"] == "real"
+    assert len(calls) == 2

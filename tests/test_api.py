@@ -86,6 +86,108 @@ def test_packet_and_memories_never_embedding(client):
         _no_embedding(body)
 
 
-def test_controls_stubbed(client):
-    assert client.post("/api/worker/kill").status_code == 501
-    assert client.get("/api/eeg/preview").status_code == 501
+
+
+# ------------------------------------------------------------------ D5: control.py + POST endpoints
+# control.py tests live here because CONTRACTS §1 gives David no test_control.py.
+
+import sys
+import time
+
+from harness import control
+from harness.db import get_db
+
+
+@pytest.fixture
+def camp():
+    d = get_db()
+    assert d.name == "second_shift_david"
+    cid = "camp_c0ffee" + os.urandom(1).hex()
+    d.campaigns.insert_one({"_id": cid, "objective": "control test", "goal_version": 1,
+                            "constraints": {"max_channels": 64},
+                            "goal_history": [{"version": 1, "constraints": {"max_channels": 64},
+                                              "changed_at": "2026-09-26T00:00:00Z", "reason": "initial goal"}],
+                            "protocol_id": "p_test", "budget": {"max_experiments": 10}, "state": "PLAN",
+                            "context_epoch": 0, "final": None, "created_at": "2026-09-26T00:00:00Z", "fake": True})
+    yield cid
+    d.campaigns.delete_one({"_id": cid})
+    d.events.delete_many({"campaign_id": cid})
+
+
+def test_change_constraint(camp):
+    d = get_db()
+    after = control.change_constraint(d, camp, 9, "headset budget cut")
+    assert after["goal_version"] == 2 and after["constraints"] == {"max_channels": 9}
+    assert after["goal_history"][-1]["version"] == 2 and after["goal_history"][-1]["reason"] == "headset budget cut"
+    ev = d.events.find_one({"campaign_id": camp, "type": "goal_changed"})
+    assert ev["payload"]["from_version"] == 1 and ev["payload"]["to_version"] == 2
+    assert ev["payload"]["old_constraints"] == {"max_channels": 64}
+    with pytest.raises(ValueError):
+        control.change_constraint(d, camp, 32, "no")
+
+
+def test_reset_context(camp):
+    d = get_db()
+    assert control.reset_context(d, camp) == 1
+    assert control.reset_context(d, camp) == 2
+    assert d.events.count_documents({"campaign_id": camp, "type": "context_reset"}) == 2
+
+
+def test_start_kill_status_on_dummy_process(camp, tmp_path, monkeypatch):
+    monkeypatch.setattr(control, "RUN_DIR", tmp_path)
+    monkeypatch.setattr(control, "worker_cmd", lambda cid: [sys.executable, "-c", "import time; time.sleep(60)"])
+    assert control.worker_status()["running"] is False
+    pid = control.start_worker(camp)
+    st = control.worker_status()
+    assert st == {**st, "running": True, "pid": pid, "campaign_id": camp}
+    with pytest.raises(RuntimeError):
+        control.start_worker(camp)
+    out = control.kill_worker()
+    assert out == {"killed": True, "pid": pid}
+    assert control.worker_status()["running"] is False
+    ev = get_db().events.find_one({"campaign_id": camp, "type": "worker_killed"})
+    assert ev["payload"] == {"pid": pid, "signal": "SIGKILL"}
+    assert control.kill_worker()["killed"] is False
+
+
+def test_control_endpoints(client, camp, tmp_path, monkeypatch):
+    monkeypatch.setattr(control, "RUN_DIR", tmp_path)
+    monkeypatch.setattr(control, "worker_cmd", lambda cid: [sys.executable, "-c", "import time; time.sleep(60)"])
+    r = client.post(f"/api/campaigns/{camp}/constraint", json={"max_channels": 21, "reason": "ui test"})
+    assert r.status_code == 200 and r.json()["constraints"] == {"max_channels": 21}
+    assert client.post(f"/api/campaigns/{camp}/constraint", json={"max_channels": 5, "reason": ""}).status_code == 400
+    assert client.post(f"/api/campaigns/{camp}/context-reset").json() == {"context_epoch": 1}
+    assert client.post("/api/campaigns/camp_nope0000/context-reset").status_code == 404
+    pid = client.post("/api/worker/start", json={"campaign_id": camp}).json()["pid"]
+    assert client.get("/api/worker/status").json()["running"] is True
+    assert client.post("/api/worker/start", json={"campaign_id": camp}).status_code == 409
+    assert client.post("/api/worker/kill").json() == {"killed": True, "pid": pid}
+    assert client.get("/api/worker/status").json()["running"] is False
+
+
+def test_eeg_preview_is_real_and_display_only(client):
+    r = client.get("/api/eeg/preview")
+    if r.status_code == 503:
+        pytest.skip(r.json()["error"])
+    d = r.json()
+    assert d["source"] == "PhysioNet eegmmidb v1.0.0, S001 run 6" and d["display_only"] is True
+    assert set(d["trace"]["channels"]) == {"C3", "Cz", "C4"}
+    assert len(d["trace"]["t"]) == len(d["trace"]["channels"]["C3"])
+    assert d["psd"]["n_epochs"]["T1"] > 0 and d["psd"]["n_epochs"]["T2"] > 0
+    assert d["psd"]["freqs"][0] >= 4 and d["psd"]["freqs"][-1] <= 40
+
+
+def test_campaign_llm_usage_and_running(client):
+    c = client.get(f"/api/campaigns/{CID}").json()
+    assert c["llm_usage"]["calls"] == 0 and c["llm_usage"]["cost_usd"] == 0
+    assert len(c["running"]) == 1 and c["running"][0]["lease"]["expires_at"]
+    d = get_db()
+    d.events.insert_one({"campaign_id": CID, "ts": "2099-01-01T00:00:00Z", "type": "llm_call", "fake": True,
+                         "payload": {"usage": {"input_tokens": 100, "output_tokens": 10, "cost_usd": 0.001,
+                                               "source": "provider"}, "fallback_used": False}})
+    d.events.insert_one({"campaign_id": CID, "ts": "2099-01-01T00:00:01Z", "type": "llm_call", "fake": True,
+                         "payload": {"usage": {"input_tokens": 999, "source": "estimate"}, "fallback_used": True}})
+    u = client.get(f"/api/campaigns/{CID}").json()["llm_usage"]
+    assert u == {"calls": 2, "fallbacks": 1, "provider_calls": 1, "input_tokens": 100, "output_tokens": 10,
+                 "cost_usd": 0.001}
+    seed_fake.main()

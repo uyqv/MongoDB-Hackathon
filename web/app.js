@@ -4,11 +4,13 @@
 
 const POLL_MS = 2000;
 const TIMELINE_TYPES = new Set([
-  "worker_start", "worker_killed", "context_reset", "goal_changed", "job_reused",
-  "lease_expired", "stale_commit_rejected", "finalized",
+  "worker_start", "worker_stop", "worker_killed", "fault_injection", "context_reset", "goal_changed",
+  "job_reused", "lease_expired", "stale_commit_rejected", "finalized", "proposal_rejected", "llm_call",
 ]);
 
-const state = { campaignId: null, userPicked: false, chart: null, fake: false };
+const params = new URLSearchParams(location.search);
+const state = { campaignId: params.get("campaign"), userPicked: params.has("campaign"), chart: null, fake: false, expanded: new Set(), memories: {},
+                expIds: new Set(), openMemory: null };
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => (
@@ -17,10 +19,12 @@ const fmt = (x, d = 3) => (x === null || x === undefined ? "—" : Number(x).toF
 const localTime = (iso) => (iso ? new Date(iso).toLocaleTimeString() : "—");
 const badge = (text, cls) => `<span class="badge ${cls}">${esc(text)}</span>`;
 
-async function api(path) {
-  const r = await fetch(path);
+async function api(path, opts) {
+  const r = await fetch(path, opts);
   if (!r.ok) {
-    const err = new Error(`${r.status} ${path}`);
+    let detail = "";
+    try { detail = (await r.json()).detail || ""; } catch (_) { /* not json */ }
+    const err = new Error(`${r.status} ${detail || path}`);
     err.status = r.status;
     throw err;
   }
@@ -35,7 +39,7 @@ function markFake(...docs) {
 async function loadCampaigns() {
   const list = await api("/api/campaigns");
   const sel = $("campaign-select");
-  const current = sel.value;
+  const current = sel.value || state.campaignId;
   sel.innerHTML = list.map((c) =>
     `<option value="${esc(c._id)}">${esc(c._id)}${c.fake ? " (FAKE)" : ""} · ${esc(c.state)} · ${esc(localTime(c.created_at))}</option>`
   ).join("");
@@ -49,23 +53,47 @@ async function loadCampaigns() {
 }
 
 // ---------------------------------------------------------------- panel 1
+function leaseLine(c) {
+  if (!c.running?.length) return "";
+  return c.running.map((j) => {
+    const exp = j.lease?.expires_at ? (new Date(j.lease.expires_at) - Date.now()) / 1000 : null;
+    const when = exp === null ? "no lease" : exp > 0 ? `lease expires in ${exp.toFixed(0)} s`
+      : `lease expired ${(-exp).toFixed(0)} s ago, waiting for reclaim`;
+    return `<div class="lease ${exp !== null && exp <= 0 ? "expired" : ""}">running: ${esc(j.label)} · attempt ${esc(j.attempt)} · ${esc(when)}</div>`;
+  }).join("");
+}
+
 function renderGoal(c) {
   const hist = (c.goal_history || []).map((h) =>
     `<li>v${esc(h.version)} · max_channels ${esc(h.constraints?.max_channels)} · ${esc(localTime(h.changed_at))}${h.reason ? " · " + esc(h.reason) : ""}</li>`
   ).join("");
   const inc = c.incumbent;
+  const u = c.llm_usage || {};
+  const f = c.final;
+  const stateCls = c.state === "WAITING" ? "state-waiting" : c.state === "DONE" ? "state-done" : c.state === "FAILED" ? "state-failed" : "";
   $("goal").innerHTML = `
     <dl class="kv">
-      <dt>Objective</dt><dd>${esc(c.objective)}</dd>
-      <dt>State</dt><dd>${esc(c.state)}</dd>
+      <dt>Objective</dt><dd class="prose">${esc(c.objective)}</dd>
+      <dt>State</dt><dd><span class="state ${stateCls}">${esc(c.state)}</span></dd>
       <dt>Goal version</dt><dd>${esc(c.goal_version)}</dd>
       <dt>Max channels</dt><dd class="big">${esc(c.constraints?.max_channels)}</dd>
       <dt>Budget</dt><dd>${esc(c.used)} used / ${esc(c.remaining)} remaining of ${esc(c.budget?.max_experiments)}</dd>
       <dt>Context epoch</dt><dd>${esc(c.context_epoch)}</dd>
-      <dt>Protocol</dt><dd>${esc(c.protocol_id)}</dd>
-      <dt>Incumbent</dt><dd>${inc ? `${fmt(inc.val_balanced_accuracy)} · ${esc(inc.label)}` : '<span class="empty">none eligible yet</span>'}</dd>
-      ${c.final ? `<dt>Final test</dt><dd>bal acc ${fmt(c.final.test_balanced_accuracy)} · F1 ${fmt(c.final.test_f1)}</dd>` : ""}
+      <dt>Incumbent</dt><dd>${inc ? `<b>${fmt(inc.val_balanced_accuracy)}</b> val · ${esc(inc.label)}` : '<span class="empty">none eligible yet</span>'}</dd>
+      <dt>Planner calls</dt><dd>${esc(u.calls ?? 0)} · ${esc(u.fallbacks ?? 0)} fallback</dd>
+      <dt>Planner tokens</dt><dd>${esc(u.input_tokens ?? 0)} in / ${esc(u.output_tokens ?? 0)} out · $${Number(u.cost_usd ?? 0).toFixed(4)} <span class="muted">(provider, ${esc(u.provider_calls ?? 0)} calls)</span></dd>
     </dl>
+    ${leaseLine(c)}
+    ${f ? `<div class="final">
+      <div class="final-title">Final (goal v${esc(f.goal_version)}, max_channels ${esc(f.constraints?.max_channels)}) · ${esc(f.label)}</div>
+      <div class="final-nums">
+        <div><span class="muted">validation bal acc</span><b>${fmt(f.val_balanced_accuracy)}</b></div>
+        <div><span class="muted">sealed test bal acc</span><b>${fmt(f.test_balanced_accuracy)}</b></div>
+        <div><span class="muted">test F1</span><b>${fmt(f.test_f1)}</b></div>
+        <div><span class="muted">n_test</span><b>${esc(f.n_test ?? "—")}</b></div>
+      </div>
+      <div class="muted">test set scored once, at finalize</div>
+    </div>` : ""}
     <div class="muted" style="margin-top:10px">Goal history</div>
     <ol class="history">${hist || '<li class="empty">none</li>'}</ol>`;
 }
@@ -119,26 +147,76 @@ function renderChart(exps, campaign) {
 }
 
 // ---------------------------------------------------------------- panel 3
+function evidenceLink(id) {
+  if (state.expIds.has(id)) return `<a href="#" class="ev-link" data-exp="${esc(id)}">${esc(id)}</a>`;
+  if (state.memories[id]) return `<a href="#" class="ev-link" data-mem="${esc(id)}">${esc(id)}</a>`;
+  return `<span class="mono muted" title="not in this campaign">${esc(id)}</span>`;
+}
+
 function renderExperiments(exps, campaign) {
   const incId = campaign.incumbent?.experiment_id;
+  state.expIds = new Set(exps.map((e) => e._id));
+  if (params.get("expand") === "all" && !state.expandedOnce) {  // for screenshots and the video
+    exps.forEach((e) => state.expanded.add(e._id));
+    state.expandedOnce = true;
+  }
   $("exp-table").querySelector("tbody").innerHTML = exps.map((e, i) => {
     const pb = e.proposed_by || {};
     const proposer = pb.fallback_used ? badge("FALLBACK", "b-fallback") : esc(pb.model || "—");
     const acc = e.result?.val_balanced_accuracy;
     const elig = e.eligible === true ? "yes" : e.eligible === false ? '<span class="no">no</span>' : "?";
-    return `<tr class="${e._id === incId ? "incumbent" : ""}" title="${esc(pb.rationale || "")}">
-      <td class="mono">${i + 1}</td>
+    const open = state.expanded.has(e._id);
+    const ev = pb.evidence_ids || [];
+    const mem = state.openMemory && state.openMemory.row === e._id ? state.memories[state.openMemory.id] : null;
+    const detail = open ? `<tr class="detail" id="detail-${esc(e._id)}"><td></td><td colspan="8">
+        <div class="rationale">${pb.rationale ? `“${esc(pb.rationale)}”` : '<span class="empty">no rationale</span>'}</div>
+        <div class="muted">evidence: ${ev.length ? ev.map(evidenceLink).join(", ") : "uncited"}
+          ${pb.request_id ? ` · request ${esc(pb.request_id)}` : ""}${pb.fallback_used ? " · deterministic fallback" : ""}</div>
+        ${mem ? `<div class="memory"><div>${badge(mem.kind, "")}${mem.verified ? badge("verified", "b-verified") : ""}<span class="mono">${esc(mem._id)}</span></div><div class="text">${esc(mem.text)}</div></div>` : ""}
+        ${e.error ? `<div class="err">error: ${esc(e.error)}</div>` : ""}
+        <div class="muted mono">${esc(e._id)}</div>
+      </td></tr>` : "";
+    return `<tr id="exp-${esc(e._id)}" class="exp-row ${e._id === incId ? "incumbent" : ""} ${open ? "open" : ""}" data-id="${esc(e._id)}">
+      <td class="mono">${open ? "▾" : "▸"} ${i + 1}</td>
       <td class="mono">${esc(e.label)}</td>
       <td>${badge(e.status, "s-" + e.status)}</td>
       <td>${esc(e.attempt)}</td>
       <td>${esc(e.n_channels)}</td>
       <td>${elig}</td>
-      <td class="mono">${fmt(acc)}</td>
+      <td class="mono">${acc == null ? "—" : `<b>${fmt(acc)}</b>`}</td>
       <td>${proposer}</td>
-      <td>${e.reused ? badge("reused", "b-reused") : ""}${e._id === incId ? badge("incumbent", "b-inc") : ""}${e.fake ? badge("FAKE", "b-fake") : ""}${e.error ? `<span class="muted" title="${esc(e.error)}">error</span>` : ""}</td>
-    </tr>`;
+      <td>${e._id === incId ? badge("incumbent", "b-inc") : ""}${e.reused ? badge("reused", "b-reused") : ""}${e.fake ? badge("FAKE", "b-fake") : ""}${e.error ? badge("error", "s-failed") : ""}</td>
+    </tr>${detail}`;
   }).join("") || `<tr><td colspan="9" class="empty">no experiments yet</td></tr>`;
+  state.lastExps = exps;
+  state.lastCampaign = campaign;
 }
+
+$("exp-table").addEventListener("click", (ev) => {
+  const link = ev.target.closest(".ev-link");
+  if (link) {
+    ev.preventDefault();
+    const row = link.closest("tr.detail")?.id.replace("detail-", "");
+    if (link.dataset.exp) {
+      state.expanded.add(link.dataset.exp);
+      renderExperiments(state.lastExps, state.lastCampaign);
+      const target = document.getElementById(`exp-${link.dataset.exp}`);
+      target?.scrollIntoView({ block: "center", behavior: "smooth" });
+      target?.classList.add("flash");
+      setTimeout(() => target?.classList.remove("flash"), 1500);
+    } else if (link.dataset.mem) {
+      const same = state.openMemory?.id === link.dataset.mem && state.openMemory?.row === row;
+      state.openMemory = same ? null : { id: link.dataset.mem, row };
+      renderExperiments(state.lastExps, state.lastCampaign);
+    }
+    return;
+  }
+  const tr = ev.target.closest("tr.exp-row");
+  if (!tr) return;
+  const id = tr.dataset.id;
+  if (state.expanded.has(id)) state.expanded.delete(id); else state.expanded.add(id);
+  renderExperiments(state.lastExps, state.lastCampaign);
+});
 
 // ---------------------------------------------------------------- panel 4
 function renderPacket(p) {
@@ -172,13 +250,25 @@ function renderPacket(p) {
 function describe(ev) {
   const p = ev.payload || {};
   switch (ev.type) {
-    case "worker_start": return p.resumed ? `resumed · ${p.reused_done ?? 0} done reused` : "fresh start";
+    case "worker_start": {
+      const done = p.counts?.done ?? p.reused_done ?? 0;
+      return p.resumed ? `resumed · ${done} done reused, not recomputed` : "fresh start";
+    }
+    case "worker_stop": return `clean exit · ${p.steps ?? 0} steps`;
+    case "fault_injection": return `${p.experiment_id ?? ""} · attempt ${p.attempt ?? "?"} · self-SIGKILL`;
     case "worker_killed": return `pid ${p.pid ?? "?"} · ${p.signal ?? ""}`;
     case "context_reset": return `epoch ${p.context_epoch}`;
     case "goal_changed": return `v${p.from_version} → v${p.to_version} · max_channels ${p.old_constraints?.max_channels} → ${p.new_constraints?.max_channels}${p.reason ? " · " + p.reason : ""}`;
     case "job_reused": case "lease_expired": case "stale_commit_rejected":
       return `${p.experiment_id ?? ""}${p.attempt ? " · attempt " + p.attempt : ""}`;
-    case "finalized": return p.experiment_id ? `winner ${p.experiment_id}` : "";
+    case "finalized": return `${p.label ?? p.experiment_id ?? ""} · val ${fmt(p.val_balanced_accuracy)} · test ${fmt(p.test_balanced_accuracy)} (n=${p.n_test ?? "?"})`;
+    case "proposal_rejected": return `${p.reason ?? ""}`;
+    case "llm_call": {
+      const u = p.usage || {};
+      const tok = u.source === "provider" ? `${u.input_tokens ?? "?"} in (provider)` : "tokens n/a";
+      const cost = u.cost_usd == null ? "" : ` · $${Number(u.cost_usd).toFixed(4)}`;
+      return `${p.fallback_used ? "FALLBACK" : p.model ?? ""} · ${p.action ?? ""} · ${tok}${cost}`;
+    }
     default: return "";
   }
 }
@@ -191,20 +281,115 @@ function renderTimeline(events) {
   ).join("") || '<li class="empty">no timeline events yet</li>';
 }
 
+// ---------------------------------------------------------------- panel 6 (display only, loaded once)
+const EEG_COLORS = { C3: "#7cc4ff", Cz: "#00ed64", C4: "#f5b942" };
+const axis = (title) => ({ ticks: { color: "#8b95a3", maxTicksLimit: 7 }, grid: { color: "#262c35" },
+  title: { display: true, text: title, color: "#8b95a3" } });
+
+async function loadEeg() {
+  let d;
+  try {
+    d = await api("/api/eeg/preview");
+  } catch (err) {
+    $("eeg-placeholder").textContent = `EEG preview unavailable: ${err.message}`;
+    return;
+  }
+  $("eeg-placeholder").hidden = true;
+  const tr = d.trace;
+  // Offset channels vertically so the three traces don't overlap.
+  const offsets = { C3: 60, Cz: 0, C4: -60 };
+  new Chart($("eeg-trace"), {
+    type: "line",
+    data: {
+      datasets: Object.entries(tr.channels).map(([ch, ys]) => ({
+        label: ch, data: ys.map((y, i) => ({ x: tr.t[i], y: y + (offsets[ch] || 0) })),
+        borderColor: EEG_COLORS[ch], borderWidth: 1, pointRadius: 0,
+      })),
+    },
+    options: {
+      animation: false, maintainAspectRatio: false, parsing: false,
+      plugins: { legend: { labels: { color: "#e6e9ee", boxWidth: 10 } }, tooltip: { enabled: false } },
+      scales: { x: { type: "linear", ...axis("s after cue") }, y: { ...axis(`${tr.units} (offset)`), ticks: { display: false } } },
+    },
+  });
+  const f = d.psd.freqs;
+  const avg = (byCh) => f.map((_, i) => Object.values(byCh).reduce((a, v) => a + v[i], 0) / Object.keys(byCh).length);
+  new Chart($("eeg-psd"), {
+    type: "line",
+    data: {
+      datasets: [
+        { label: `T1 ${d.labels.T1} (n=${d.psd.n_epochs.T1})`, data: avg(d.psd.by_class.T1).map((y, i) => ({ x: f[i], y })),
+          borderColor: "#7cc4ff", borderWidth: 1.5, pointRadius: 0 },
+        { label: `T2 ${d.labels.T2} (n=${d.psd.n_epochs.T2})`, data: avg(d.psd.by_class.T2).map((y, i) => ({ x: f[i], y })),
+          borderColor: "#f5b942", borderWidth: 1.5, pointRadius: 0 },
+      ],
+    },
+    options: {
+      animation: false, maintainAspectRatio: false, parsing: false,
+      plugins: { legend: { labels: { color: "#e6e9ee", boxWidth: 10 } } },
+      scales: { x: { type: "linear", ...axis("Hz") }, y: axis(d.psd.units) },
+    },
+  });
+  $("eeg-trace-title").textContent = `C3 / Cz / C4, ${tr.filter}, 6 s from the ${tr.cue} (${tr.cue_label})`;
+  $("eeg-psd-title").textContent = `PSD mean of C3/Cz/C4, ${d.psd.window}`;
+  $("eeg-caption").textContent = `Source: ${d.source}. Display only; no metric uses this panel.`;
+}
+
+// ---------------------------------------------------------------- controls
+const post = (path, body) => api(path, {
+  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}),
+});
+
+function renderWorker(st) {
+  const el = $("worker-status");
+  el.textContent = st.running ? `API worker: running pid ${st.pid} · ${st.campaign_id}` : "API worker: stopped";
+  el.style.color = st.running ? "var(--accent)" : "var(--muted)";
+  $("btn-start").disabled = st.running || !state.campaignId;
+  $("btn-kill").disabled = !st.running;
+}
+
+async function control(label, fn) {
+  const msg = $("control-msg");
+  msg.textContent = `${label}…`;
+  try {
+    const out = await fn();
+    msg.textContent = `${label}: ok ${out ? JSON.stringify(out).slice(0, 80) : ""}`;
+  } catch (err) {
+    msg.textContent = `${label} failed: ${err.message}`;
+  }
+  poll();
+}
+
+$("btn-start").addEventListener("click", () =>
+  control("start", () => post("/api/worker/start", { campaign_id: state.campaignId })));
+$("btn-kill").addEventListener("click", () => control("SIGKILL", () => post("/api/worker/kill")));
+$("btn-reset").addEventListener("click", () =>
+  control("context reset", () => post(`/api/campaigns/${state.campaignId}/context-reset`)));
+$("btn-constraint").addEventListener("click", () => control("constraint", async () => {
+  const c = await post(`/api/campaigns/${state.campaignId}/constraint`, {
+    max_channels: Number($("sel-channels").value), reason: $("constraint-reason").value,
+  });
+  $("constraint-reason").value = "";
+  return { goal_version: c.goal_version, max_channels: c.constraints.max_channels };
+}));
+
 // ---------------------------------------------------------------- loop
 async function poll() {
   try {
     const health = await api("/api/health");
     $("db-name").textContent = `db: ${health.db}`;
     await loadCampaigns();
+    renderWorker(await api("/api/worker/status"));
     const cid = state.campaignId;
     if (!cid) { $("goal").innerHTML = '<p class="empty">no campaigns yet</p>'; return; }
-    const [camp, exps, events, packet] = await Promise.all([
+    const [camp, exps, events, packet, mems] = await Promise.all([
       api(`/api/campaigns/${cid}`),
       api(`/api/campaigns/${cid}/experiments`),
       api(`/api/campaigns/${cid}/events?limit=500`),
       api(`/api/campaigns/${cid}/packets/latest?strategy=evidence`).catch((e) => (e.status === 404 ? null : Promise.reject(e))),
+      api(`/api/campaigns/${cid}/memories`),
     ]);
+    state.memories = Object.fromEntries(mems.map((m) => [m._id, m]));
     state.fake = false;
     markFake(camp, exps, events, packet ? [packet] : []);
     $("fake-banner").hidden = !state.fake;
@@ -227,3 +412,4 @@ $("campaign-select").addEventListener("change", () => {
 
 poll();
 setInterval(poll, POLL_MS);
+loadEeg();

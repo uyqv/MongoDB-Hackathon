@@ -9,6 +9,8 @@ and the incumbent are computed on read with contracts.is_eligible. The
 """
 from __future__ import annotations
 
+import json
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -17,8 +19,10 @@ from bson import ObjectId
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
 from harness import contracts as C
+from harness import control
 from harness.db import get_db
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
@@ -104,7 +108,29 @@ def campaign(cid: str):
     camp["used"] = used
     camp["remaining"] = None if max_exp is None else max(0, max_exp - used)
     camp["incumbent"] = incumbent(camp, exps)
+    camp["llm_usage"] = llm_usage(cid)
+    camp["running"] = [{"experiment_id": e["_id"], "label": e.get("label"), "attempt": e.get("attempt"),
+                        "lease": e.get("lease")}
+                       for e in db().experiments.find({"campaign_id": cid, "status": "running"},
+                                                      {"label": 1, "attempt": 1, "lease": 1})]
     return clean(camp)
+
+
+def llm_usage(cid: str) -> dict:
+    """Running totals over llm_call events. Token and cost sums count provider-reported usage only."""
+    out = {"calls": 0, "fallbacks": 0, "provider_calls": 0, "input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}
+    for ev in db().events.find({"campaign_id": cid, "type": "llm_call"}, {"payload": 1}):
+        p = ev.get("payload") or {}
+        u = p.get("usage") or {}
+        out["calls"] += 1
+        out["fallbacks"] += bool(p.get("fallback_used"))
+        if u.get("source") == "provider":
+            out["provider_calls"] += 1
+            out["input_tokens"] += u.get("input_tokens") or 0
+            out["output_tokens"] += u.get("output_tokens") or 0
+            out["cost_usd"] += u.get("cost_usd") or 0.0
+    out["cost_usd"] = round(out["cost_usd"], 6)
+    return out
 
 
 @app.get("/api/campaigns/{cid}/experiments")
@@ -150,35 +176,111 @@ def memories(cid: str, kind: str | None = None, include_synthetic: bool = False)
     return clean(list(db().memories.find(flt, {"embedding": 0}).sort("created_at", -1)))
 
 
-def _not_yet(what: str):
-    return JSONResponse({"error": f"{what} not implemented yet (prompt 2)"}, status_code=501)
+class StartBody(BaseModel):
+    campaign_id: str
+
+
+class ConstraintBody(BaseModel):
+    max_channels: int
+    reason: str = ""
+
+
+EEG_SOURCE = "PhysioNet eegmmidb v1.0.0, S001 run 6"
+EEG_CHANNELS = ("C3", "Cz", "C4")
+
+
+def build_eeg_preview() -> dict:
+    """Display only: never feeds any metric. Real S001 run 6 (imagined both fists vs both feet)."""
+    import mne
+    import numpy as np
+    from mne.datasets import eegbci
+
+    mne.set_log_level("ERROR")
+    data_dir = os.environ.get("EEG_DATA_DIR", "data/eeg")
+    path = eegbci.load_data(1, [6], path=data_dir, update_path=False)[0]
+    raw = mne.io.read_raw_edf(path, preload=True)
+    eegbci.standardize(raw)
+    sf = raw.info["sfreq"]
+    events, event_id = mne.events_from_annotations(raw)
+    cues = [(int(s), code) for s, _, code in events if code in (event_id["T1"], event_id["T2"])]
+    first = cues[0][0]
+    picks = [raw.ch_names.index(c) for c in EEG_CHANNELS]
+    x = raw.get_data(picks=picks) * 1e6  # volts to microvolts
+
+    filt = mne.filter.filter_data(x, sf, 1.0, 40.0, phase="zero")
+    step = 2  # 160 Hz -> 80 Hz for display, after the 40 Hz low-pass
+    seg = filt[:, first:first + int(6 * sf):step]
+    t = (np.arange(seg.shape[1]) * step / sf).round(4)
+
+    lo, hi = int(1 * sf), int(3 * sf)
+    by_class: dict[str, list] = {"T1": [], "T2": []}
+    code_name = {event_id["T1"]: "T1", event_id["T2"]: "T2"}
+    for s0, code in cues:
+        if s0 + hi <= x.shape[1]:
+            by_class[code_name[code]].append(x[:, s0 + lo:s0 + hi])
+    psd = {}
+    freqs = None
+    for cls, epochs in by_class.items():
+        arr = np.stack(epochs)  # (n_epochs, n_channels, n_times)
+        p, freqs = mne.time_frequency.psd_array_welch(arr, sf, fmin=4.0, fmax=40.0, n_fft=int(2 * sf))
+        psd[cls] = {ch: (10 * np.log10(p[:, i, :].mean(axis=0))).round(3).tolist()
+                    for i, ch in enumerate(EEG_CHANNELS)}
+    return {
+        "source": EEG_SOURCE,
+        "labels": {"T1": "imagined both fists", "T2": "imagined both feet"},
+        "trace": {"t": t.tolist(), "sfreq_display": sf / step, "units": "µV", "filter": "1-40 Hz zero-phase FIR",
+                  "cue": "first task cue", "cue_label": code_name[cues[0][1]],
+                  "channels": {ch: seg[i].round(3).tolist() for i, ch in enumerate(EEG_CHANNELS)}},
+        "psd": {"freqs": np.asarray(freqs).round(3).tolist(), "units": "dB (µV²/Hz)",
+                "window": "1-3 s after cue, Welch", "n_epochs": {k: len(v) for k, v in by_class.items()},
+                "by_class": psd},
+        "display_only": True,
+    }
 
 
 @app.get("/api/eeg/preview")
 def eeg_preview():
-    return _not_yet("EEG preview")
+    cache = Path(os.environ.get("EEG_PREVIEW_CACHE", "data/eeg_preview.json"))
+    if cache.exists():
+        return json.loads(cache.read_text())
+    try:
+        out = build_eeg_preview()
+    except Exception as e:  # download or parse failure: the panel says so, nothing else breaks
+        return JSONResponse({"error": f"EEG preview unavailable: {type(e).__name__}: {e}"}, status_code=503)
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_text(json.dumps(out))
+    return out
 
 
 @app.get("/api/worker/status")
 def worker_status():
-    return _not_yet("worker status")
+    return control.worker_status()
 
 
 @app.post("/api/worker/start")
-def worker_start():
-    return _not_yet("worker start")
+def worker_start(body: StartBody):
+    _campaign_or_404(body.campaign_id)
+    try:
+        return {"pid": control.start_worker(body.campaign_id)}
+    except RuntimeError as e:
+        raise HTTPException(409, str(e))
 
 
 @app.post("/api/worker/kill")
 def worker_kill():
-    return _not_yet("worker kill")
+    return control.kill_worker()
 
 
 @app.post("/api/campaigns/{cid}/constraint")
-def constraint(cid: str):
-    return _not_yet("constraint change")
+def constraint(cid: str, body: ConstraintBody):
+    _campaign_or_404(cid)
+    try:
+        return clean(control.change_constraint(db(), cid, body.max_channels, body.reason))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
 
 
 @app.post("/api/campaigns/{cid}/context-reset")
 def context_reset(cid: str):
-    return _not_yet("context reset")
+    _campaign_or_404(cid)
+    return {"context_epoch": control.reset_context(db(), cid)}

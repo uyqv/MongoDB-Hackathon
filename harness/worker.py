@@ -2,7 +2,7 @@
 
 CLI (the API spawns this exact command, so keep it stable):
     python -m harness.worker --campaign <campaign_id>
-    python -m harness.worker --new --mode {smoke,demo} --max-channels 64 --budget 10
+    python -m harness.worker --new --mode {smoke,demo} --max-channels 64 --budget 10 [--create-only]
 
 State loop: REHYDRATE -> PLAN -> VALIDATE -> QUEUE -> EXECUTE -> COMMIT -> REHYDRATE,
 plus WAITING / FAILED / DONE. Holds no conversation history between steps: every
@@ -18,6 +18,7 @@ import os
 import random
 import signal
 import socket
+import sys
 import time
 import traceback
 
@@ -69,7 +70,22 @@ def fallback_plan(packet: dict, reason: str) -> dict:
             "fallback_used": True, "fallback_reason": reason}
 
 
-def call_planner(packet: dict) -> dict:
+JEV_KIND = {"research_note": "hypothesis", "failure_memory": "failure"}   # ignore / review: no working memory
+
+
+def route_note(text: str) -> dict | None:
+    """David's Jev router when present. None means Jev is not available yet."""
+    try:
+        from harness.jev import route_note as _route
+    except ImportError:
+        return None
+    return _route(text)
+
+
+RATE_LIMIT_BACKOFF = (10, 20, 30)   # seconds; OpenRouter new accounts get 20 requests/min per model
+
+
+def _call_planner_once(packet: dict) -> dict:
     try:
         from harness.planner import plan
         return plan(packet)
@@ -77,6 +93,18 @@ def call_planner(packet: dict) -> dict:
         return fallback_plan(packet, "planner not implemented yet")
     except Exception as exc:  # the planner must never take the worker down
         return fallback_plan(packet, f"planner error: {type(exc).__name__}: {exc}"[:300])
+
+
+def call_planner(packet: dict) -> dict:
+    """Call the planner, waiting out provider rate limits instead of silently falling back."""
+    for wait in (*RATE_LIMIT_BACKOFF, None):
+        result = _call_planner_once(packet)
+        reason = result.get("fallback_reason") or ""
+        if not (result["fallback_used"] and ("RateLimitError" in reason or "429" in reason)) or wait is None:
+            return result
+        print(f"planner rate limited; retrying in {wait}s", file=sys.stderr, flush=True)
+        time.sleep(wait)
+    return result
 
 
 def guard(packet: dict, result: dict) -> str | None:
@@ -139,6 +167,39 @@ class Worker:
                          text=render_result_text(e) if done else render_failure_text(e),
                          source_ids=[e["_id"]], verified=done)
         self.log("memory_added", memory_id=mid, experiment_id=e["_id"], kind="verified_result" if done else "failure")
+
+    def route_rationale(self, camp: dict, e: dict) -> None:
+        """Jev routes the planner's free-text rationale into working memory, or keeps it out.
+
+        Code decides the outcome wording (Jev never compares numbers), and a Jev label
+        never makes a note verified. The raw text always stays in the event log.
+        """
+        rationale = (e.get("proposed_by") or {}).get("rationale")
+        if not rationale:
+            return
+        if e["status"] == "failed":
+            outcome = f"the experiment failed: {e.get('error')}"
+        else:
+            best = store.incumbent(self.db, store.get_campaign(self.db, self.cid))
+            outcome = ("it is now the best eligible result" if best and best["_id"] == e["_id"]
+                       else "it did not beat the best eligible result")
+        text = (f"Planner hypothesis before running {e['label']}: {rationale} "
+                f"Outcome, computed by code: {outcome}.")
+        try:
+            r = route_note(text)
+        except Exception as exc:
+            r = {"label": "review", "fallback_used": True, "fallback_reason": f"{type(exc).__name__}: {exc}"[:300]}
+        if r is None:
+            return
+        mid = None
+        kind = JEV_KIND.get(r.get("label"))
+        if kind:
+            mid = add_memory(self.db, campaign_id=self.cid, protocol_id=camp["protocol_id"], kind=kind,
+                             text=f"Unverified note (routed by Jev as {r['label']}): {text}",
+                             source_ids=[e["_id"]], verified=False)
+        self.log("jev_routed", experiment_id=e["_id"], label=r.get("label"), memory_id=mid, note=text,
+                 provider=r.get("provider"), model=r.get("model"), request_id=r.get("request_id"),
+                 usage=r.get("usage"), fallback_used=r.get("fallback_used"), fallback_reason=r.get("fallback_reason"))
 
     # boot -------------------------------------------------------------------
     def boot(self) -> dict:
@@ -237,12 +298,16 @@ class Worker:
         except Exception as exc:
             self.state("COMMIT")
             if store.fail_job(self.db, job["_id"], token, f"{type(exc).__name__}: {exc}", self.worker_id):
-                self.write_result_memory(camp, self.db.experiments.find_one({"_id": job["_id"]}))
+                failed = self.db.experiments.find_one({"_id": job["_id"]})
+                self.write_result_memory(camp, failed)
+                self.route_rationale(camp, failed)
             traceback.print_exc()
             return
         self.state("COMMIT")
         if store.commit_result(self.db, job["_id"], token, result, self.worker_id):
-            self.write_result_memory(camp, self.db.experiments.find_one({"_id": job["_id"]}))
+            done = self.db.experiments.find_one({"_id": job["_id"]})
+            self.write_result_memory(camp, done)
+            self.route_rationale(camp, done)
 
     def finish(self, camp: dict, why: str) -> None:
         """Freeze the incumbent under the CURRENT goal and score the sealed test set once."""
@@ -268,14 +333,22 @@ def main() -> None:
     ap.add_argument("--max-steps", type=int)
     ap.add_argument("--crash-after-claim", type=int)
     ap.add_argument("--strategy", default="evidence", choices=["evidence", "recent_window"])
+    ap.add_argument("--create-only", action="store_true", help="with --new: create the campaign, print its id, exit")
     args = ap.parse_args()
     db = get_db()
     store.ensure_indexes(db)
+    try:
+        from harness.memory import ensure_vector_index
+        ensure_vector_index(db)
+    except Exception as exc:  # retrieval falls back to exact reads; never block the worker
+        print(f"vector index unavailable, retrieval will fall back: {exc}", file=sys.stderr)
     if args.new:
         protocol, _ = eeg.load_protocol(args.mode)
         cid = store.create_campaign(db, protocol=protocol, objective=OBJECTIVE, max_channels=args.max_channels,
                                     max_experiments=args.budget)
         print(cid, flush=True)
+        if args.create_only:
+            return
     elif args.campaign:
         cid = args.campaign
     else:

@@ -18,12 +18,17 @@ from pymongo import ASCENDING, DESCENDING
 from pymongo.database import Database
 
 from harness import store
-from harness.contracts import is_eligible, surface_summary
+from harness.contracts import MEMORY_KINDS, is_eligible, surface_summary
 from harness.db import log_event, now_iso
 
 RECENT_EVIDENCE = 3
 RECENT_BASELINE = 6
 RETRIEVE_K = 4
+# Vector Search is for notes. Verified results reach the packet by exact read (incumbent,
+# leaders, laggards, recent), because embeddings cannot rank by a number.
+NOTE_KINDS = [k for k in MEMORY_KINDS if k != "verified_result"]
+LEADERS = 3
+LAGGARDS = 2
 
 
 def estimate_tokens(obj) -> int:
@@ -31,7 +36,7 @@ def estimate_tokens(obj) -> int:
     return len(json.dumps(obj, default=str)) // 4
 
 
-def _search(db: Database, campaign: dict, query: str, k: int) -> list[dict]:
+def _search(db: Database, campaign: dict, query: str, k: int, kinds: list[str]) -> list[dict]:
     """David's memory.search_memories when present; exact filtered read otherwise."""
     try:
         from harness.memory import search_memories
@@ -39,9 +44,10 @@ def _search(db: Database, campaign: dict, query: str, k: int) -> list[dict]:
         search_memories = None
     if search_memories is not None:
         return search_memories(db, campaign_id=campaign["_id"], protocol_id=campaign["protocol_id"],
-                               query=query, k=k)
+                               query=query, k=k, kinds=kinds)
     docs = db.memories.find({"campaign_id": campaign["_id"], "protocol_id": campaign["protocol_id"],
-                             "status": "active"}, {"embedding": 0}).sort("created_at", DESCENDING).limit(k)
+                             "status": "active", "kind": {"$in": kinds}},
+                            {"embedding": 0}).sort("created_at", DESCENDING).limit(k)
     return [{"memory_id": d["_id"], "kind": d["kind"], "text": d["text"], "source_ids": d["source_ids"],
              "score": None, "verified": d["verified"], "retrieval": "fallback"} for d in docs]
 
@@ -81,6 +87,9 @@ def build_packet(db: Database, campaign_id: str, strategy: str = "evidence", bud
         "recent": [],
         "retrieved": [],
         "tried_keys": [e["key"] for e in exps],
+        "tried": [e["label"] for e in exps],
+        "leaders": [],
+        "laggards": [],
         "surface": surface_summary(),
         "token_estimate": 0,
         "budget_tokens": budget_tokens,
@@ -94,10 +103,16 @@ def build_packet(db: Database, campaign_id: str, strategy: str = "evidence", bud
         packet["pending"] = [{"experiment_id": e["_id"], "label": e["label"], "status": e["status"]}
                              for e in exps if e["status"] in ("queued", "running")]
         packet["recent"] = [_exp_row(e, constraints) for e in finished[-RECENT_EVIDENCE:]]
+        # Numerical evidence by exact read, never by semantic similarity.
+        done = sorted((e for e in finished if e["status"] == "done" and e["protocol_id"] == campaign["protocol_id"]),
+                      key=lambda e: e["result"]["val_balanced_accuracy"], reverse=True)
+        packet["leaders"] = [_exp_row(e, constraints) for e in done if is_eligible(e["config"], constraints)][:LEADERS]
+        packet["laggards"] = ([_exp_row(e, constraints) for e in finished if e["status"] == "failed"]
+                              + [_exp_row(e, constraints) for e in done[::-1]])[:LAGGARDS]
         query = (f"Choosing the next EEG motor imagery experiment with at most {constraints['max_channels']} "
                  f"channels. Useful: results and failures for eligible channel sets"
                  + (f"; current best is {inc['label']}" if inc else "") + ".")
-        packet["retrieved"] = _search(db, campaign, query, RETRIEVE_K)
+        packet["retrieved"] = _search(db, campaign, query, RETRIEVE_K, NOTE_KINDS)
     elif strategy == "recent_window":
         packet["recent"] = [_exp_row(e, constraints) for e in finished[-RECENT_BASELINE:]]
     else:

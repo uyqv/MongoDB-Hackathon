@@ -36,7 +36,7 @@ EVENT_TYPES = (
     "state_change", "packet_built", "llm_call", "proposal", "proposal_rejected",
     "job_queued", "job_reused", "job_claimed", "job_committed", "job_failed",
     "lease_expired", "stale_commit_rejected", "context_reset", "goal_changed",
-    "memory_added", "finalized", "fault_injection",
+    "memory_added", "finalized", "fault_injection", "jev_routed",
 )
 PACKET_STRATEGIES = ("evidence", "recent_window")
 
@@ -314,6 +314,9 @@ class EvidencePacket(TypedDict):
     recent: list[dict]       # [{"experiment_id", "label", "status", "val_balanced_accuracy", "eligible"}]
     retrieved: list[RetrievedMemory]
     tried_keys: list[str]    # every experiment key already queued/running/done/failed
+    tried: list[str]         # the same experiments as readable labels, so the model can avoid repeats
+    leaders: list[dict]      # evidence only: top eligible results, exact read
+    laggards: list[dict]     # evidence only: worst results and failures, exact read
     surface: dict            # surface_summary()
     token_estimate: int      # estimate, labeled as such in the UI
     budget_tokens: int

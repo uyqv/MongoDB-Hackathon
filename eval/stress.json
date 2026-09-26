@@ -1,0 +1,120 @@
+{
+  "ran_at": "2026-09-26T17:18:05.809+00:00",
+  "db": "second_shift_eval",
+  "campaign_id": "camp_ed8675ea",
+  "src_campaign_id": "camp_0f8981ee",
+  "incumbent_memory_id": "m_ce9f5f81e5fd",
+  "queries": 20,
+  "k": 4,
+  "latency_note": "end to end search_memories: Voyage query embedding + $vectorSearch, from this laptop",
+  "results": [
+    {
+      "level": 0,
+      "insert_embed_seconds": 0.0,
+      "index_sync_seconds": 0.0,
+      "memories_total": 9,
+      "distractors": 0,
+      "search_ms_p50": 239.6,
+      "search_ms_p95": 317.5,
+      "retrieval_modes": {
+        "vector": 20
+      },
+      "incumbent_in_top4": false,
+      "incumbent_rank": null,
+      "top4_kinds": [
+        "verified_result",
+        "verified_result",
+        "verified_result",
+        "verified_result"
+      ],
+      "top4_scores": [
+        0.7906,
+        0.7898,
+        0.7884,
+        0.7876
+      ],
+      "packet_token_estimate": 940,
+      "packet_budget_tokens": 4000,
+      "packet_under_budget": true,
+      "packet_retrieved_kinds": [
+        "verified_result",
+        "verified_result",
+        "verified_result",
+        "verified_result"
+      ],
+      "packet_has_incumbent": true
+    },
+    {
+      "level": 1000,
+      "insert_embed_seconds": 7.2,
+      "index_sync_seconds": 3.5,
+      "memories_total": 1009,
+      "distractors": 1000,
+      "search_ms_p50": 261.4,
+      "search_ms_p95": 309.7,
+      "retrieval_modes": {
+        "vector": 20
+      },
+      "incumbent_in_top4": false,
+      "incumbent_rank": null,
+      "top4_kinds": [
+        "verified_result",
+        "verified_result",
+        "verified_result",
+        "verified_result"
+      ],
+      "top4_scores": [
+        0.7906,
+        0.7898,
+        0.7884,
+        0.7876
+      ],
+      "packet_token_estimate": 780,
+      "packet_budget_tokens": 4000,
+      "packet_under_budget": true,
+      "packet_retrieved_kinds": [
+        "synthetic_stress",
+        "synthetic_stress",
+        "synthetic_stress",
+        "synthetic_stress"
+      ],
+      "packet_has_incumbent": true
+    },
+    {
+      "level": 10000,
+      "insert_embed_seconds": 105.1,
+      "index_sync_seconds": 4.5,
+      "memories_total": 10009,
+      "distractors": 10000,
+      "search_ms_p50": 726.5,
+      "search_ms_p95": 4613.5,
+      "retrieval_modes": {
+        "vector": 20
+      },
+      "incumbent_in_top4": false,
+      "incumbent_rank": null,
+      "top4_kinds": [
+        "verified_result",
+        "verified_result",
+        "verified_result",
+        "verified_result"
+      ],
+      "top4_scores": [
+        0.7906,
+        0.7898,
+        0.7884,
+        0.7876
+      ],
+      "packet_token_estimate": 781,
+      "packet_budget_tokens": 4000,
+      "packet_under_budget": true,
+      "packet_retrieved_kinds": [
+        "synthetic_stress",
+        "synthetic_stress",
+        "synthetic_stress",
+        "synthetic_stress"
+      ],
+      "packet_has_incumbent": true
+    }
+  ]
+}
