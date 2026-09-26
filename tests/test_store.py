@@ -17,11 +17,11 @@ RESULT = {"val_balanced_accuracy": 0.8, "val_f1": 0.79, "n_train": 75, "n_val": 
 
 @pytest.fixture
 def db():
-    d = get_db("second_shift_test_andrew")
+    d = get_db("second_shift_pytest")
     for c in ("campaigns", "experiments", "events", "memories", "packets"):
         d[c].delete_many({})
     yield d
-    d.client.drop_database("second_shift_test_andrew")
+    d.client.drop_database("second_shift_pytest")
 
 
 def _campaign(db, max_channels=64):
