@@ -31,6 +31,8 @@ Branch `david`. Dev DB `second_shift_david`.
   - `obsolete_protocol`: the trap is a synthetic experiment under a different protocol_id (evaluator `eeg-eval-0`), val bal acc = real incumbent + 0.12, created last. `store.incumbent` excludes it; the recent_window packet shows it.
   - Rebuild: `python -m eval.fixtures --src-campaign camp_0f8981ee --reset` (reset deletes only `fixture: true` docs and their packets/events).
 - **D7** `/api/eeg/preview` + panel 6 (13:08 ET). Real `S001R06.edf` via `eegbci.load_data(1, [6])` + `standardize`: C3/Cz/C4, 1-40 Hz zero-phase FIR, 6 s from the first task cue, shown at 80 Hz; Welch PSD 4-40 Hz on 1-3 s epochs, T1 fists (n=7) vs T2 feet (n=8). Cached to `data/eeg_preview.json` (gitignored). Returns 503 with the reason if the download fails. Caption names the PhysioNet source and says it is display only.
+- **D8** `docs/ATTRIBUTION.md` (13:08 ET): eegmmidb v1.0.0 (DOI 10.13026/C28G6P, ODC-By 1.0), Schalk et al. 2004 BCI2000 citation, Goldberger et al. 2000 PhysioNet citation, software/service table with licenses, and the statement of what is original work from today.
+- Andrew: Jev (D9) is REQUIRED now, not stretch; do it after D8 regardless of time; do not wire it into the worker.
 
 ## Tests
 
