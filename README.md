@@ -1,6 +1,6 @@
 # Second Shift
 
-**A research agent that can lose its working context, or its whole process, without losing its research campaign.**
+**A neuroscience harness that lets an agent lose its working context, or its whole process, without losing the research campaign.**
 
 Built today (September 26, 2026) at the MongoDB x Cerebral Valley Harness Engineering hackathon, Problem Statement 2: Long Horizon Engineering.
 
@@ -109,8 +109,12 @@ flowchart LR
 
 ## Run it
 
+**Hosted dashboard:** https://second-shift-iota.vercel.app. The public deployment
+shows a labeled snapshot of real Atlas campaigns, with a capture timestamp.
+See [Vercel deployment](docs/VERCEL_DEPLOYMENT.md) for Git deployment and refresh instructions.
+
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+python3 -m venv .venv && .venv/bin/pip install -r requirements-worker.txt
 cp .env.example .env          # MONGODB_URI, OPENROUTER_API_KEY, VOYAGE_API_KEY, DB_NAME=second_shift
 
 .venv/bin/python -m harness.eeg --mode demo                     # real data gate: hashes, splits, sample results

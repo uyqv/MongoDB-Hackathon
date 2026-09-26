@@ -106,6 +106,7 @@ All responses are JSON. ObjectIds become strings. **The `embedding` field is nev
 | GET | `/api/campaigns/{cid}/experiments` | ordered by `created_at`, each with computed `eligible` |
 | GET | `/api/campaigns/{cid}/events?after=<iso>&limit=200` | ordered by `ts` |
 | GET | `/api/campaigns/{cid}/packets/latest?strategy=evidence` | latest packet doc |
+| GET | `/api/campaigns/{cid}/packets/{packet_id}` | stored packet for this campaign only; 404 for a missing campaign or a packet owned by another campaign; embeddings omitted |
 | GET | `/api/campaigns/{cid}/memories?kind=&include_synthetic=false` | memories without embeddings |
 | GET | `/api/eeg/preview` | real EEG trace + per-class PSD from S001 run 6 (see §7) |
 | GET | `/api/worker/status` | `control.worker_status()` |

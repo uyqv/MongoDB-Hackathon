@@ -6,3 +6,10 @@ data/
 run/
 *.pid
 .pytest_cache/
+/.playwright-report/
+/.playwright-mcp
+/.playwright-cli
+/design-demos
+/.vercel/
+/.env.local
+/output/vercel-dashboard/

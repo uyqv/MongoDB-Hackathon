@@ -1,0 +1,17 @@
+*
+!app.py
+!requirements.txt
+!.python-version
+!vercel.json
+!api
+!api/**
+!harness
+!harness/**
+!web
+!web/**
+!eval
+!eval/*.json
+!artifacts
+!artifacts/*.json
+**/__pycache__/**
+**/*.pyc

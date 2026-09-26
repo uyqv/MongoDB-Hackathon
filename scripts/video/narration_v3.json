@@ -1,0 +1,10 @@
+[
+ {"id":"intro","text":"When an AI agent starts over, should your research have to start over too?"},
+ {"id":"promise","text":"We built Second Shift so that every new decision can begin with evidence from the work already done."},
+ {"id":"run","text":"Here, it is running experiments on recorded brain signals, with MongoDB Atlas holding the campaign's memory."},
+ {"id":"kill","text":"Now watch what happens when I stop the worker in the middle of an experiment."},
+ {"id":"recover","text":"The worker disappears, but its completed results remain. When we restart it, those results are reused, and the interrupted experiment runs again."},
+ {"id":"goal","text":"Now we give it a different challenge: work with just nine electrodes instead of sixty-four."},
+ {"id":"adapt","text":"It rechecks its earlier results, rebuilds its context, and continues under the new constraint."},
+ {"id":"close","text":"That is Second Shift: an agent that can start fresh while its research keeps moving forward."}
+]

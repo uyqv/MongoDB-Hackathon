@@ -1,0 +1,63 @@
+{
+  "interrupted_id": "camp_614645d1:x_37d0f9079a33137c",
+  "interrupted_attempt": 1,
+  "retried_attempt": 2,
+  "retry_result": {
+    "val_balanced_accuracy": 0.6654,
+    "val_f1": 0.6628,
+    "n_train": 75,
+    "n_val": 75,
+    "n_channels": 21,
+    "fit_seconds": 0.341,
+    "evaluator_version": "eeg-eval-1",
+    "per_subject_val_balanced_accuracy": {
+      "1": 1.0,
+      "2": 0.4821,
+      "3": 0.4554,
+      "4": 0.875,
+      "5": 0.5446
+    }
+  },
+  "preserved_results": [
+    {
+      "id": "camp_614645d1:x_179f0e198f2ab069",
+      "attempt": 1,
+      "result": {
+        "val_balanced_accuracy": 0.6924,
+        "val_f1": 0.6914,
+        "n_train": 75,
+        "n_val": 75,
+        "n_channels": 21,
+        "fit_seconds": 0.352,
+        "evaluator_version": "eeg-eval-1",
+        "per_subject_val_balanced_accuracy": {
+          "1": 0.9375,
+          "2": 0.5,
+          "3": 0.7411,
+          "4": 1.0,
+          "5": 0.3304
+        }
+      }
+    },
+    {
+      "id": "camp_614645d1:x_ef4ac199c19d5c65",
+      "attempt": 1,
+      "result": {
+        "val_balanced_accuracy": 0.7454,
+        "val_f1": 0.7438,
+        "n_train": 75,
+        "n_val": 75,
+        "n_channels": 21,
+        "fit_seconds": 0.037,
+        "evaluator_version": "eeg-eval-1",
+        "per_subject_val_balanced_accuracy": {
+          "1": 0.9375,
+          "2": 0.8125,
+          "3": 0.5893,
+          "4": 0.875,
+          "5": 0.5536
+        }
+      }
+    }
+  ]
+}

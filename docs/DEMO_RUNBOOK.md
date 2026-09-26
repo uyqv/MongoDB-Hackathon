@@ -1,59 +1,58 @@
-# Demo runbook and one minute video
+# Second Shift product demonstration
 
-Record on site. Record the real run at normal speed, then cut it down to 60 seconds. If a cut skips time, put a small "cut" or "sped up" caption on it. Never show a replay as if it were live.
+The current delivery is `presentation/neuroscience-demo/second-shift-neuroscience.mp4`. It is a 59.6 second, 1920 × 1080 recording of the working interface with neuroscience-focused narration only. The script, evidence, and scored review are in the same directory. The previous edition remains in `presentation/product-demo/`.
 
-## Setup (3:30 PM, about 5 minutes)
+Use the monochrome dashboard at http://localhost:8000. The working context, decision, experiment, and durable memory form one live diagram. Click a node or **Inspect** for evidence, **Activity** for historical decisions, or **Under the hood** for actual repository code. **Follow activity** switches to a fixed overview when disabled.
 
-Terminal A, the dashboard:
+## Run the dashboard
+
 ```bash
-cd MongoDB-Hackathon && git checkout main && git pull
-DB_NAME=second_shift .venv/bin/uvicorn api.main:app --port 8000
+DB_NAME=second_shift .venv/bin/uvicorn api.main:app --host 127.0.0.1 --port 8000
 ```
-Open http://localhost:8000 in a clean browser window at 1440 px wide or more.
 
-Terminal B, a fresh campaign that is created but not started:
+To create a campaign for a manual demo:
+
 ```bash
 DB_NAME=second_shift .venv/bin/python -m harness.worker --new --mode demo --max-channels 64 --budget 10 --create-only
-# prints camp_xxxxxxxx; select it in the dashboard dropdown
 ```
 
-Check: `.venv/bin/python -m pytest -q` is green, and the dashboard shows the new campaign with 0 experiments and the real EEG panel.
+Select that campaign and press **Start worker**. Press **Stop worker** while an experiment is claimed to demonstrate a real SIGKILL. Completed results remain. Press **Start worker** again, allow the previous lease to expire, and inspect attempt two. Use **Clear context**, then the **9** electrode limit. If no existing result qualifies, the incumbent must remain empty until an eligible result is measured.
 
-## The run (about 3 minutes real time)
+## Record a new take
 
-1. **Start.** Terminal B runs the worker with fault injection, so the crash lands mid job:
-   ```bash
-   DB_NAME=second_shift .venv/bin/python -m harness.worker --campaign camp_xxxxxxxx --crash-after-claim 4
-   ```
-   Experiments stream into the table and the chart. The context packet panel shows the retrieved evidence IDs.
-2. **Crash.** On the 4th job the worker logs `fault_injection` and SIGKILLs itself. The dashboard shows a job stuck in `running`.
-3. **Recover.** Press **Start worker** in the dashboard. The timeline shows `worker_start` with "resuming: 3 done experiments will be reused, not recomputed". Then `WAITING` while the dead lease runs out, then `lease_expired`, and the job reruns as attempt 2.
-4. **Change the goal.** After about 6 experiments, press **Reset context**, then set the channel budget to **9** with reason "new headset has 9 electrodes". The incumbent switches to the best 9 channel result already measured, with no new job. Every later proposal uses 9 channels, and the packet panel shows goal version 2.
-5. **Finish.** The worker finalizes and scores the sealed test set once. The goal panel shows the final validation and test numbers.
+```bash
+DEMO_API=http://localhost:8000 VIDEO_CAPTURE_DIR=run/video-v3/new-take DB_NAME=second_shift .venv/bin/python -m scripts.video.record_demo_v3
+```
 
-Backup, if a live step misbehaves: `python -m eval.demo_checks all` reproduces the recovery and constraint proofs end to end. Record its PASS output instead.
+The recorder creates a fresh real campaign. It drives the dashboard controls, captures a continuous 1080p browser video, and preserves timestamps, events, packets, and experiment documents. It asserts that the interrupted experiment retries as attempt two and that earlier results are unchanged. It will fail rather than claim a missed stop as recovery. Do not run another worker concurrently.
 
-## Dry run notes (1:42 PM, `camp_9099ead8`, every beat worked)
+Narration comes from the revised 120-word neuroscience script in `scripts/video/narration.json`. The previous 130-word script is preserved in `scripts/video/narration_v3.json`:
 
-- The whole run took about 2 minutes: crash on the 4th job at 0:41, restart plus lease wait about 5 s, 6 done at 1:10, finished at 2:00. 10 planner calls, 0 fallbacks, $0.10. Jev routed 10 of 10.
-- Press **Start worker only after the terminal worker has crashed.** An earlier run had two workers overlap. Nothing broke (the lease serialized them), but it muddies the story.
-- After 64 to 9, the incumbent can be empty if no 9 channel experiment ran yet. Then the right line is "nothing measured qualifies, so it keeps searching under the new goal", and the next proposals are all 9 channel. Don't promise a switch on camera unless the table already shows a central9 row.
-- The timeline panel fills with `llm_call` lines, so by the end the crash and restart events have scrolled off. Film them when they happen, or scroll the timeline.
-- 9 channel results are weaker: the sealed test for the 9 channel pick was 0.547. Don't narrate it as an improvement.
+```bash
+VIDEO_VOICE_DIR=run/video-v4/voice .venv/bin/python scripts/video/tts_elevenlabs.py
+```
 
-## Storyboard (60 s)
+Listen to the voice before choosing cuts. Do not mechanically accelerate the voice. The delivered edit preserves its original speed and inserts silence between complete sentences.
 
-| Time | Show | Say |
-|---|---|---|
-| 0 to 8 s | Goal panel and the real EEG panel | "Long running agents lose the reasoning behind old experiments. Second Shift rebuilds every decision from durable evidence in MongoDB." |
-| 8 to 20 s | Experiments streaming, one packet with evidence IDs | "Claude picks the next EEG experiment from a fixed menu and cites evidence. Code computes every number." |
-| 20 to 33 s | Fault injection, stuck job, Start worker, timeline | "We kill the worker mid job. A new process rebuilds the campaign from Atlas. Finished work is reused, and the orphaned job reruns as attempt 2." |
-| 33 to 47 s | Reset context, channel budget 64 to 9, incumbent switch, packet with goal v2 | "We wipe the context and cut the electrode budget to 9. It re-ranks what it already measured and keeps going under the new goal." |
-| 47 to 56 s | README results: checks, comparison table, tokens, cost | Only measured numbers: checks passed, comparison result, tokens, cost. |
-| 56 to 60 s | Code and the Atlas collections | "One persistent mission, bounded context, decisions grounded in measured results." |
+## Reproduce the reviewed edit
 
-## Submission (4:25 PM)
+```bash
+.venv/bin/python scripts/video/edit_demo_v4.py
+VIDEO_REVIEW_ROOT=run/video-v4 VIDEO_EVIDENCE_DIR=run/video-v3/take-2 .venv/bin/python scripts/video/review_demo_v3.py
+```
 
-- The repo is public at github.com/uyqv/MongoDB-Hackathon. Open it logged out and confirm the README renders.
-- Video link: open it logged out and confirm audio plays.
-- Cerebral Valley: description from the README's first paragraph plus measured results. Both teammates added.
+The neuroscience revision uses new narration and new cuts of the approved continuous take. The editor's shot list is deliberately tied to `run/video-v3/take-2`, campaign `camp_614645d1`. A new campaign has different timings, so build a new edit decision list from its marks and events. Do not reuse these cut times blindly.
+
+All included footage plays at normal speed. Clean cuts omit waiting periods; list those omissions in delivery notes. The video contains no captions, subtitles, lower thirds, speed badges, marketing overlays, music, or sound effects. The cursor and labels are part of the recorded interface. No historical events are replayed as a live campaign.
+
+## Verify
+
+```bash
+node --test tests/test_live_state.mjs
+.venv/bin/python -m pytest -q tests/test_packet_endpoint.py tests/test_contracts.py tests/test_worker.py
+DEMO_API=http://localhost:8000 .venv/bin/python scripts/video/check_dashboard.py
+```
+
+The browser checks isolate their data with HTTP fixtures and make no database writes. The packet endpoint test uses a mocked database. The real recording verifies the actual worker controls and persisted recovery evidence. The existing integration API tests require the separate `second_shift_david` test database; do not point seed tests at the real demo database.
+
+Review the exported video muted, the audio alone, and the combined timing. Direct listening remains a required human check when the reviewing environment cannot hear audio playback. The accompanying review explicitly distinguishes measured audio checks from that listening check.

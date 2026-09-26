@@ -1,0 +1,2378 @@
+[
+  {
+    "observed": 0.119,
+    "_id": "6ab81e614cf4f7c988c2dd64",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:34:57.594+00:00",
+    "type": "campaign_created",
+    "worker_id": null,
+    "payload": {
+      "protocol_id": "p_8b1175a416b1",
+      "constraints": {
+        "max_channels": 64
+      },
+      "max_experiments": 10,
+      "objective": "Maximize validation balanced accuracy for imagined both-fists vs both-feet motor imagery EEG (PhysioNet eegmmidb runs 6/10/14), within the experiment budget and the current channel limit."
+    }
+  },
+  {
+    "observed": 10.846,
+    "_id": "6ab81e6cb73477afbc973a6f",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:08.590+00:00",
+    "type": "worker_start",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "resumed": false,
+      "pid": 56190,
+      "counts": {
+        "done": 0,
+        "failed": 0,
+        "running": 0,
+        "queued": 0
+      },
+      "note": "fresh start"
+    }
+  },
+  {
+    "observed": 13.655,
+    "_id": "6ab81e6fb73477afbc973a70",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:11.370+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "observed": 15.057,
+    "_id": "6ab81e70b73477afbc973a71",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:12.616+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "packet_id": "pk_072441f90265",
+      "strategy": "evidence",
+      "goal_version": 1,
+      "token_estimate": 260,
+      "budget_tokens": 4000,
+      "retrieved_ids": [],
+      "incumbent_id": null
+    }
+  },
+  {
+    "observed": 17.992,
+    "_id": "6ab81e73b73477afbc973a72",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:15.641+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "packet_id": "pk_072441f90265",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790451313-qxCf1buw1NulK5dJFUd7",
+      "usage": {
+        "input_tokens": 2089,
+        "output_tokens": 192,
+        "cost_usd": 0.006098,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 17.992,
+    "_id": "6ab81e73b73477afbc973a73",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:15.847+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "observed": 18.374,
+    "_id": "6ab81e74b73477afbc973a74",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:16.173+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "observed": 18.709,
+    "_id": "6ab81e74b73477afbc973a75",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:16.285+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "packet_id": "pk_072441f90265",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 4
+      },
+      "rationale": "CSP with LDA on motor-relevant channels and a broad beta band is a strong, well-established baseline for fists-vs-feet motor imagery decoding.",
+      "evidence_ids": [],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "observed": 18.709,
+    "_id": "6ab81e74b73477afbc973a76",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:16.458+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_179f0e198f2ab069",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4"
+    }
+  },
+  {
+    "observed": 19.042,
+    "_id": "6ab81e74b73477afbc973a77",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:16.699+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "observed": 19.042,
+    "_id": "6ab81e74b73477afbc973a78",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:16.893+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_179f0e198f2ab069",
+      "attempt": 1,
+      "lease_token": "6186c88efca41187"
+    }
+  },
+  {
+    "observed": 19.757,
+    "_id": "6ab81e75b73477afbc973a79",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:17.420+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "observed": 20.095,
+    "_id": "6ab81e75b73477afbc973a7a",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:17.663+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_179f0e198f2ab069",
+      "val_balanced_accuracy": 0.6924,
+      "fit_seconds": 0.352
+    }
+  },
+  {
+    "observed": 20.478,
+    "_id": "6ab81e76b73477afbc973a7b",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:18.085+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "memory_id": "m_32c6264fcaa9",
+      "experiment_id": "camp_614645d1:x_179f0e198f2ab069",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "observed": 21.146,
+    "_id": "6ab81e76b73477afbc973a7c",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:18.996+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_179f0e198f2ab069",
+      "label": "research_note",
+      "memory_id": "m_c6fa818da11c",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=4: CSP with LDA on motor-relevant channels and a broad beta band is a strong, well-established baseline for fists-vs-feet motor imagery decoding. Outcome, computed by code: it is now the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790451318-OmchSmLZpC7DScX77Hk9",
+      "usage": {
+        "input_tokens": 533,
+        "output_tokens": 48,
+        "cost_usd": 2.2386e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 21.525,
+    "_id": "6ab81e77b73477afbc973a7d",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:19.252+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 22.571,
+    "_id": "6ab81e78b73477afbc973a7e",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:20.130+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "observed": 23.239,
+    "_id": "6ab81e78b73477afbc973a7f",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:20.899+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "packet_id": "pk_283b4ab80129",
+      "strategy": "evidence",
+      "goal_version": 1,
+      "token_estimate": 640,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_c6fa818da11c"
+      ],
+      "incumbent_id": "camp_614645d1:x_179f0e198f2ab069"
+    }
+  },
+  {
+    "observed": 26.915,
+    "_id": "6ab81e7cb73477afbc973a80",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:24.497+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "packet_id": "pk_283b4ab80129",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790451321-pbPOY0WaMLO22nXiXs1o",
+      "usage": {
+        "input_tokens": 2903,
+        "output_tokens": 204,
+        "cost_usd": 0.007846,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 26.915,
+    "_id": "6ab81e7cb73477afbc973a81",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:24.680+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "observed": 27.293,
+    "_id": "6ab81e7db73477afbc973a82",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:25.008+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "observed": 27.293,
+    "_id": "6ab81e7db73477afbc973a83",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:25.094+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "packet_id": "pk_283b4ab80129",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "motor21",
+        "n_components": 6
+      },
+      "rationale": "Explore a higher n_components for CSP to see if more spatial filters improve on the incumbent baseline within the same band/window/channels.",
+      "evidence_ids": [
+        "camp_614645d1:x_179f0e198f2ab069"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "observed": 27.744,
+    "_id": "6ab81e7db73477afbc973a84",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:25.291+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_ef4ac199c19d5c65",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6"
+    }
+  },
+  {
+    "observed": 27.744,
+    "_id": "6ab81e7db73477afbc973a85",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:25.551+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "observed": 28.148,
+    "_id": "6ab81e7db73477afbc973a86",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:25.838+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_ef4ac199c19d5c65",
+      "attempt": 1,
+      "lease_token": "d19ae222cef50f64"
+    }
+  },
+  {
+    "observed": 28.482,
+    "_id": "6ab81e7eb73477afbc973a87",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:26.061+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "observed": 28.482,
+    "_id": "6ab81e7eb73477afbc973a88",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:26.256+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_ef4ac199c19d5c65",
+      "val_balanced_accuracy": 0.7454,
+      "fit_seconds": 0.037
+    }
+  },
+  {
+    "observed": 29.2,
+    "_id": "6ab81e7eb73477afbc973a89",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:26.790+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "memory_id": "m_1b9484487564",
+      "experiment_id": "camp_614645d1:x_ef4ac199c19d5c65",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "observed": 30.263,
+    "_id": "6ab81e7fb73477afbc973a8a",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:27.944+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_ef4ac199c19d5c65",
+      "label": "research_note",
+      "memory_id": "m_4ed58b413b56",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 motor21 \u00b7 n=6: Explore a higher n_components for CSP to see if more spatial filters improve on the incumbent baseline within the same band/window/channels. Outcome, computed by code: it is now the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790451327-s9zoEDzEntJC9IhayW6G",
+      "usage": {
+        "input_tokens": 528,
+        "output_tokens": 48,
+        "cost_usd": 2.2176e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 30.684,
+    "_id": "6ab81e80b73477afbc973a8b",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:28.159+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 31.817,
+    "_id": "6ab81e81b73477afbc973a8c",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:29.598+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "observed": 32.99,
+    "_id": "6ab81e82b73477afbc973a8d",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:30.653+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "packet_id": "pk_d458f173d9e6",
+      "strategy": "evidence",
+      "goal_version": 1,
+      "token_estimate": 953,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_c6fa818da11c",
+        "m_4ed58b413b56"
+      ],
+      "incumbent_id": "camp_614645d1:x_ef4ac199c19d5c65"
+    }
+  },
+  {
+    "observed": 36.878,
+    "_id": "6ab81e86b73477afbc973a8e",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:34.641+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "packet_id": "pk_d458f173d9e6",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790451330-nmdKiLUHcjM4fXD8Nd9Y",
+      "usage": {
+        "input_tokens": 3564,
+        "output_tokens": 225,
+        "cost_usd": 0.009378,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 37.253,
+    "_id": "6ab81e86b73477afbc973a8f",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:34.820+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "observed": 37.589,
+    "_id": "6ab81e87b73477afbc973a90",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:35.165+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "observed": 37.589,
+    "_id": "6ab81e87b73477afbc973a91",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:35.251+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "packet_id": "pk_d458f173d9e6",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.5_3.5",
+        "channels": "motor21",
+        "n_components": 6
+      },
+      "rationale": "Test a later window with the incumbent's best n_components=6 to see if shifting the epoch window improves CSP spatial filter separability for fists vs feet.",
+      "evidence_ids": [
+        "camp_614645d1:x_ef4ac199c19d5c65",
+        "m_4ed58b413b56"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "observed": 37.929,
+    "_id": "6ab81e87b73477afbc973a92",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:35.499+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_37d0f9079a33137c",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.5_3.5 \u00b7 motor21 \u00b7 n=6"
+    }
+  },
+  {
+    "observed": 37.929,
+    "_id": "6ab81e87b73477afbc973a93",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:35.690+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "observed": 38.302,
+    "_id": "6ab81e87b73477afbc973a94",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:35.863+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_56190",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_37d0f9079a33137c",
+      "attempt": 1,
+      "lease_token": "bc4241c34662f77b"
+    }
+  },
+  {
+    "observed": 38.302,
+    "_id": "6ab81e8815e9f4b4c674bbf2",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:36.038+00:00",
+    "type": "worker_killed",
+    "worker_id": null,
+    "payload": {
+      "pid": 56190,
+      "signal": "SIGKILL"
+    }
+  },
+  {
+    "observed": 48.081,
+    "_id": "6ab81e91953bc246d8b096b2",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:45.823+00:00",
+    "type": "worker_start",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "resumed": true,
+      "pid": 56766,
+      "counts": {
+        "done": 2,
+        "failed": 0,
+        "running": 1,
+        "queued": 0
+      },
+      "note": "resuming: 2 done experiments will be reused, not recomputed"
+    }
+  },
+  {
+    "observed": 50.181,
+    "_id": "6ab81e93953bc246d8b096b3",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:47.861+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 50.893,
+    "_id": "6ab81e94953bc246d8b096b4",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:48.693+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "WAITING",
+      "experiment_id": "camp_614645d1:x_37d0f9079a33137c",
+      "lease_expires_at": "2026-09-26T19:35:50.776+00:00"
+    }
+  },
+  {
+    "observed": 53.84,
+    "_id": "6ab81e97953bc246d8b096b5",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:51.311+00:00",
+    "type": "lease_expired",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_37d0f9079a33137c",
+      "attempt": 1,
+      "dead_owner": "w_Andrews-Ma_56190"
+    }
+  },
+  {
+    "observed": 54.295,
+    "_id": "6ab81e97953bc246d8b096b6",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:51.592+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "WAITING",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 55.165,
+    "_id": "6ab81e98953bc246d8b096b7",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:52.563+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "observed": 55.165,
+    "_id": "6ab81e98953bc246d8b096b8",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:52.799+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_37d0f9079a33137c",
+      "attempt": 2,
+      "lease_token": "168abe87e18e1d62"
+    }
+  },
+  {
+    "observed": 55.952,
+    "_id": "6ab81e99953bc246d8b096b9",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:53.412+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "observed": 55.952,
+    "_id": "6ab81e99953bc246d8b096ba",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:53.611+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_37d0f9079a33137c",
+      "val_balanced_accuracy": 0.6654,
+      "fit_seconds": 0.341
+    }
+  },
+  {
+    "observed": 56.663,
+    "_id": "6ab81e9a953bc246d8b096bb",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:54.379+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "memory_id": "m_e0ba9f772ea7",
+      "experiment_id": "camp_614645d1:x_37d0f9079a33137c",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "observed": 57.332,
+    "_id": "6ab81e9b953bc246d8b096bc",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:55.180+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_37d0f9079a33137c",
+      "label": "research_note",
+      "memory_id": "m_f324188f035d",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.5_3.5 \u00b7 motor21 \u00b7 n=6: Test a later window with the incumbent's best n_components=6 to see if shifting the epoch window improves CSP spatial filter separability for fists vs feet. Outcome, computed by code: it did not beat the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790451354-i4iMljcgU9tfoVuva5hl",
+      "usage": {
+        "input_tokens": 535,
+        "output_tokens": 48,
+        "cost_usd": 2.247e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 57.705,
+    "_id": "6ab81e9b953bc246d8b096bd",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:55.423+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 58.902,
+    "_id": "6ab81e9c953bc246d8b096be",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:56.556+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "observed": 59.726,
+    "_id": "6ab81e9d953bc246d8b096bf",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:35:57.367+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_c8e5417ab8f1",
+      "strategy": "evidence",
+      "goal_version": 1,
+      "token_estimate": 1221,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_c6fa818da11c",
+        "m_4ed58b413b56",
+        "m_f324188f035d"
+      ],
+      "incumbent_id": "camp_614645d1:x_ef4ac199c19d5c65"
+    }
+  },
+  {
+    "observed": 64.451,
+    "_id": "6ab81ea2953bc246d8b096c0",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:02.035+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_c8e5417ab8f1",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790451357-t2gKFtAxUcaEFuCkHdRL",
+      "usage": {
+        "input_tokens": 4101,
+        "output_tokens": 243,
+        "cost_usd": 0.010632,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 64.451,
+    "_id": "6ab81ea2953bc246d8b096c1",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:02.237+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "observed": 64.967,
+    "_id": "6ab81ea2953bc246d8b096c2",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:02.527+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "observed": 64.967,
+    "_id": "6ab81ea2953bc246d8b096c3",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:02.614+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_c8e5417ab8f1",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w0.5_2.5",
+        "channels": "motor21",
+        "n_components": 6
+      },
+      "rationale": "Test the earlier window with the best n_components=6 to see if shifting epoch timing earlier improves separability, since w1.0_3.0 outperformed w1.5_3.5.",
+      "evidence_ids": [
+        "camp_614645d1:x_ef4ac199c19d5c65",
+        "camp_614645d1:x_37d0f9079a33137c"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "observed": 65.376,
+    "_id": "6ab81ea2953bc246d8b096c4",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:02.859+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_951c0606000fc825",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 motor21 \u00b7 n=6"
+    }
+  },
+  {
+    "observed": 65.376,
+    "_id": "6ab81ea3953bc246d8b096c5",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:03.055+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "observed": 65.709,
+    "_id": "6ab81ea3953bc246d8b096c6",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:03.287+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_951c0606000fc825",
+      "attempt": 1,
+      "lease_token": "9402c1837bd348d3"
+    }
+  },
+  {
+    "observed": 65.709,
+    "_id": "6ab81ea3953bc246d8b096c7",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:03.563+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "observed": 66.179,
+    "_id": "6ab81ea3953bc246d8b096c8",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:03.819+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_951c0606000fc825",
+      "val_balanced_accuracy": 0.7735,
+      "fit_seconds": 0.037
+    }
+  },
+  {
+    "observed": 66.625,
+    "_id": "6ab81ea4953bc246d8b096c9",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:04.340+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "memory_id": "m_416b0dc9f537",
+      "experiment_id": "camp_614645d1:x_951c0606000fc825",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "observed": 67.065,
+    "_id": "6ab81ea415e9f4b4c674bbf3",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:04.534+00:00",
+    "type": "context_reset",
+    "worker_id": null,
+    "payload": {
+      "context_epoch": 1
+    }
+  },
+  {
+    "observed": 67.589,
+    "_id": "6ab81ea5953bc246d8b096ca",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:05.154+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_951c0606000fc825",
+      "label": "research_note",
+      "memory_id": "m_e0b4889dabc2",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 motor21 \u00b7 n=6: Test the earlier window with the best n_components=6 to see if shifting epoch timing earlier improves separability, since w1.0_3.0 outperformed w1.5_3.5. Outcome, computed by code: it is now the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790451364-nQE061hb0nvrChslycT4",
+      "usage": {
+        "input_tokens": 547,
+        "output_tokens": 48,
+        "cost_usd": 2.2974e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 68.113,
+    "_id": "6ab81ea5953bc246d8b096cb",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:05.397+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 68.113,
+    "_id": "6ab81ea5953bc246d8b096cc",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:05.657+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "note": "context reset observed; next decision rebuilt from Atlas only",
+      "context_epoch": 1
+    }
+  },
+  {
+    "observed": 69.161,
+    "_id": "6ab81ea615e9f4b4c674bbf4",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:06.525+00:00",
+    "type": "goal_changed",
+    "worker_id": null,
+    "payload": {
+      "from_version": 1,
+      "to_version": 2,
+      "old_constraints": {
+        "max_channels": 64
+      },
+      "new_constraints": {
+        "max_channels": 9
+      },
+      "reason": "Electrode budget changed from the research dashboard"
+    }
+  },
+  {
+    "observed": 69.161,
+    "_id": "6ab81ea6953bc246d8b096cd",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:06.813+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "observed": 70.212,
+    "_id": "6ab81ea7953bc246d8b096ce",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:07.565+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_49a886d9df37",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1162,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_c6fa818da11c",
+        "m_f324188f035d",
+        "m_4ed58b413b56",
+        "m_e0b4889dabc2"
+      ],
+      "incumbent_id": null
+    }
+  },
+  {
+    "observed": 74.929,
+    "_id": "6ab81eac953bc246d8b096cf",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:12.269+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_49a886d9df37",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790451367-JPgI3Ai7uXbHcau1wAXO",
+      "usage": {
+        "input_tokens": 3886,
+        "output_tokens": 273,
+        "cost_usd": 0.010502,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 74.929,
+    "_id": "6ab81eac953bc246d8b096d0",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:12.479+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "observed": 75.454,
+    "_id": "6ab81eac953bc246d8b096d1",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:12.817+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "observed": 75.454,
+    "_id": "6ab81eac953bc246d8b096d2",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:12.919+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_49a886d9df37",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w0.5_2.5",
+        "channels": "central9",
+        "n_components": 6
+      },
+      "rationale": "Since motor21 (21 channels) exceeds the max_channels=9 constraint, we must switch to the eligible central9 channel set while keeping the best-performing band/window/n_components combo (beta_13_30, w0.5_2.5, n=6) to test if the incumbent setup transfers to fewer channels.",
+      "evidence_ids": [
+        "camp_614645d1:x_951c0606000fc825",
+        "m_e0b4889dabc2"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "observed": 75.454,
+    "_id": "6ab81ead953bc246d8b096d3",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:13.092+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_950ecac7d6682ddc",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=6"
+    }
+  },
+  {
+    "observed": 75.978,
+    "_id": "6ab81ead953bc246d8b096d4",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:13.336+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "observed": 75.978,
+    "_id": "6ab81ead953bc246d8b096d5",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:13.533+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_950ecac7d6682ddc",
+      "attempt": 1,
+      "lease_token": "4062ad5506b7bd44"
+    }
+  },
+  {
+    "observed": 76.384,
+    "_id": "6ab81ead953bc246d8b096d6",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:13.772+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "observed": 76.384,
+    "_id": "6ab81ead953bc246d8b096d7",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:13.968+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_950ecac7d6682ddc",
+      "val_balanced_accuracy": 0.7592,
+      "fit_seconds": 0.024
+    }
+  },
+  {
+    "observed": 76.832,
+    "_id": "6ab81eae953bc246d8b096d8",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:14.383+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "memory_id": "m_b1fb8483d14a",
+      "experiment_id": "camp_614645d1:x_950ecac7d6682ddc",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "observed": 78.077,
+    "_id": "6ab81eaf953bc246d8b096d9",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:15.437+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_950ecac7d6682ddc",
+      "label": "research_note",
+      "memory_id": "m_702b572e5a1c",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=6: Since motor21 (21 channels) exceeds the max_channels=9 constraint, we must switch to the eligible central9 channel set while keeping the best-performing band/window/n_components combo (beta_13_30, w0.5_2.5, n=6) to test if the incumbent setup transfers to fewer channels. Outcome, computed by code: it is now the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790451374-A4W5nmbLTKYZfFdPjyH6",
+      "usage": {
+        "input_tokens": 572,
+        "output_tokens": 48,
+        "cost_usd": 2.4024e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 78.077,
+    "_id": "6ab81eaf953bc246d8b096da",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:15.632+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 79.649,
+    "_id": "6ab81eb1953bc246d8b096db",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:17.015+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "observed": 80.172,
+    "_id": "6ab81eb1953bc246d8b096dc",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:17.811+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_16d142536848",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1336,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_702b572e5a1c",
+        "m_c6fa818da11c",
+        "m_4ed58b413b56",
+        "m_f324188f035d"
+      ],
+      "incumbent_id": "camp_614645d1:x_950ecac7d6682ddc"
+    }
+  },
+  {
+    "observed": 84.893,
+    "_id": "6ab81eb6953bc246d8b096dd",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:22.455+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_16d142536848",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790451378-lvAqv6GeqX2L9a6c5Fvt",
+      "usage": {
+        "input_tokens": 4258,
+        "output_tokens": 229,
+        "cost_usd": 0.010806,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 85.416,
+    "_id": "6ab81eb6953bc246d8b096de",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:22.704+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "observed": 85.416,
+    "_id": "6ab81eb7953bc246d8b096df",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:23.074+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "observed": 85.944,
+    "_id": "6ab81eb7953bc246d8b096e0",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:23.210+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_16d142536848",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w0.5_2.5",
+        "channels": "central9",
+        "n_components": 4
+      },
+      "rationale": "Test whether fewer spatial filters (n=4) improve generalization on the eligible central9 channel set, since n=6 is the current best but may overfit with only 9 channels.",
+      "evidence_ids": [
+        "camp_614645d1:x_950ecac7d6682ddc",
+        "m_702b572e5a1c"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "observed": 85.944,
+    "_id": "6ab81eb7953bc246d8b096e1",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:23.406+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_59e9e10635ef3c44",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=4"
+    }
+  },
+  {
+    "observed": 85.944,
+    "_id": "6ab81eb7953bc246d8b096e2",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:23.579+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "observed": 86.466,
+    "_id": "6ab81eb7953bc246d8b096e3",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:23.820+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_59e9e10635ef3c44",
+      "attempt": 1,
+      "lease_token": "1da1aecd91d8edae"
+    }
+  },
+  {
+    "observed": 86.466,
+    "_id": "6ab81eb8953bc246d8b096e4",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:24.059+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "observed": 86.989,
+    "_id": "6ab81eb8953bc246d8b096e5",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:24.269+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_59e9e10635ef3c44",
+      "val_balanced_accuracy": 0.745,
+      "fit_seconds": 0.024
+    }
+  },
+  {
+    "observed": 87.511,
+    "_id": "6ab81eb8953bc246d8b096e6",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:24.781+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "memory_id": "m_ba7235a9bf48",
+      "experiment_id": "camp_614645d1:x_59e9e10635ef3c44",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "observed": 88.037,
+    "_id": "6ab81eb9953bc246d8b096e7",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:25.591+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_59e9e10635ef3c44",
+      "label": "research_note",
+      "memory_id": "m_2597112c325a",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=4: Test whether fewer spatial filters (n=4) improve generalization on the eligible central9 channel set, since n=6 is the current best but may overfit with only 9 channels. Outcome, computed by code: it did not beat the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790451385-qTn3hG5vzHau69QlRViw",
+      "usage": {
+        "input_tokens": 542,
+        "output_tokens": 48,
+        "cost_usd": 2.2764e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 88.559,
+    "_id": "6ab81eb9953bc246d8b096e8",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:25.831+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 89.614,
+    "_id": "6ab81ebb953bc246d8b096e9",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:27.260+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "observed": 90.664,
+    "_id": "6ab81ebb953bc246d8b096ea",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:27.937+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_06365faf5ad1",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1414,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_702b572e5a1c",
+        "m_2597112c325a",
+        "m_c6fa818da11c",
+        "m_4ed58b413b56"
+      ],
+      "incumbent_id": "camp_614645d1:x_950ecac7d6682ddc"
+    }
+  },
+  {
+    "observed": 95.475,
+    "_id": "6ab81ec0953bc246d8b096eb",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:32.843+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_06365faf5ad1",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790451388-lKqz1WFd06hwOmuvTUea",
+      "usage": {
+        "input_tokens": 4434,
+        "output_tokens": 241,
+        "cost_usd": 0.011278,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 95.475,
+    "_id": "6ab81ec1953bc246d8b096ec",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:33.015+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "observed": 95.984,
+    "_id": "6ab81ec1953bc246d8b096ed",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:33.376+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "observed": 95.984,
+    "_id": "6ab81ec1953bc246d8b096ee",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:33.466+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_06365faf5ad1",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.0_3.0",
+        "channels": "central9",
+        "n_components": 6
+      },
+      "rationale": "Window w1.0_3.0 with n=6 outperformed w0.5_2.5 on motor21; test whether this window shift also helps on the eligible central9 channel set.",
+      "evidence_ids": [
+        "camp_614645d1:x_950ecac7d6682ddc",
+        "camp_614645d1:x_ef4ac199c19d5c65"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "observed": 95.984,
+    "_id": "6ab81ec1953bc246d8b096ef",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:33.701+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_57c6273a72d0b921",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6"
+    }
+  },
+  {
+    "observed": 96.51,
+    "_id": "6ab81ec1953bc246d8b096f0",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:33.893+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "observed": 96.51,
+    "_id": "6ab81ec2953bc246d8b096f1",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:34.068+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_57c6273a72d0b921",
+      "attempt": 1,
+      "lease_token": "062beb8b3a5447ea"
+    }
+  },
+  {
+    "observed": 96.952,
+    "_id": "6ab81ec2953bc246d8b096f2",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:34.419+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "observed": 96.952,
+    "_id": "6ab81ec2953bc246d8b096f3",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:34.592+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_57c6273a72d0b921",
+      "val_balanced_accuracy": 0.6529,
+      "fit_seconds": 0.023
+    }
+  },
+  {
+    "observed": 97.56,
+    "_id": "6ab81ec3953bc246d8b096f4",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:35.054+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "memory_id": "m_f0d558f0be79",
+      "experiment_id": "camp_614645d1:x_57c6273a72d0b921",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "observed": 98.083,
+    "_id": "6ab81ec3953bc246d8b096f5",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:35.988+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_57c6273a72d0b921",
+      "label": "research_note",
+      "memory_id": "m_8b046e94f6b7",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.0_3.0 \u00b7 central9 \u00b7 n=6: Window w1.0_3.0 with n=6 outperformed w0.5_2.5 on motor21; test whether this window shift also helps on the eligible central9 channel set. Outcome, computed by code: it did not beat the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790451395-VNRc4ryfFTMJjmhFbOkh",
+      "usage": {
+        "input_tokens": 546,
+        "output_tokens": 48,
+        "cost_usd": 2.2932e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 98.524,
+    "_id": "6ab81ec4953bc246d8b096f6",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:36.158+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 100.185,
+    "_id": "6ab81ec5953bc246d8b096f7",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:37.892+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "observed": 100.709,
+    "_id": "6ab81ec6953bc246d8b096f8",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:38.512+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_4fe7af08a73d",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1490,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_702b572e5a1c",
+        "m_2597112c325a",
+        "m_8b046e94f6b7",
+        "m_c6fa818da11c"
+      ],
+      "incumbent_id": "camp_614645d1:x_950ecac7d6682ddc"
+    }
+  },
+  {
+    "observed": 104.819,
+    "_id": "6ab81eca953bc246d8b096f9",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:42.629+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_4fe7af08a73d",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790451398-D1hhigycMoXX29WkzZLA",
+      "usage": {
+        "input_tokens": 4619,
+        "output_tokens": 253,
+        "cost_usd": 0.011768,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 105.342,
+    "_id": "6ab81eca953bc246d8b096fa",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:42.809+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "observed": 105.342,
+    "_id": "6ab81ecb953bc246d8b096fb",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:43.147+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "observed": 105.868,
+    "_id": "6ab81ecb953bc246d8b096fc",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:43.231+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_4fe7af08a73d",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w1.5_3.5",
+        "channels": "central9",
+        "n_components": 6
+      },
+      "rationale": "Test the remaining untried window (w1.5_3.5) with the incumbent's n=6 on central9, since w0.5_2.5 outperformed w1.0_3.0 and we haven't checked the later window yet.",
+      "evidence_ids": [
+        "camp_614645d1:x_950ecac7d6682ddc",
+        "camp_614645d1:x_57c6273a72d0b921"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "observed": 105.868,
+    "_id": "6ab81ecb953bc246d8b096fd",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:43.419+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_12c71e652d353f71",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w1.5_3.5 \u00b7 central9 \u00b7 n=6"
+    }
+  },
+  {
+    "observed": 105.868,
+    "_id": "6ab81ecb953bc246d8b096fe",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:43.660+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "observed": 106.392,
+    "_id": "6ab81ecb953bc246d8b096ff",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:43.858+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_12c71e652d353f71",
+      "attempt": 1,
+      "lease_token": "8a5fb24d8d867914"
+    }
+  },
+  {
+    "observed": 106.392,
+    "_id": "6ab81ecc953bc246d8b09700",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:44.050+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "observed": 106.916,
+    "_id": "6ab81ecc953bc246d8b09701",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:44.276+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_12c71e652d353f71",
+      "val_balanced_accuracy": 0.627,
+      "fit_seconds": 0.024
+    }
+  },
+  {
+    "observed": 107.441,
+    "_id": "6ab81ecc953bc246d8b09702",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:44.905+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "memory_id": "m_8cf9429bcfbf",
+      "experiment_id": "camp_614645d1:x_12c71e652d353f71",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "observed": 108.06,
+    "_id": "6ab81ecd953bc246d8b09703",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:45.757+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_12c71e652d353f71",
+      "label": "research_note",
+      "memory_id": "m_1c75fe8ce9c7",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w1.5_3.5 \u00b7 central9 \u00b7 n=6: Test the remaining untried window (w1.5_3.5) with the incumbent's n=6 on central9, since w0.5_2.5 outperformed w1.0_3.0 and we haven't checked the later window yet. Outcome, computed by code: it did not beat the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790451405-Q5BXgGa0H4NxYJSe8g9U",
+      "usage": {
+        "input_tokens": 560,
+        "output_tokens": 48,
+        "cost_usd": 2.352e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 108.06,
+    "_id": "6ab81ecd953bc246d8b09704",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:45.957+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 110.149,
+    "_id": "6ab81ecf953bc246d8b09705",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:47.612+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "observed": 110.584,
+    "_id": "6ab81ed0953bc246d8b09706",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:48.227+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_37274a99ff07",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1513,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_702b572e5a1c",
+        "m_2597112c325a",
+        "m_8b046e94f6b7",
+        "m_c6fa818da11c"
+      ],
+      "incumbent_id": "camp_614645d1:x_950ecac7d6682ddc"
+    }
+  },
+  {
+    "observed": 114.778,
+    "_id": "6ab81ed4953bc246d8b09707",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:52.593+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_37274a99ff07",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790451408-Va7tGG8UxDtsFZPFeJ2m",
+      "usage": {
+        "input_tokens": 4666,
+        "output_tokens": 250,
+        "cost_usd": 0.011832,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 115.388,
+    "_id": "6ab81ed5953bc246d8b09708",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:53.002+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "observed": 115.828,
+    "_id": "6ab81ed5953bc246d8b09709",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:53.378+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "observed": 115.828,
+    "_id": "6ab81ed5953bc246d8b0970a",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:53.474+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_37274a99ff07",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w0.5_2.5",
+        "channels": "central9",
+        "n_components": 2
+      },
+      "rationale": "n=6 beats n=4 on w0.5_2.5/central9, but we haven't tested n=2; checking if fewer filters further reduces overfitting on only 9 channels could improve on the incumbent.",
+      "evidence_ids": [
+        "camp_614645d1:x_950ecac7d6682ddc",
+        "camp_614645d1:x_59e9e10635ef3c44"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "observed": 115.828,
+    "_id": "6ab81ed5953bc246d8b0970b",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:53.711+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_310fc5724c1a7578",
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=2"
+    }
+  },
+  {
+    "observed": 116.44,
+    "_id": "6ab81ed5953bc246d8b0970c",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:53.906+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "observed": 116.44,
+    "_id": "6ab81ed6953bc246d8b0970d",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:54.149+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_310fc5724c1a7578",
+      "attempt": 1,
+      "lease_token": "69c9ebf216f05080"
+    }
+  },
+  {
+    "observed": 116.88,
+    "_id": "6ab81ed6953bc246d8b0970e",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:54.425+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "observed": 116.88,
+    "_id": "6ab81ed6953bc246d8b0970f",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:54.677+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_310fc5724c1a7578",
+      "val_balanced_accuracy": 0.6924,
+      "fit_seconds": 0.025
+    }
+  },
+  {
+    "observed": 117.494,
+    "_id": "6ab81ed7953bc246d8b09710",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:55.081+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "memory_id": "m_cc2008b38f68",
+      "experiment_id": "camp_614645d1:x_310fc5724c1a7578",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "observed": 118.54,
+    "_id": "6ab81ed8953bc246d8b09711",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:56.007+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_310fc5724c1a7578",
+      "label": "research_note",
+      "memory_id": "m_207aa80a6ae1",
+      "note": "Planner hypothesis before running csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=2: n=6 beats n=4 on w0.5_2.5/central9, but we haven't tested n=2; checking if fewer filters further reduces overfitting on only 9 channels could improve on the incumbent. Outcome, computed by code: it did not beat the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790451415-AIAxgc6mX9FhnxaZhSqH",
+      "usage": {
+        "input_tokens": 552,
+        "output_tokens": 48,
+        "cost_usd": 2.3184e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 118.54,
+    "_id": "6ab81ed8953bc246d8b09712",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:56.248+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 120.635,
+    "_id": "6ab81eda953bc246d8b09713",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:58.109+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "REHYDRATE",
+      "to": "PLAN"
+    }
+  },
+  {
+    "observed": 121.157,
+    "_id": "6ab81eda953bc246d8b09714",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:36:58.721+00:00",
+    "type": "packet_built",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_2056d3d32934",
+      "strategy": "evidence",
+      "goal_version": 2,
+      "token_estimate": 1545,
+      "budget_tokens": 4000,
+      "retrieved_ids": [
+        "m_702b572e5a1c",
+        "m_2597112c325a",
+        "m_207aa80a6ae1",
+        "m_8b046e94f6b7"
+      ],
+      "incumbent_id": "camp_614645d1:x_950ecac7d6682ddc"
+    }
+  },
+  {
+    "observed": 125.898,
+    "_id": "6ab81edf953bc246d8b09715",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:03.494+00:00",
+    "type": "llm_call",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_2056d3d32934",
+      "model": "anthropic/claude-sonnet-5",
+      "request_id": "gen-1790451418-HcVY1frCqJgFImyby2rE",
+      "usage": {
+        "input_tokens": 4735,
+        "output_tokens": 293,
+        "cost_usd": 0.0124,
+        "source": "provider"
+      },
+      "action": "propose",
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 125.898,
+    "_id": "6ab81edf953bc246d8b09716",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:03.671+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "PLAN",
+      "to": "VALIDATE"
+    }
+  },
+  {
+    "observed": 126.404,
+    "_id": "6ab81edf953bc246d8b09717",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:03.975+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "VALIDATE",
+      "to": "QUEUE"
+    }
+  },
+  {
+    "observed": 126.404,
+    "_id": "6ab81ee0953bc246d8b09718",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:04.121+00:00",
+    "type": "proposal",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "packet_id": "pk_2056d3d32934",
+      "config": {
+        "method": "bandpower_lr",
+        "band": "beta_13_30",
+        "window": "w0.5_2.5",
+        "channels": "central9",
+        "C": 1.0
+      },
+      "rationale": "All csp_lda variants on central9/beta_13_30 have been exhausted with n=6 as best; using the last budget slot to test an unexplored method (bandpower_lr) on the same top-performing band/window/channel combo to see if a different model architecture yields further gains.",
+      "evidence_ids": [
+        "camp_614645d1:x_950ecac7d6682ddc",
+        "camp_614645d1:x_59e9e10635ef3c44",
+        "camp_614645d1:x_310fc5724c1a7578"
+      ],
+      "model": "anthropic/claude-sonnet-5"
+    }
+  },
+  {
+    "observed": 126.929,
+    "_id": "6ab81ee0953bc246d8b09719",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:04.311+00:00",
+    "type": "job_queued",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_0fd077ce73e3e4d8",
+      "label": "bandpower_lr \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 C=1.0"
+    }
+  },
+  {
+    "observed": 126.929,
+    "_id": "6ab81ee0953bc246d8b0971a",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:04.491+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "QUEUE",
+      "to": "EXECUTE"
+    }
+  },
+  {
+    "observed": 126.929,
+    "_id": "6ab81ee0953bc246d8b0971b",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:04.723+00:00",
+    "type": "job_claimed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_0fd077ce73e3e4d8",
+      "attempt": 1,
+      "lease_token": "d406904c0bcf9cfa"
+    }
+  },
+  {
+    "observed": 127.365,
+    "_id": "6ab81ee0953bc246d8b0971c",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:04.933+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "EXECUTE",
+      "to": "COMMIT"
+    }
+  },
+  {
+    "observed": 127.365,
+    "_id": "6ab81ee1953bc246d8b0971d",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:05.170+00:00",
+    "type": "job_committed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_0fd077ce73e3e4d8",
+      "val_balanced_accuracy": 0.6515,
+      "fit_seconds": 0.014
+    }
+  },
+  {
+    "observed": 127.974,
+    "_id": "6ab81ee1953bc246d8b0971e",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:05.576+00:00",
+    "type": "memory_added",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "memory_id": "m_32424bd6961d",
+      "experiment_id": "camp_614645d1:x_0fd077ce73e3e4d8",
+      "kind": "verified_result"
+    }
+  },
+  {
+    "observed": 129.025,
+    "_id": "6ab81ee2953bc246d8b0971f",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:06.493+00:00",
+    "type": "jev_routed",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_0fd077ce73e3e4d8",
+      "label": "research_note",
+      "memory_id": "m_7862e1f4d6ca",
+      "note": "Planner hypothesis before running bandpower_lr \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 C=1.0: All csp_lda variants on central9/beta_13_30 have been exhausted with n=6 as best; using the last budget slot to test an unexplored method (bandpower_lr) on the same top-performing band/window/channel combo to see if a different model architecture yields further gains. Outcome, computed by code: it did not beat the best eligible result.",
+      "provider": "TypeSafe",
+      "model": "typesafe/jev-1.13-20260917",
+      "request_id": "gen-dec-1790451425-RSEf9gWG1GZJ7D4TlLJj",
+      "usage": {
+        "input_tokens": 570,
+        "output_tokens": 48,
+        "cost_usd": 2.394e-05,
+        "source": "provider"
+      },
+      "fallback_used": false,
+      "fallback_reason": null
+    }
+  },
+  {
+    "observed": 129.025,
+    "_id": "6ab81ee2953bc246d8b09720",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:06.735+00:00",
+    "type": "state_change",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "from": "COMMIT",
+      "to": "REHYDRATE"
+    }
+  },
+  {
+    "observed": 132.172,
+    "_id": "6ab81ee5953bc246d8b09721",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:09.786+00:00",
+    "type": "finalized",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "experiment_id": "camp_614645d1:x_950ecac7d6682ddc",
+      "config": {
+        "method": "csp_lda",
+        "band": "beta_13_30",
+        "window": "w0.5_2.5",
+        "channels": "central9",
+        "n_components": 6
+      },
+      "label": "csp_lda \u00b7 beta_13_30 \u00b7 w0.5_2.5 \u00b7 central9 \u00b7 n=6",
+      "val_balanced_accuracy": 0.7592,
+      "goal_version": 2,
+      "constraints": {
+        "max_channels": 9
+      },
+      "test_balanced_accuracy": 0.7194,
+      "test_f1": 0.7192,
+      "n_test": 75,
+      "per_subject_test_balanced_accuracy": {
+        "1": 0.9375,
+        "2": 0.9375,
+        "3": 0.3929,
+        "4": 0.9375,
+        "5": 0.4107
+      },
+      "scored_at": "2026-09-26T19:37:09.700+00:00"
+    }
+  },
+  {
+    "observed": 132.172,
+    "_id": "6ab81ee5953bc246d8b09722",
+    "campaign_id": "camp_614645d1",
+    "ts": "2026-09-26T19:37:09.888+00:00",
+    "type": "worker_stop",
+    "worker_id": "w_Andrews-Ma_56766",
+    "payload": {
+      "steps": 8
+    }
+  }
+]

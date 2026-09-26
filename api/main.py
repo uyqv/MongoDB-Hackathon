@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from bson import ObjectId
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -29,6 +29,27 @@ WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
 app = FastAPI(title="Second Shift")
 app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
+
+
+def read_only() -> bool:
+    """Public serverless deployments observe campaigns; workers run separately."""
+    return (os.environ.get("VERCEL") == "1" or os.environ.get("DASHBOARD_READ_ONLY") == "1"
+            or os.environ.get("DASHBOARD_DATA_MODE") == "snapshot")
+
+
+@app.middleware("http")
+async def protect_hosted_dashboard(request: Request, call_next):
+    if read_only() and request.method not in {"GET", "HEAD", "OPTIONS"}:
+        return JSONResponse({"detail": "This dashboard is read-only. Run operator controls locally."}, status_code=403)
+    if os.environ.get("DASHBOARD_DATA_MODE") == "snapshot" and request.url.path.startswith("/api/campaigns"):
+        from api.snapshot import response_for
+        body, status = response_for(request.url.path, request.query_params)
+        response = JSONResponse(body, status_code=status)
+    else:
+        response = await call_next(request)
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 def clean(obj: Any) -> Any:
@@ -87,6 +108,9 @@ def index():
 
 @app.get("/api/health")
 def health():
+    if os.environ.get("DASHBOARD_DATA_MODE") == "snapshot":
+        from api.snapshot import load_snapshot
+        return {"ok": True, "mode": "snapshot", "captured_at": load_snapshot()["captured_at"]}
     d = db()
     d.command("ping")
     return {"ok": True, "db": d.name}
@@ -166,6 +190,16 @@ def latest_packet(cid: str, strategy: str = "evidence"):
     return clean(doc)
 
 
+@app.get("/api/campaigns/{cid}/packets/{packet_id}")
+def packet_by_id(cid: str, packet_id: str):
+    """The stored evidence for one decision, scoped to its owning campaign."""
+    _campaign_or_404(cid)
+    doc = db().packets.find_one({"_id": packet_id, "campaign_id": cid})
+    if not doc:
+        raise HTTPException(404, "packet not found in this campaign")
+    return clean(doc)
+
+
 @app.get("/api/campaigns/{cid}/memories")
 def memories(cid: str, kind: str | None = None, include_synthetic: bool = False):
     flt: dict = {"campaign_id": cid}
@@ -240,7 +274,8 @@ def build_eeg_preview() -> dict:
 
 @app.get("/api/eeg/preview")
 def eeg_preview():
-    cache = Path(os.environ.get("EEG_PREVIEW_CACHE", "data/eeg_preview.json"))
+    bundled = WEB_DIR.parent / "artifacts" / "eeg_preview.json"
+    cache = Path(os.environ.get("EEG_PREVIEW_CACHE", str(bundled) if bundled.exists() else "data/eeg_preview.json"))
     if cache.exists():
         return json.loads(cache.read_text())
     try:
@@ -254,6 +289,12 @@ def eeg_preview():
 
 @app.get("/api/worker/status")
 def worker_status():
+    if read_only():
+        status = {"running": False, "pid": None, "campaign_id": None, "read_only": True, "remote": True}
+        if os.environ.get("DASHBOARD_DATA_MODE") == "snapshot":
+            from api.snapshot import load_snapshot
+            status.update(data_mode="snapshot", captured_at=load_snapshot()["captured_at"])
+        return status
     return control.worker_status()
 
 
@@ -284,3 +325,57 @@ def constraint(cid: str, body: ConstraintBody):
 def context_reset(cid: str):
     _campaign_or_404(cid)
     return {"context_epoch": control.reset_context(db(), cid)}
+
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def _read(rel: str):
+    p = ROOT / rel
+    return json.loads(p.read_text()) if p.exists() else None
+
+
+@app.get("/api/proof")
+def proof():
+    """Measured results for the Results view, read from the eval output files (never typed in by hand)."""
+    checks = _read("eval/checks.json") or []
+    latest = {}
+    for r in checks:
+        latest[r["check"]] = r
+    passed = sum(sum(r["checks"].values()) for r in latest.values())
+    total = sum(len(r["checks"]) for r in latest.values())
+    stress = _read("eval/stress.json") or {}
+    levels = [{"memories": x["memories_total"], "p50_ms": x["search_ms_p50"], "p95_ms": x["search_ms_p95"]}
+              for x in stress.get("results", [])]
+    current = _read("eval/stress_current_packet.json") or {}
+    ab = (_read("eval/results.json") or {}).get("summary", {})
+    rec = (latest.get("recovery") or {}).get("checks", {})
+    lost = 0 if rec.get("every_experiment_committed_once") and rec.get("done_experiments_not_recomputed") else None
+    return {
+        "results_lost": lost,
+        "checks": {"passed": passed, "total": total,
+                   "by_check": {k: {"passed": sum(v["checks"].values()), "total": len(v["checks"]),
+                                    "campaign_id": v["campaign_id"]} for k, v in latest.items()}},
+        "memory": {"notes": current.get("memories"), "packet_tokens": current.get("packet_token_estimate"),
+                   "budget_tokens": current.get("budget_tokens"), "levels": levels},
+        "ablation": {arm: {"cited": v.get("cited_expected_evidence"), "decisions": v.get("decisions"),
+                           "tokens": v.get("mean_input_tokens_provider")} for arm, v in ab.items()},
+    }
+
+
+SOURCE_FILES = {"harness/store.py", "harness/context.py", "harness/worker.py", "harness/eeg.py", "harness/planner.py",
+                "harness/memory.py", "harness/jev.py", "harness/contracts.py"}
+
+
+@app.get("/api/source")
+def source(file: str, fn: str):
+    """One function's source, straight from the repo, for the Code view."""
+    import ast
+    if file not in SOURCE_FILES:
+        raise HTTPException(404, "not an allowed file")
+    text = (ROOT / file).read_text()
+    for node in ast.walk(ast.parse(text)):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.name == fn:
+            lines = text.splitlines()[node.lineno - 1: node.end_lineno]
+            return {"file": file, "fn": fn, "start": node.lineno, "end": node.end_lineno, "code": "\n".join(lines)}
+    raise HTTPException(404, "function not found")
