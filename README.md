@@ -48,7 +48,20 @@ The packet stays far under its 4,000 token budget while memory grows by three or
 
 Raw output for both is in `eval/checks.json`.
 
-**Context comparison** (`python -m eval.run_ablation`): _RESULTS PENDING: filled in from eval/results.json, whichever arm wins._
+**Context comparison** (`python -m eval.run_ablation`, `eval/results.json`): 5 scenarios built from the real campaign, 2 context strategies, 3 repeats each, 30 real planner calls. Both strategies share the same planner, model, tools and code guards; only the packet differs. `recent_window` sees the goal, the tried list and the last 6 experiments. `evidence` adds exact reads of the best and worst results plus Vector Search over notes.
+
+| | recent_window | evidence |
+|---|---|---|
+| Decisions that cited the scenario's key evidence | 9 of 15 | 12 of 15 |
+| Decisions that cited forbidden evidence (obsolete protocol) | 0 | 0 |
+| Eligible proposals | 15 of 15 | 15 of 15 |
+| Fallbacks | 0 | 0 |
+| Mean provider input tokens | 3,310 | 4,171 |
+| Cost for 15 decisions | $0.137 | $0.163 |
+
+The whole gap comes from one scenario. In `buried_best_eligible`, the best result allowed under the new 9 channel limit sat outside the recent window: `evidence` cited it 3 of 3 times, `recent_window` 0 of 3. The evidence reached the model through an exact read, not through Vector Search. In `buried_failure`, the evidence packet contained the buried bad result but the model cited it 0 of 3 times; neither strategy repeated that bad configuration family. The other three scenarios tied at 3 of 3. The evidence packet costs about 26% more input tokens. This is a demo scale check (n = 15 per strategy), not a benchmark.
+
+An earlier run of this comparison is kept in `eval/results_run1_invalid.json` and does not count: the packet then listed tried experiments only as hashes, so the model re-proposed tried configurations and 15 of 30 decisions fell back. Fixing that is what made this run valid.
 
 ## How it works
 
