@@ -19,7 +19,7 @@ import secrets
 import time
 from functools import lru_cache
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values, load_dotenv
 from pymongo.operations import SearchIndexModel
 
 from harness import contracts as C
@@ -27,6 +27,11 @@ from harness.db import now_iso
 
 load_dotenv()
 log = logging.getLogger(__name__)
+
+
+def _env(key: str, default: str | None = None) -> str | None:
+    """os.environ, but an EMPTY exported var falls back to .env (load_dotenv never overrides it)."""
+    return os.environ.get(key) or dotenv_values().get(key) or default
 
 INDEX_NAME = "memories_vec"
 FILTER_FIELDS = ("campaign_id", "protocol_id", "status", "kind", "synthetic")
@@ -41,12 +46,13 @@ def _voyage():
     if _client is None:
         import voyageai
         # Retries with backoff: a Voyage key without a payment method is capped at 3 RPM / 10K TPM.
-        _client = voyageai.Client(max_retries=int(os.environ.get("VOYAGE_MAX_RETRIES", "3")))
+        _client = voyageai.Client(api_key=_env("VOYAGE_API_KEY"),
+                                  max_retries=int(_env("VOYAGE_MAX_RETRIES", "3")))
     return _client
 
 
 def embed(texts: list[str], input_type: str = "document") -> list[list[float]]:
-    model = os.environ.get("VOYAGE_MODEL", "voyage-3.5")
+    model = _env("VOYAGE_MODEL", "voyage-3.5")
     out: list[list[float]] = []
     for i in range(0, len(texts), EMBED_BATCH):
         out += _voyage().embed(texts[i:i + EMBED_BATCH], model=model, input_type=input_type).embeddings

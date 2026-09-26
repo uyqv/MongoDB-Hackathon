@@ -1,1 +1,78 @@
+<!doctype html>
 <!-- Dashboard. OWNER: David. Served by api/main.py at "/". See docs/CONTRACTS.md. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Second Shift</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="fake-banner" class="fake-banner" hidden>FAKE DATA: seeded UI fixtures, not results</div>
+  <header>
+    <div class="brand">
+      <h1>Second Shift</h1>
+      <span class="sub">long-horizon EEG research agent · state lives in MongoDB Atlas</span>
+    </div>
+    <div class="header-controls">
+      <label>Campaign <select id="campaign-select"></select></label>
+      <span id="db-name" class="pill"></span>
+      <span id="last-poll" class="muted"></span>
+    </div>
+  </header>
+
+  <div id="controls" class="controls">
+    <button id="btn-start" disabled>Start worker</button>
+    <button id="btn-kill" class="danger" disabled>Kill worker (SIGKILL)</button>
+    <button id="btn-reset" disabled>Reset context</button>
+    <span class="sep"></span>
+    <label>Channel budget
+      <select id="sel-channels" disabled><option>9</option><option>21</option><option>64</option></select>
+    </label>
+    <input id="constraint-reason" placeholder="reason" disabled>
+    <button id="btn-constraint" disabled>Apply</button>
+    <span id="worker-status" class="muted">controls arrive in D5</span>
+  </div>
+
+  <main class="grid">
+    <section class="panel" id="panel-goal">
+      <h2>1 · Goal</h2>
+      <div id="goal"></div>
+    </section>
+
+    <section class="panel wide" id="panel-metric">
+      <h2>2 · Metric trajectory <span class="muted">val balanced accuracy, done experiments</span></h2>
+      <div class="chart-box"><canvas id="metric-chart"></canvas></div>
+      <div class="legend muted">solid = eligible under current goal · hollow grey = ineligible · line = best eligible so far · dashed = chance 0.5</div>
+    </section>
+
+    <section class="panel full" id="panel-experiments">
+      <h2>3 · Experiments</h2>
+      <div class="table-wrap"><table id="exp-table">
+        <thead><tr><th>#</th><th>Config</th><th>Status</th><th>Attempt</th><th>Ch</th><th>Eligible</th><th>Val bal acc</th><th>Proposer</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </section>
+
+    <section class="panel" id="panel-packet">
+      <h2>4 · Latest context packet</h2>
+      <div id="packet"></div>
+    </section>
+
+    <section class="panel" id="panel-timeline">
+      <h2>5 · Timeline</h2>
+      <ol id="timeline"></ol>
+    </section>
+
+    <section class="panel" id="panel-eeg">
+      <h2>6 · EEG input</h2>
+      <div id="eeg">
+        <p class="placeholder">Real EEG from PhysioNet loads here.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

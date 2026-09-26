@@ -13,11 +13,16 @@ import json
 import os
 from typing import Any, Callable
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values, load_dotenv
 
 from harness import contracts as C
 
 load_dotenv()
+
+
+def _env(key: str, default: str | None = None) -> str | None:
+    """os.environ, but an EMPTY exported var falls back to .env (load_dotenv never overrides it)."""
+    return os.environ.get(key) or dotenv_values().get(key) or default
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 DEFAULT_MODEL = "anthropic/claude-sonnet-5"
@@ -27,7 +32,7 @@ MAX_TOKENS = 600
 
 def _default_client():
     from openai import OpenAI
-    return OpenAI(base_url=OPENROUTER_BASE_URL, api_key=os.environ["OPENROUTER_API_KEY"], timeout=60)
+    return OpenAI(base_url=OPENROUTER_BASE_URL, api_key=_env("OPENROUTER_API_KEY"), timeout=60)
 
 
 # Tests replace this with a fake client factory.
@@ -204,7 +209,7 @@ def _estimate_tokens(messages: list[dict]) -> int:
 
 
 def plan(packet: dict, *, model: str | None = None) -> dict:
-    model = model or os.environ.get("PLANNER_MODEL") or DEFAULT_MODEL
+    model = model or _env("PLANNER_MODEL", DEFAULT_MODEL)
     usage = {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}
     provider_usage = False
     request_id: str | None = None
