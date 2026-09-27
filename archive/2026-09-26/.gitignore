@@ -1,0 +1,7 @@
+# Local working material; preserved on disk, excluded from Git.
+/output/research/
+/output/vercel-dashboard/
+/design-demos/
+/.playwright-cli/
+/.playwright-mcp/
+/run/

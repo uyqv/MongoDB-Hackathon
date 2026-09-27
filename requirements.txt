@@ -1,4 +1,5 @@
-fastapi>=0.115,<1
-pymongo>=4.10,<5
-python-dotenv>=1,<2
-uvicorn>=0.30,<1
+# Direct dependency versions validated by the local and CI suites.
+fastapi==0.141.1
+pymongo==4.17.0
+python-dotenv==1.2.3
+uvicorn==0.54.0

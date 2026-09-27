@@ -11,7 +11,7 @@ from pathlib import Path
 from playwright.async_api import async_playwright, expect
 
 BASE = os.environ.get('DEMO_API', 'http://localhost:8001')
-OUT = Path('run/video-v3/checks')
+OUT = Path('output/dashboard-checks')
 
 
 async def main():

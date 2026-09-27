@@ -52,7 +52,7 @@ export const slides = [
   ...shell(4,'90-second narrated demo'),
   head('The working\nsystem',96,188,1600,270,125),
   text('Saved results survive a restart.\nThe electrode limit drops from 64 to 9.',100,530,1340,145,51,{lineHeight:1.2}),
-  {type:'video',x:0,y:0,w:1920,h:1080,src:'media/second-shift-neuroai-90s.mp4'},
+  {type:'video',x:0,y:0,w:1920,h:1080,src:'media/second-shift-neuroai-90s-zoom-music.mp4'},
   text('Press Enter to play',100,837,1100,55,35,{color:C.green,weight:600}),
  ]},
  {id:'evidence',title:'Results and reliability',start:140,duration:22,notes:'The demo reaches seventy five point nine percent validation balanced accuracy using nine electrodes. Separately, our reference campaign scored seventy three point two percent on its sealed test using twenty one electrodes. These are small offline experiments, supported by separate reliability checks.',sources:['presentation/second-shift-neuroai-90s.mp4 at 1:26–1:29: 0.759 best eligible validation score with 9 electrodes','run/video-v6/take-1/experiments.json: camp_639cfbea, central9, val_balanced_accuracy 0.7592, n_val 75','README.md: camp_0f8981ee, 0.774 validation, 0.732 sealed test, 21 electrodes, 75 test trials, subjects 1–5','eval/checks.json: camp_51b0f538 recovery 8/8; camp_66e4900c constraint 5/5','Validation guides model selection. The 73.2% sealed test result and reliability checks come from separate campaigns, not the demo.'],elements:[
@@ -77,4 +77,4 @@ export const slides = [
   text('github.com/uyqv/MongoDB-Hackathon',100,912,890,46,29,{color:C.green,link:'https://github.com/uyqv/MongoDB-Hackathon'})
  ]}
 ];
-export const deck={title:'Second Shift',width:1920,height:1080,colors:C,slides,targetSeconds:175,reserveSeconds:5,demoSeconds:90,demoFile:'media/second-shift-neuroai-90s.mp4'};
+export const deck={title:'Second Shift',width:1920,height:1080,colors:C,slides,targetSeconds:175,reserveSeconds:5,demoSeconds:90,demoFile:'media/second-shift-neuroai-90s-zoom-music.mp4'};

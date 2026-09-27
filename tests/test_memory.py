@@ -6,8 +6,7 @@ import pytest
 
 from harness import memory
 
-pytestmark = pytest.mark.skipif(not os.environ.get("MONGODB_URI") and not os.path.exists(".env"),
-                                reason="needs Atlas")
+pytestmark = pytest.mark.integration
 
 
 @pytest.fixture

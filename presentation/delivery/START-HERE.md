@@ -15,7 +15,7 @@ The pitch is timed for **2:55 within a three-minute slot**, including the comple
 
 ## Included demo
 
-**media/second-shift-neuroai-90s.mp4** is an unchanged copy of the exact movie requested for this presentation. It loads automatically and starts only when you press Enter or click slide 4. The Load demo control can reconnect the file if needed.
+**media/second-shift-neuroai-90s-zoom-music.mp4** is a byte-identical copy of the requested zoom-and-music movie at `presentation/second-shift-neuroai-90s-zoom-music.mp4`. It loads automatically and starts only when you press Enter or click slide 4. The Load demo control can reconnect the file if needed.
 
 The video shows experiments accumulating, a worker stop and restart, context clearing, and the electrode limit changing from 64 to nine. It ends with a best eligible validation score of 0.759 using nine electrodes. Its narration remains intact. Do not play any separate voiceover on top of it.
 

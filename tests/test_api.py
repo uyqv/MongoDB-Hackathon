@@ -27,16 +27,19 @@ def _no_embedding(obj):
             _no_embedding(v)
 
 
+@pytest.mark.integration
 def test_index_and_static(client):
     assert client.get("/").status_code == 200
     assert "Second Shift" in client.get("/").text
     assert client.get("/static/app.js").status_code == 200
 
 
+@pytest.mark.integration
 def test_health(client):
     assert client.get("/api/health").json() == {"ok": True, "db": "second_shift_david"}
 
 
+@pytest.mark.integration
 def test_campaign_list_and_detail(client):
     lst = client.get("/api/campaigns").json()
     assert any(c["_id"] == CID for c in lst)
@@ -51,6 +54,7 @@ def test_campaign_list_and_detail(client):
     assert client.get("/api/campaigns/camp_nope0000").status_code == 404
 
 
+@pytest.mark.integration
 def test_experiments_eligibility_and_reuse(client):
     exps = client.get(f"/api/campaigns/{CID}/experiments").json()
     assert len(exps) == 8
@@ -61,6 +65,7 @@ def test_experiments_eligibility_and_reuse(client):
     assert sum(e["reused"] for e in exps) == 1
 
 
+@pytest.mark.integration
 def test_events_ordering_and_after(client):
     evs = client.get(f"/api/campaigns/{CID}/events").json()
     ts = [e["ts"] for e in evs]
@@ -72,6 +77,7 @@ def test_events_ordering_and_after(client):
     assert [e["ts"] for e in last5] == ts[-5:]
 
 
+@pytest.mark.integration
 def test_packet_and_memories_never_embedding(client):
     p = client.get(f"/api/campaigns/{CID}/packets/latest").json()
     assert p["strategy"] == "evidence" and p["retrieved"]
@@ -114,6 +120,7 @@ def camp():
     d.events.delete_many({"campaign_id": cid})
 
 
+@pytest.mark.integration
 def test_change_constraint(camp):
     d = get_db()
     after = control.change_constraint(d, camp, 9, "headset budget cut")
@@ -126,6 +133,7 @@ def test_change_constraint(camp):
         control.change_constraint(d, camp, 32, "no")
 
 
+@pytest.mark.integration
 def test_reset_context(camp):
     d = get_db()
     assert control.reset_context(d, camp) == 1
@@ -133,6 +141,7 @@ def test_reset_context(camp):
     assert d.events.count_documents({"campaign_id": camp, "type": "context_reset"}) == 2
 
 
+@pytest.mark.integration
 def test_start_kill_status_on_dummy_process(camp, tmp_path, monkeypatch):
     monkeypatch.setattr(control, "RUN_DIR", tmp_path)
     monkeypatch.setattr(control, "worker_cmd", lambda cid: [sys.executable, "-c", "import time; time.sleep(60)"])
@@ -150,6 +159,7 @@ def test_start_kill_status_on_dummy_process(camp, tmp_path, monkeypatch):
     assert control.kill_worker()["killed"] is False
 
 
+@pytest.mark.integration
 def test_control_endpoints(client, camp, tmp_path, monkeypatch):
     monkeypatch.setattr(control, "RUN_DIR", tmp_path)
     monkeypatch.setattr(control, "worker_cmd", lambda cid: [sys.executable, "-c", "import time; time.sleep(60)"])
@@ -165,6 +175,7 @@ def test_control_endpoints(client, camp, tmp_path, monkeypatch):
     assert client.get("/api/worker/status").json()["running"] is False
 
 
+@pytest.mark.integration
 def test_eeg_preview_is_real_and_display_only(client):
     r = client.get("/api/eeg/preview")
     if r.status_code == 503:
@@ -177,6 +188,7 @@ def test_eeg_preview_is_real_and_display_only(client):
     assert d["psd"]["freqs"][0] >= 4 and d["psd"]["freqs"][-1] <= 40
 
 
+@pytest.mark.integration
 def test_campaign_llm_usage_and_running(client):
     c = client.get(f"/api/campaigns/{CID}").json()
     assert c["llm_usage"]["calls"] == 0 and c["llm_usage"]["cost_usd"] == 0

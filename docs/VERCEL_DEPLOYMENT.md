@@ -23,6 +23,10 @@ exports the app. `requirements.txt` contains the lightweight dashboard runtime.
 `.python-version` selects Python 3.12. `.vercelignore` limits deployment files to
 application code, web assets, evaluation JSON, and the recorded artifacts.
 
+Before publishing, run the checks in [Release readiness](PRODUCTION_READINESS.md).
+The required `artifacts/` files are versioned; neither the archive nor final
+presentation media is sent to the dashboard deployment.
+
 Production and preview environments use `DASHBOARD_READ_ONLY=1` and
 `DASHBOARD_DATA_MODE=snapshot`. `MONGODB_URI` is unnecessary in this mode.
 Push to the production release branch to trigger a production deployment.

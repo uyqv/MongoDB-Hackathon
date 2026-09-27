@@ -1,4 +1,6 @@
 .env
+.env.*
+!.env.example
 node_modules/
 __pycache__/
 .venv/
@@ -14,3 +16,10 @@ run/
 /.env.local
 /output/vercel-dashboard/
 /output/research/
+/.claude/worktrees/
+/.claude/settings.local.json
+/.chart-data-*/
+.DS_Store
+.coverage
+htmlcov/
+/output/

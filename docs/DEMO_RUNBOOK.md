@@ -26,7 +26,7 @@ DEMO_API=http://localhost:8000 VIDEO_CAPTURE_DIR=run/video-v6/new-take DB_NAME=s
 
 The recorder creates a fresh real campaign with a 14-experiment budget and allows the EEG search to run for at least 65 seconds before the interruption. It drives the dashboard controls, captures a continuous 1080p browser video, and preserves timestamps, events, packets, and experiment documents. It asserts that the interrupted experiment retries as attempt two and that earlier results are unchanged. It will fail rather than claim a missed stop as recovery. Do not run another worker concurrently.
 
-Narration comes from the revised 148-word NeuroAI script in `scripts/video/narration.json`. Prior scripts are preserved as `narration_v3.json`, `narration_v4.json`, and `narration_v5.json`:
+Narration comes from the revised 148-word NeuroAI script in `scripts/video/narration.json`. Prior scripts and older capture runs are preserved under `archive/2026-09-26/scripts/video/` and `archive/2026-09-26/run/`:
 
 ```bash
 VIDEO_VOICE_DIR=run/video-v6/voice-final .venv/bin/python scripts/video/tts_elevenlabs.py ypfAZhVeE0hhj0A5eGdR

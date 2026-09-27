@@ -1,8 +1,16 @@
-# Second Shift presentation source
+# Second Shift final presentation and demos
 
-The current presentation lives in `delivery/`. Open `delivery/index.html` and follow `delivery/presenter-script.md`. It is timed for three minutes, including the finished 90-second movie at `second-shift-neuroai-90s.mp4`. `delivery/START-HERE.md` explains playback and the PowerPoint backup.
+The current presentation lives in `delivery/`. Open `delivery/index.html` and follow `delivery/presenter-script.md`. It is timed for three minutes, including the finished 90-second zoom-and-music movie at `second-shift-neuroai-90s-zoom-music.mp4`. `delivery/START-HERE.md` explains playback and the PowerPoint backup.
 
-The current shareable package is `Second-Shift-Presentation-Aligned.zip`. The earlier ZIP and `delivery/Second-Shift-Neuro-AI.pptx` remain as previous versions. The revised PowerPoint is `delivery/Second-Shift-Neuro-AI-Aligned.pptx`.
+The current shareable package is [Second-Shift-Presentation-Aligned.zip](Second-Shift-Presentation-Aligned.zip). The revised PowerPoint is [Second-Shift-Neuro-AI-Aligned.pptx](delivery/Second-Shift-Neuro-AI-Aligned.pptx).
+
+All delivered demos remain available:
+
+- `second-shift-neuroai-90s-zoom-music.mp4`: the latest standalone movie, with camera movement and music.
+- `second-shift-neuroai-90s.mp4`: the original narrated edition, retained alongside the music version.
+- `harness-demo/`, `neuroscience-demo/`, `product-demo/`: delivered editions with narration and verification evidence.
+
+Previous slide exports, optional 60-second audio, and unused narration generators are preserved under `../archive/2026-09-26/presentation/`. Current build sources remain here. `checksums.json` records retained media and packaged exports for `python scripts/check_release.py`. When intentionally replacing a final export, update its checksum after reviewing the new version; editable source and prose are not frozen by this check.
 
 ## Rebuild
 
@@ -20,6 +28,6 @@ For PowerPoint, use the Codex bundled runtime. Link its node_modules at `present
 
 ## Demo and narration
 
-The delivery copy at `delivery/media/second-shift-neuroai-90s.mp4` must remain byte-identical to `second-shift-neuroai-90s.mp4`. The browser plays its embedded narration and never mixes in alternate audio. The video was reviewed against its frames, the matching export transcript, experiment records, and recovery evidence under `run/video-v6/`.
+The browser delivery copy at `delivery/media/second-shift-neuroai-90s-zoom-music.mp4` must remain byte-identical to `second-shift-neuroai-90s-zoom-music.mp4`. The browser plays its embedded narration and never mixes in alternate audio. The video was reviewed against its frames, the matching export transcript, experiment records, and recovery evidence under `run/video-v6/`.
 
-`delivery/demo-narration.md` and `delivery/media/narration-cues.json` describe this finished 90-second movie. The old `source/narration.json`, `generate_voice.py`, and `prepare_audio.py` are recipes for the previous optional 60-second voiceover. They are not part of the current presentation build. Do not regenerate or layer that audio onto this movie.
+`delivery/demo-narration.md` and `delivery/media/narration-cues.json` describe this finished 90-second movie. Recipes for the previous optional 60-second voiceover are archived under `../archive/2026-09-26/presentation/source/`. Do not regenerate or layer that audio onto this movie.

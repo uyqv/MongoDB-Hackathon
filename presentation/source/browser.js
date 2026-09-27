@@ -24,13 +24,13 @@ function buildItem(v,i){
   n=el('video',{id:'demoVideo',preload:'metadata',controls:true,playsInline:true,hidden:true});n.classList.add('video');
   if(D.demoReady)n.src=v.src;
   n.addEventListener('ended',()=>toast('Demo complete. Press → to continue.'));
-  n.addEventListener('error',()=>{n.hidden=true;toast('The demo could not load. Use “Load demo” to choose second-shift-neuroai-90s.mp4.')});
+  n.addEventListener('error',()=>{n.hidden=true;toast('The demo could not load. Use “Load demo” to choose second-shift-neuroai-90s-zoom-music.mp4.')});
  }
  n.classList.add('el');if(v.motion)n.classList.add(v.motion);if(!['video','line','connector'].includes(v.type))n.classList.add('reveal');
  Object.assign(n.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:v.h+'px'});
  n.style.setProperty('--delay',Math.min(i*28,310)+'ms');return n;
 }
-D.slides.forEach((s,j)=>{const section=el('section');section.className='slide';section.dataset.id=s.id;section.setAttribute('aria-label',s.title);s.elements.forEach((v,i)=>section.append(buildItem(v,i)));if(s.id==='demo'&&!D.demoReady){const info=el('div',{textContent:'Demo file missing. Use “Load demo” to choose second-shift-neuroai-90s.mp4.'});info.className='no-video';section.append(info)}stage.append(section)});
+D.slides.forEach((s,j)=>{const section=el('section');section.className='slide';section.dataset.id=s.id;section.setAttribute('aria-label',s.title);s.elements.forEach((v,i)=>section.append(buildItem(v,i)));if(s.id==='demo'&&!D.demoReady){const info=el('div',{textContent:'Demo file missing. Use “Load demo” to choose second-shift-neuroai-90s-zoom-music.mp4.'});info.className='no-video';section.append(info)}stage.append(section)});
 const sections=[...stage.children],video=document.querySelector('#demoVideo');
 let current=0,hideTimer,started=performance.now(),slideStarted=started,objectURL;
 function resize(){stage.style.transform=`scale(${Math.min(innerWidth/1920,innerHeight/1080)})`;document.querySelectorAll('.mini-stage').forEach(n=>n.style.transform=`scale(${n.parentElement.clientWidth/1920})`)}
@@ -40,7 +40,7 @@ function show(index){
  document.querySelector('#counter').textContent=`${current+1} / 6`;history.replaceState(null,'','#'+(current+1));updateNotes();document.title=`${current+1}. ${D.slides[current].title} · Second Shift`;
 }
 function toast(message){const t=document.querySelector('#toast');t.textContent=message;t.hidden=false;clearTimeout(t.timer);t.timer=setTimeout(()=>t.hidden=true,6500)}
-async function play(){if(!video.src){toast('Choose second-shift-neuroai-90s.mp4 using “Load demo”.');controls();return}video.hidden=false;try{if(video.paused)await video.play();else video.pause()}catch(e){toast('Playback needs a click. Use the video’s play control.')}}
+async function play(){if(!video.src){toast('Choose second-shift-neuroai-90s-zoom-music.mp4 using “Load demo”.');controls();return}video.hidden=false;try{if(video.paused)await video.play();else video.pause()}catch(e){toast('Playback needs a click. Use the video’s play control.')}}
 function controls(){document.body.classList.add('controls-visible');clearTimeout(hideTimer);hideTimer=setTimeout(()=>document.body.classList.remove('controls-visible'),2200)}
 function fmt(n){return `${Math.floor(n/60)}:${String(Math.floor(n%60)).padStart(2,'0')}`}
 function updateNotes(){const s=D.slides[current];document.querySelector('#notes-title').textContent=s.title;document.querySelector('#notes-copy').textContent=s.notes+(s.cue?'\n\n'+s.cue:'');document.querySelector('#notes-cue').textContent=`Pitch ${fmt(s.start)}–${fmt(s.start+s.duration)} · ${s.duration} seconds`;}

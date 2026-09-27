@@ -25,6 +25,7 @@ def no_voyage(monkeypatch):
 SRC = seed_fake.CAMPAIGN_ID
 
 
+@pytest.mark.integration
 def test_all_scenarios_build_and_label(dbs):
     for name in fixtures.SCENARIOS:
         sc = fixtures.build_scenario(dbs, dbs, SRC, name, n_distractors=12, seed=1)
@@ -48,6 +49,7 @@ def test_all_scenarios_build_and_label(dbs):
                    for i in sc["expected_evidence_ids"] + sc["forbidden_evidence_ids"])
 
 
+@pytest.mark.integration
 def test_buried_best_eligible_sits_first(dbs):
     sc = fixtures.build_scenario(dbs, dbs, SRC, "buried_best_eligible", n_distractors=5)
     exps = list(dbs.experiments.find({"campaign_id": sc["campaign_id"]}).sort("created_at", 1))
@@ -65,6 +67,7 @@ def test_buried_best_eligible_sits_first(dbs):
     assert fixtures._in_packet(ev, sc["expected_evidence_ids"])
 
 
+@pytest.mark.integration
 def test_obsolete_protocol_is_forbidden_and_excluded_from_incumbent(dbs):
     sc = fixtures.build_scenario(dbs, dbs, SRC, "obsolete_protocol", n_distractors=3)
     bad_id = sc["forbidden_evidence_ids"][0]
@@ -76,6 +79,7 @@ def test_obsolete_protocol_is_forbidden_and_excluded_from_incumbent(dbs):
     assert any(r["experiment_id"] == bad_id for r in rw["recent"])  # the trap is visible to the baseline
 
 
+@pytest.mark.integration
 def test_goal_changed_history(dbs):
     sc = fixtures.build_scenario(dbs, dbs, SRC, "goal_changed", n_distractors=2)
     camp = dbs.campaigns.find_one({"_id": sc["campaign_id"]})
