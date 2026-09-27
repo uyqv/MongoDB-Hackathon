@@ -4,7 +4,7 @@ OWNER: Andrew.
 
 No language model touches anything in this file. It computes every metric.
 
-Protocol (fixed before any results were seen, see docs/WORKPLAN.md): within
+Protocol (fixed before any results were seen, see archive/2026-09-26/docs/WORKPLAN.md): within
 subject. Each subject gets its own model fit on run 6 and scored on run 10;
 run 14 stays sealed until score_test_once. Predictions are pooled across
 subjects before computing balanced accuracy / macro F1.

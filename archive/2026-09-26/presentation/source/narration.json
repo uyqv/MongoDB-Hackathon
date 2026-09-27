@@ -1,0 +1,8 @@
+[
+  {"id":"intro","text":"This is Second Shift, an autonomous research assistant for brain signals."},
+  {"id":"run","text":"It searches EEG recordings for patterns of imagined hand and foot movement. The planner chooses an experiment. Numerical code measures the result, and MongoDB Atlas preserves the evidence."},
+  {"id":"crash","text":"Now we kill the worker. A replacement rebuilds its context from Atlas. Completed experiments are reused. An interrupted attempt can run again."},
+  {"id":"goal","text":"Next, we reset its context and cut the electrode limit from sixty four to nine. It checks existing results against the new limit and continues the search."},
+  {"id":"results","text":"Separate checks passed all eight recovery tests and all five goal change tests. Here is the code that rebuilds each decision from evidence."},
+  {"id":"close","text":"Second Shift keeps the research moving, even when the agent starts over."}
+]

@@ -7,8 +7,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-ROOT=Path(os.environ.get('VIDEO_REVIEW_ROOT','run/video-v3'))
-CAPTURE=Path(os.environ.get('VIDEO_EVIDENCE_DIR',str(ROOT/'take-2')))
+ROOT=Path(os.environ.get('VIDEO_REVIEW_ROOT','run/video-v7'))
+CAPTURE=Path(os.environ.get('VIDEO_EVIDENCE_DIR','run/video-v6/take-1'))
 VIDEO=ROOT/'export/second-shift-demo.mp4'
 OUT=ROOT/'review'
 
@@ -24,7 +24,7 @@ def main():
     video=next(s for s in probe['streams'] if s['codec_type']=='video')
     assert (video['width'],video['height'])==(1920,1080)
     duration = float(probe['format']['duration'])
-    assert duration <= float(os.environ.get('VIDEO_MAX_SECONDS', '60'))
+    assert duration <= float(os.environ.get('VIDEO_MAX_SECONDS', '90'))
     if os.environ.get('VIDEO_TARGET_SECONDS'):
         assert abs(duration-float(os.environ['VIDEO_TARGET_SECONDS'])) < .04
     assert [s['codec_type'] for s in probe['streams']]==['video','audio']

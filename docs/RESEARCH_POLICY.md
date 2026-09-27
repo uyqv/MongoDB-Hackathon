@@ -99,7 +99,8 @@ scientific runtime; the numerical policy runs in the worker.
 ## Verification and benchmark
 
 ```bash
-.venv/bin/python -m pytest -q tests/test_research.py tests/test_research_benchmark.py tests/test_research_store.py
+.venv/bin/python -m pytest -q tests/test_research.py tests/test_research_benchmark.py
+DB_NAME=second_shift_david .venv/bin/python -m pytest -q --run-integration tests/test_research_store.py
 .venv/bin/python -m eval.research_benchmark --precompute
 .venv/bin/python -m eval.research_benchmark
 .venv/bin/python -m eval.research_demo
@@ -113,6 +114,11 @@ The benchmark caches the 225 actual validation outcomes in the ignored local fil
 `output/research/oracle.json`. This is evaluator-only data. Each policy receives only the
 measurements it has selected. No test run is parsed or scored by the benchmark. A protocol
 change invalidates the cache.
+
+The previous local cache and run logs were preserved under
+`archive/2026-09-26/output/research/`. To reuse that cache, copy `oracle.json` back
+to `output/research/oracle.json` before running the benchmark. These large local
+outputs are not part of the Git checkout or dashboard deployment.
 
 Four arms compare the current planner, hybrid shortlist planner, numerical optimizer and
 seeded random search. Each uses a budget of ten, the same three initial configurations for

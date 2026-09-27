@@ -59,7 +59,8 @@ for(let i=0;i<deck.slides.length;i++){
  const layout=await slide.export({format:'layout'});await fs.writeFile(path.join(build,'renders',`slide-${i+1}.json`),await layout.text());
  console.log('Rendered slide',i+1);
 }
-const finalPath=path.join(out,process.argv[2]||'Second-Shift-Neuro-AI.pptx');
+const finalPath=path.join(out,process.argv[2]||'Second-Shift-Neuro-AI-Rebuilt.pptx');
+const referencePath=path.join(root,'archive/2026-09-26/presentation/delivery/Second-Shift-Neuro-AI.pptx');
 const result=await finalizePresentation({
  workspaceDir:root,candidatePath:candidate,finalPath,
  explicitTotalSlideCount:6,requiredNativeChartOwnerSlides:[2],requiredNativeTableOwnerSlides:[],materializeLiteralChartWorkbooks:true,
@@ -67,7 +68,7 @@ const result=await finalizePresentation({
  integrityValidatorPath:path.join(SKILL,'container_tools/inspect_presentation_package_integrity.py'),
  layoutValidatorPath:path.join(SKILL,'container_tools/inspect_presentation_layout_geometry.py'),
  layoutArgs:['--expected-slide-size-emu','12192000,6858000','--validate-heading-fit'],
- fontPolicy:{basis:'reference',families:['Space Grotesk','Source Sans 3'],referencePath:path.join(out,'Second-Shift-Neuro-AI.pptx'),referenceSha256:createHash('sha256').update(await fs.readFile(path.join(out,'Second-Shift-Neuro-AI.pptx'))).digest('hex')},verifyArtifactToolImport:true,
+ fontPolicy:{basis:'reference',families:['Space Grotesk','Source Sans 3'],referencePath,referenceSha256:createHash('sha256').update(await fs.readFile(referencePath)).digest('hex')},verifyArtifactToolImport:true,
  receiptPath:path.join(build,path.basename(finalPath)+'.validation.json')
 });
 console.log(JSON.stringify(result,null,2));

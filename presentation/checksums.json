@@ -1,0 +1,230 @@
+{
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "presentation/Second-Shift-Presentation-Aligned.zip",
+      "sha256": "b455347b5b04c57662650d00df3ac94b20237a695550f8ae7a30638fd0c2497a",
+      "bytes": 19583394
+    },
+    {
+      "path": "presentation/delivery/Second-Shift-Neuro-AI-Aligned.pptx",
+      "sha256": "bdd3a57d0299429080c046aa9d21b8ad13e04a3ba8e5b8f86d6e2e430d9ed1a7",
+      "bytes": 2563316
+    },
+    {
+      "path": "presentation/delivery/assets/brain-hero-alpha.png",
+      "sha256": "8c1860739ebb334e2a79e48d53303865375ceec50e845642fbe9879087bda85c",
+      "bytes": 1402768
+    },
+    {
+      "path": "presentation/delivery/assets/brain-memory-alpha.png",
+      "sha256": "646ea996153defd9d4090717046c5fa50d22b5b43fce49040cede7859ef1bbac",
+      "bytes": 1146401
+    },
+    {
+      "path": "presentation/delivery/assets/fonts/SourceSans3-400.ttf",
+      "sha256": "b6f2cc8d9905e97b5cd7a294367bb529814385f299fb23057060394cbd6bbffb",
+      "bytes": 234708
+    },
+    {
+      "path": "presentation/delivery/assets/fonts/SourceSans3-500.ttf",
+      "sha256": "3772689bdef0cd284428994189d89d1fd412591e8906fb5bd0c4692a3314cbe7",
+      "bytes": 234496
+    },
+    {
+      "path": "presentation/delivery/assets/fonts/SourceSans3-600.ttf",
+      "sha256": "26efb7fbad9540df2595fe867a37e454d22973b9e37816d263fdc5295cb084bb",
+      "bytes": 234680
+    },
+    {
+      "path": "presentation/delivery/assets/fonts/SpaceGrotesk-400.ttf",
+      "sha256": "ec926d5065eaca49a48f96e312bbae0bbc5733c24215cf5dfabbdccee926fef7",
+      "bytes": 69360
+    },
+    {
+      "path": "presentation/delivery/assets/fonts/SpaceGrotesk-500.ttf",
+      "sha256": "3e699ead1876244fa392243054ddefe7cf631b488438828a8a100731a22ab995",
+      "bytes": 69416
+    },
+    {
+      "path": "presentation/delivery/assets/fonts/SpaceGrotesk-600.ttf",
+      "sha256": "6c0346b8d297ebdc225832833e03e884a26ad99d265ecd3924d46e1ba285ea87",
+      "bytes": 69356
+    },
+    {
+      "path": "presentation/delivery/assets/fonts/SpaceGrotesk-700.ttf",
+      "sha256": "3e756954468ff1cb302dae0414262e72f76a67d87bef3fa1f3226cd0fb9b2d85",
+      "bytes": 69308
+    },
+    {
+      "path": "presentation/delivery/assets/mongodb.ico",
+      "sha256": "1143ff8a5619ad9d016e3d94462f44ae9047ab4ac4c39722d265c88961591a1a",
+      "bytes": 32988
+    },
+    {
+      "path": "presentation/delivery/assets/second-shift.svg",
+      "sha256": "dae62bf8ca3873b89e3c20270dbf16f87f651fea14f4dda63e4719fd07e589cc",
+      "bytes": 226
+    },
+    {
+      "path": "presentation/delivery/media/second-shift-neuroai-90s-zoom-music.mp4",
+      "bytes": 30701178,
+      "sha256": "51e5badc6725cdbc452f15ff7aaa1fcf351f6181be05cfd8abaf34b5a1653122"
+    },
+    {
+      "path": "presentation/delivery/media/second-shift-neuroai-90s.mp4",
+      "sha256": "c1b041371d99985fc875ba9d18731fdf104ac7ee78f77cd7510323cc7a339d37",
+      "bytes": 14158278
+    },
+    {
+      "path": "presentation/delivery/preview.png",
+      "sha256": "b27e35704311a125f5b773b309f9713f0edd6c412cc1903cc13c95ceb372432f",
+      "bytes": 781815
+    },
+    {
+      "path": "presentation/harness-demo/evidence/arrow.png",
+      "sha256": "58af93e5c2a16747f74e63f9d616dca90317a2562579e51875d18605379714b8",
+      "bytes": 1161
+    },
+    {
+      "path": "presentation/harness-demo/evidence/cut-1.jpg",
+      "sha256": "4ac87d39d606b5b02ab0cffac5ce67c3c7499e9a5b63956bff5352713d83ff85",
+      "bytes": 127439
+    },
+    {
+      "path": "presentation/harness-demo/evidence/cut-2.jpg",
+      "sha256": "e78097a09365eaec23ab461ecb45c16681851b2b5daec97eb48efa899e25e1ab",
+      "bytes": 134274
+    },
+    {
+      "path": "presentation/harness-demo/evidence/cut-3.jpg",
+      "sha256": "adbc9d5a299cda3efdc6dab2d20ce89d12f37875fca7308e0b0f2b39343d161f",
+      "bytes": 130721
+    },
+    {
+      "path": "presentation/harness-demo/evidence/cut-4.jpg",
+      "sha256": "8fef2694f7d523e58882fff4b744290f5360dd50fd6693ec8a725afac2fe52c2",
+      "bytes": 118876
+    },
+    {
+      "path": "presentation/harness-demo/evidence/cut-5.jpg",
+      "sha256": "bf101187dee629ccd7f216faab1f6a5f4062f50bf920ba814fbbf75851be0531",
+      "bytes": 117365
+    },
+    {
+      "path": "presentation/harness-demo/evidence/muted-review-1.jpg",
+      "sha256": "3fa0286a757e92c29af32d226c347d2185e3e58c3485afa8b41ce1a24c3888f5",
+      "bytes": 312109
+    },
+    {
+      "path": "presentation/harness-demo/evidence/muted-review-2.jpg",
+      "sha256": "b79808ce027f14460dd93d531b31c2bc0a6b7cbc5a85800125b7643048d3a048",
+      "bytes": 304951
+    },
+    {
+      "path": "presentation/harness-demo/evidence/muted-review-3.jpg",
+      "sha256": "96b596a9c42190d47a4d1c0939aed603acace65a40b57baf239816c2413065f9",
+      "bytes": 309009
+    },
+    {
+      "path": "presentation/harness-demo/narration.wav",
+      "sha256": "909c3a16c9033402fcc718ac5613fa09c55943c21a482b464a033ad91aad587b",
+      "bytes": 11443278
+    },
+    {
+      "path": "presentation/harness-demo/raw-continuous.webm",
+      "sha256": "998437766c861936d6648e4f7a5c99a3ee3c9ac2262a6c1b03c67961b2879e1c",
+      "bytes": 14302996
+    },
+    {
+      "path": "presentation/harness-demo/second-shift-harness.mp4",
+      "sha256": "53cc94d03487a0c946667bfaf6983d4d3b0be8ab755dbb0145ca7596187b2be8",
+      "bytes": 8621661
+    },
+    {
+      "path": "presentation/neuroscience-demo/evidence/cut-1.jpg",
+      "sha256": "f2ec5d3c015a32b7f0f26796b9ff1cc8e084672c018cf3207108c1a0cc2e009d",
+      "bytes": 114112
+    },
+    {
+      "path": "presentation/neuroscience-demo/evidence/cut-2.jpg",
+      "sha256": "d66356f31de35c25233fb182b3aa276ace4d19765f3797145af47e5c291ee914",
+      "bytes": 118844
+    },
+    {
+      "path": "presentation/neuroscience-demo/evidence/cut-3.jpg",
+      "sha256": "6cde5d592ee3d1d59e8d26686d1088d357b33794436af83e33c1a4e6f4019214",
+      "bytes": 133993
+    },
+    {
+      "path": "presentation/neuroscience-demo/evidence/cut-4.jpg",
+      "sha256": "0e5d1a3b0e87313959c219a86867db5e10db3d614931f83c7f3ab889e4238859",
+      "bytes": 129869
+    },
+    {
+      "path": "presentation/neuroscience-demo/evidence/cut-5.jpg",
+      "sha256": "1abb8c4e38de1dc5e00cb1614d582aafd115146ce3a41a720ae5ac34d1d4c250",
+      "bytes": 117657
+    },
+    {
+      "path": "presentation/neuroscience-demo/evidence/cut-6.jpg",
+      "sha256": "cd3276b67ed81a577bfa4060a1c69ddde87bb7d0436e65d85cbfa43cabcdac25",
+      "bytes": 103446
+    },
+    {
+      "path": "presentation/neuroscience-demo/evidence/muted-review-1.jpg",
+      "sha256": "a2f7de06c9620e216705a3219938b701bbfb6c56243c4e18161691996d883280",
+      "bytes": 311330
+    },
+    {
+      "path": "presentation/neuroscience-demo/evidence/muted-review-2.jpg",
+      "sha256": "a6861e285279ade782b0d87e11566e7caffc11688d3ee0ed92964e8037d53b5a",
+      "bytes": 308905
+    },
+    {
+      "path": "presentation/neuroscience-demo/evidence/muted-review-3.jpg",
+      "sha256": "2796cd2e3739a8c4f1e6e18dd09e00baa44c1bce4613fbfea641777d6f59d0b6",
+      "bytes": 307883
+    },
+    {
+      "path": "presentation/neuroscience-demo/narration.wav",
+      "sha256": "e8d244e32669e9a6e457bd2ff4a994b683c0ee29d79b944d82b831bcbd76e074",
+      "bytes": 11443278
+    },
+    {
+      "path": "presentation/neuroscience-demo/second-shift-neuroscience.mp4",
+      "sha256": "8c54667b72c718c8100b8375ccc14aea12d5ac7788e933e96d9aa6a9bcc503c7",
+      "bytes": 8284644
+    },
+    {
+      "path": "presentation/product-demo/narration.wav",
+      "sha256": "db208d7a2cf9b26e8d9074b7d888e3780a2c26809e099197df654ce04dee7d28",
+      "bytes": 11443278
+    },
+    {
+      "path": "presentation/product-demo/preview.png",
+      "sha256": "c54745b68e5645668600d468773b208f5c3a20696d8cb2f1f92e749e9666b44d",
+      "bytes": 298225
+    },
+    {
+      "path": "presentation/product-demo/raw-continuous.webm",
+      "sha256": "5d8a48daf1f284ea8bae92e5c0291cf0367b794d4013c0b5876e54e0f322edc5",
+      "bytes": 15888941
+    },
+    {
+      "path": "presentation/product-demo/second-shift-demo.mp4",
+      "sha256": "41fb8efa4c7ed83a65fe2e3c2f87fc5d8b1b2bf8859140dfce58e0bb3cc678f3",
+      "bytes": 8488332
+    },
+    {
+      "path": "presentation/second-shift-neuroai-90s-zoom-music.mp4",
+      "sha256": "51e5badc6725cdbc452f15ff7aaa1fcf351f6181be05cfd8abaf34b5a1653122",
+      "bytes": 30701178
+    },
+    {
+      "path": "presentation/second-shift-neuroai-90s.mp4",
+      "sha256": "c1b041371d99985fc875ba9d18731fdf104ac7ee78f77cd7510323cc7a339d37",
+      "bytes": 14158278
+    }
+  ]
+}

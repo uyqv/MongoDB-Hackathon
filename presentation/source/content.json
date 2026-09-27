@@ -1381,7 +1381,7 @@
           "y": 0,
           "w": 1920,
           "h": 1080,
-          "src": "media/second-shift-neuroai-90s.mp4"
+          "src": "media/second-shift-neuroai-90s-zoom-music.mp4"
         },
         {
           "type": "text",
@@ -1781,6 +1781,6 @@
   "targetSeconds": 175,
   "reserveSeconds": 5,
   "demoSeconds": 90,
-  "demoFile": "media/second-shift-neuroai-90s.mp4",
+  "demoFile": "media/second-shift-neuroai-90s-zoom-music.mp4",
   "demoReady": true
 }

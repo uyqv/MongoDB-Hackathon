@@ -6,8 +6,7 @@ import pytest
 from harness import store
 from harness.db import get_db
 
-pytestmark = pytest.mark.skipif(not os.environ.get("MONGODB_URI") and not os.path.exists(".env"),
-                                reason="needs Atlas")
+pytestmark = pytest.mark.integration
 
 CSP9 = {"method": "csp_lda", "band": "broad_8_30", "window": "w1.0_3.0", "channels": "central9", "n_components": 4}
 CSP64 = {**CSP9, "channels": "all64"}

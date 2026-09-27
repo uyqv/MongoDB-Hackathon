@@ -3,8 +3,8 @@
     python scripts/video/tts_elevenlabs.py [voice_id]
 
 One continuous generation keeps the delivery natural. The character alignment
-then gives each scene's exact start and end, which edit.py uses to time the
-footage. Writes run/video/voice/narration.wav and timeline.json.
+then gives each scene's exact start and end for the editing scripts.
+Writes run/video-v6/voice-new/narration.wav and timeline.json by default.
 Key: ELEVENLABS_API_KEY in .env.
 """
 import base64
@@ -20,7 +20,7 @@ from dotenv import dotenv_values
 KEY = dotenv_values(".env")["ELEVENLABS_API_KEY"]
 VOICE = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("VIDEO_VOICE_ID", "ypfAZhVeE0hhj0A5eGdR")
 MODEL = "eleven_v3"
-OUT = Path(os.environ.get("VIDEO_VOICE_DIR", "run/video/voice"))
+OUT = Path(os.environ.get("VIDEO_VOICE_DIR", "run/video-v6/voice-new"))
 SCENES = json.loads(Path(os.environ.get("VIDEO_SCRIPT", "scripts/video/narration.json")).read_text())
 
 

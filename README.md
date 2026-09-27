@@ -2,7 +2,18 @@
 
 **A neuroscience harness that lets an agent lose its working context, or its whole process, without losing the research campaign.**
 
-Built today (September 26, 2026) at the MongoDB x Cerebral Valley Harness Engineering hackathon, Problem Statement 2: Long Horizon Engineering.
+Originally built on September 26, 2026 at the MongoDB x Cerebral Valley Harness Engineering hackathon, Problem Statement 2: Long Horizon Engineering.
+
+## Repository guide
+
+- `api/`, `harness/`, `web/`: dashboard, worker, and research engine.
+- `artifacts/`: versioned recorded campaigns and EEG preview for the public dashboard.
+- `presentation/`: final presentation, all delivered demo videos, and current rebuild sources. Start with [the delivery guide](presentation/README.md).
+- `eval/`, `tests/`: measured evidence, reproducible evaluations, and automated tests.
+- `docs/`: current contracts, research policy, demo runbook, and deployment instructions.
+- `archive/2026-09-26/`: superseded plans, exports, scripts, design experiments, and working captures. [Archive inventory and restoration](archive/README.md).
+
+The public release is a **read-only recorded dashboard**. See [release checks and operational limits](docs/PRODUCTION_READINESS.md) before enabling live operation.
 
 Long running agents forget why they ran old experiments, rerun work they already paid for, and keep optimizing against goals that changed hours ago. Second Shift keeps the campaign in MongoDB Atlas and rebuilds every decision from durable evidence, so the model's context window can be thrown away after each step.
 
@@ -19,7 +30,7 @@ The reference workload is a real one: classifying imagined movement (both fists 
 
 ![Dashboard after a real campaign: fault injection and restart, context reset, channel budget cut from 64 to 9, sealed test scored once](docs/dashboard.png)
 
-## Measured today
+## Measured at the hackathon
 
 All numbers below come from real runs against real PhysioNet data and our Atlas Sandbox cluster. Nothing is simulated except where labeled.
 
@@ -63,7 +74,7 @@ Raw output for both is in `eval/checks.json`.
 
 The whole gap comes from one scenario. In `buried_best_eligible`, the best result allowed under the new 9 channel limit sat outside the recent window: `evidence` cited it 3 of 3 times, `recent_window` 0 of 3. The evidence reached the model through an exact read, not through Vector Search. In `buried_failure`, the evidence packet contained the buried bad result but the model cited it 0 of 3 times; neither strategy repeated that bad configuration family. The other three scenarios tied at 3 of 3. The evidence packet costs about 26% more input tokens. This is a demo scale check (n = 15 per strategy), not a benchmark.
 
-An earlier run of this comparison is kept in `eval/results_run1_invalid.json` and does not count: the packet then listed tried experiments only as hashes, so the model re-proposed tried configurations and 15 of 30 decisions fell back. Fixing that is what made this run valid.
+An earlier run of this comparison is kept in `archive/2026-09-26/eval/results_run1_invalid.json` and does not count: the packet then listed tried experiments only as hashes, so the model re-proposed tried configurations and 15 of 30 decisions fell back. Fixing that is what made this run valid.
 
 ## How it works
 
@@ -128,6 +139,16 @@ flowchart LR
 shows a labeled snapshot of real Atlas campaigns, with a capture timestamp.
 See [Vercel deployment](docs/VERCEL_DEPLOYMENT.md) for Git deployment and refresh instructions.
 
+For the recorded dashboard, no credentials or EEG download are needed:
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+DASHBOARD_DATA_MODE=snapshot DASHBOARD_READ_ONLY=1 .venv/bin/uvicorn api.main:app --host 127.0.0.1 --port 8000
+```
+
+For live research and local operator controls:
+
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements-worker.txt
 cp .env.example .env          # MONGODB_URI, OPENROUTER_API_KEY, VOYAGE_API_KEY, DB_NAME=second_shift
@@ -136,10 +157,26 @@ cp .env.example .env          # MONGODB_URI, OPENROUTER_API_KEY, VOYAGE_API_KEY,
 .venv/bin/python -m harness.worker --new --mode demo --budget 10 # run a campaign
 .venv/bin/uvicorn api.main:app --port 8000                      # dashboard at http://localhost:8000
 .venv/bin/python -m eval.demo_checks all                        # recovery + constraint checks
-.venv/bin/python -m pytest -q
 ```
 
 The EEG files (about 39 MB for subjects 1 to 5) download from PhysioNet on first run.
+
+Validate changes locally (the default test suite does not need Atlas):
+
+```bash
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python -m pytest -q
+node --test tests/test_live_state.mjs
+.venv/bin/python scripts/check_release.py
+```
+
+Database integration tests are explicit because they create and remove test data:
+
+```bash
+DB_NAME=second_shift_david .venv/bin/python -m pytest -q --run-integration
+```
+
+Use a test Atlas cluster for that command. Optional paid-provider tests still require `LIVE=1`.
 
 ## What we do not claim
 
@@ -152,7 +189,7 @@ The EEG files (about 39 MB for subjects 1 to 5) download from PhysioNet on first
 
 EEG data: Schalk G., McFarland D.J., Hinterberger T., Birbaumer N., Wolpaw J.R. (2004). BCI2000: A General-Purpose Brain-Computer Interface (BCI) System. IEEE Transactions on Biomedical Engineering 51(6):1034 to 1043. Distributed by PhysioNet (DOI 10.13026/C28G6P) under the Open Data Commons Attribution License. Full credits, including MNE-Python, scikit-learn, Voyage AI, OpenRouter and MongoDB Atlas, are in `docs/ATTRIBUTION.md`.
 
-The harness, EEG adapter, tests and dashboard in this repository are our original work from today.
+The harness, EEG adapter, tests and dashboard in this repository are original work from the hackathon.
 
 ## Team
 

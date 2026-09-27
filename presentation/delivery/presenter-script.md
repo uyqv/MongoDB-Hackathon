@@ -85,4 +85,4 @@ These times are relative to the video, not the presentation clock. Let the recor
 4. Keep these notes on a second device or printed page. The browser's N shortcut shows notes on the projected screen.
 5. Start the movie at 0:50. Stay silent during its narration. At 2:20, move to slide 5 and finish by 2:55.
 
-If playback fails, open `media/second-shift-neuroai-90s.mp4` directly. The PowerPoint backup uses the same script and requires the accompanying MP4 in a separate player.
+If playback fails, open `media/second-shift-neuroai-90s-zoom-music.mp4` directly. The PowerPoint backup uses the same script and requires the accompanying MP4 in a separate player.

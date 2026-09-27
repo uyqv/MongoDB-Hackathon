@@ -13,7 +13,7 @@ from harness.db import get_db
 from harness.worker import Worker, fallback_plan
 from tests.test_research import measurement, predictions
 
-pytestmark = pytest.mark.skipif(not os.environ.get("MONGODB_URI") and not Path(".env").exists(), reason="needs Atlas")
+pytestmark = pytest.mark.integration
 
 
 @pytest.fixture
